@@ -1,0 +1,11 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /{allPaths=**} {
+      // WARNING: This allows anyone to upload and delete files.
+      // For a personal portfolio, this is okay for now.
+      allow read, write: if true;
+    }
+  }
+}
