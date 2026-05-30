@@ -122,9 +122,23 @@ export function PortfolioProvider({ children }) {
   const uploadFile = async (file, folderPath) => {
     if (!file) return null;
     const fileRef = ref(storage, `${folderPath}/${Date.now()}_${file.name}`);
-    const metadata = {
-      contentType: file.type || 'application/octet-stream'
-    };
+    
+    // Detect content type robustly, especially for PDFs
+    let contentType = file.type;
+    if (!contentType) {
+      const ext = file.name.split('.').pop().toLowerCase();
+      if (ext === 'pdf') {
+        contentType = 'application/pdf';
+      } else if (['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg'].includes(ext)) {
+        contentType = `image/${ext === 'jpg' ? 'jpeg' : ext === 'svg' ? 'svg+xml' : ext}`;
+      } else if (['mp4', 'webm', 'ogg'].includes(ext)) {
+        contentType = `video/${ext}`;
+      } else {
+        contentType = 'application/octet-stream';
+      }
+    }
+
+    const metadata = { contentType };
     await uploadBytes(fileRef, file, metadata);
     return await getDownloadURL(fileRef);
   };
