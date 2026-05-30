@@ -6,59 +6,89 @@ export default function ProjectEditor() {
   const { projects, addProject, updateProject, deleteProject, uploadFile } = usePortfolio();
   const [editingId, setEditingId] = useState(null);
 
-  const [formData, setFormData] = useState({ title: '', tags: '', iconType: 'Code' });
+  const [formData, setFormData] = useState({
+    title: '',
+    tags: '',
+    iconType: 'Code',
+    problem: '',
+    solution: '',
+    result: '',
+    thumbnailUrl: ''
+  });
+  const [thumbnailFile, setThumbnailFile] = useState(null);
   const [blocks, setBlocks] = useState([]);
+  const [uploading, setUploading] = useState(false);
 
   const handleEdit = (project) => {
     setEditingId(project.id);
     setFormData({
       title: project.title,
       tags: project.tags.join(', '),
-      iconType: project.iconType
+      iconType: project.iconType,
+      problem: project.problem || '',
+      solution: project.solution || '',
+      result: project.result || '',
+      thumbnailUrl: project.thumbnailUrl || ''
     });
     setBlocks(project.blocks || []);
+    setThumbnailFile(null);
     window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
   };
-
-  const [uploading, setUploading] = useState(false);
 
   const handleSave = async (e) => {
     e.preventDefault();
     setUploading(true);
     
-    // Process blocks to handle file uploads
-    const processedBlocks = await Promise.all(blocks.map(async (block) => {
-      if (block.type === 'media' && block.file) {
-        const url = await uploadFile(block.file, 'project_media');
-        // Return block without the file object
-        const { file, ...rest } = block;
-        return { ...rest, url };
+    try {
+      // Process blocks to handle file uploads
+      const processedBlocks = await Promise.all(blocks.map(async (block) => {
+        if (block.type === 'media' && block.file) {
+          const url = await uploadFile(block.file, 'project_media');
+          // Return block without the file object
+          const { file, ...rest } = block;
+          return { ...rest, url };
+        }
+        return block;
+      }));
+
+      let finalThumbnailUrl = formData.thumbnailUrl;
+      if (thumbnailFile) {
+        finalThumbnailUrl = await uploadFile(thumbnailFile, 'project_thumbnails');
       }
-      return block;
-    }));
 
-    const data = {
-      title: formData.title,
-      tags: formData.tags.split(',').map(s => s.trim()).filter(s => s),
-      iconType: formData.iconType,
-      blocks: processedBlocks
-    };
+      const data = {
+        title: formData.title,
+        tags: formData.tags.split(',').map(s => s.trim()).filter(s => s),
+        iconType: formData.iconType,
+        problem: formData.problem,
+        solution: formData.solution,
+        result: formData.result,
+        thumbnailUrl: finalThumbnailUrl,
+        blocks: processedBlocks
+      };
 
-    if (editingId) {
-      await updateProject(editingId, data);
-      setEditingId(null);
-    } else {
-      await addProject(data);
+      if (editingId) {
+        await updateProject(editingId, data);
+        setEditingId(null);
+      } else {
+        await addProject(data);
+      }
+      setFormData({ title: '', tags: '', iconType: 'Code', problem: '', solution: '', result: '', thumbnailUrl: '' });
+      setBlocks([]);
+      setThumbnailFile(null);
+    } catch (err) {
+      console.error("Error saving project:", err);
+      alert("Error saving project. Check console.");
+    } finally {
+      setUploading(false);
     }
-    setFormData({ title: '', tags: '', iconType: 'Code' });
-    setBlocks([]);
-    setUploading(false);
   };
 
   const cancelEdit = () => {
     setEditingId(null);
-    setFormData({ title: '', tags: '', iconType: 'Code' });
+    setFormData({ title: '', tags: '', iconType: 'Code', problem: '', solution: '', result: '', thumbnailUrl: '' });
     setBlocks([]);
+    setThumbnailFile(null);
   };
 
   const addBlock = (type) => {
@@ -97,7 +127,7 @@ export default function ProjectEditor() {
         {projects.length === 0 ? <p style={{ color: 'var(--text-muted)' }}>No projects found. Add one below.</p> : (
           <ul style={{ listStyle: 'none', padding: 0 }}>
             {(projects || []).map(p => (
-              <li key={p.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 'var(--spacing-sm)', borderBottom: '1px solid var(--border-glass)' }}>
+              <li key={p.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 'var(--spacing-sm)', borderBottom: '1px solid var(--border-subtle)' }}>
                 <span>{p.title} <span className="mono" style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>({(p.tags || []).join(', ')})</span></span>
                 <div style={{ display: 'flex', gap: '8px' }}>
                   <button onClick={() => handleEdit(p)} style={{ background: 'transparent', border: 'none', color: 'var(--accent-primary)', cursor: 'pointer' }}><Edit size={18} /></button>
@@ -110,8 +140,8 @@ export default function ProjectEditor() {
       </div>
 
       {/* Add / Edit Form */}
-      <div style={{ background: 'rgba(0,0,0,0.2)', padding: 'var(--spacing-md)', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-glass)' }}>
-        <h3 style={{ marginBottom: 'var(--spacing-md)', fontSize: '1.2rem' }}>{editingId ? 'Edit Project Notebook' : 'Create New Project Notebook'}</h3>
+      <div style={{ background: 'rgba(0,0,0,0.2)', padding: 'var(--spacing-md)', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)' }}>
+        <h3 style={{ marginBottom: 'var(--spacing-md)', fontSize: '1.2rem' }}>{editingId ? 'Edit Project Case Study' : 'Create New Project Case Study'}</h3>
         
         <form onSubmit={handleSave}>
           {/* Basic Details */}
@@ -137,14 +167,45 @@ export default function ProjectEditor() {
             </div>
           </div>
 
+          {/* Case Study Details */}
+          <div className="form-group" style={{ marginTop: 'var(--spacing-md)' }}>
+            <label className="form-label">Featured Case Study Image (URL or Upload)</label>
+            <div style={{ display: 'flex', gap: 'var(--spacing-sm)', alignItems: 'center' }}>
+              <input type="url" className="form-input" placeholder="https://..." value={formData.thumbnailUrl} onChange={e => setFormData({...formData, thumbnailUrl: e.target.value})} disabled={!!thumbnailFile} />
+              <span style={{ color: 'var(--text-secondary)' }}>OR</span>
+              <label className="btn-primary" style={{ background: 'var(--bg-glass)', border: '1px solid var(--border-subtle)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', padding: '0.6rem 1rem', whiteSpace: 'nowrap' }}>
+                <UploadCloud size={18} /> {thumbnailFile ? thumbnailFile.name : 'Upload Thumbnail'}
+                <input type="file" style={{ display: 'none' }} accept="image/*" onChange={e => setThumbnailFile(e.target.files[0])} />
+              </label>
+              {thumbnailFile && (
+                <button type="button" onClick={() => setThumbnailFile(null)} style={{ background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer', fontSize: '0.8rem' }}>Clear</button>
+              )}
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">The Problem (El Problema)</label>
+            <textarea className="form-input" rows="3" placeholder="Describe the challenges or requirements..." value={formData.problem} onChange={e => setFormData({...formData, problem: e.target.value})} />
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">The Solution (La Solución)</label>
+            <textarea className="form-input" rows="3" placeholder="Describe how you solved it..." value={formData.solution} onChange={e => setFormData({...formData, solution: e.target.value})} />
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">The Result (El Resultado)</label>
+            <textarea className="form-input" rows="3" placeholder="Describe the measurable outcome, metrics or impact..." value={formData.result} onChange={e => setFormData({...formData, result: e.target.value})} />
+          </div>
+
           {/* Block Editor Section */}
-          <div style={{ marginTop: 'var(--spacing-xl)', borderTop: '1px solid var(--border-glass)', paddingTop: 'var(--spacing-md)' }}>
-            <h4 style={{ marginBottom: 'var(--spacing-md)' }}>Notebook Content Blocks</h4>
+          <div style={{ marginTop: 'var(--spacing-xl)', borderTop: '1px solid var(--border-subtle)', paddingTop: 'var(--spacing-md)' }}>
+            <h4 style={{ marginBottom: 'var(--spacing-md)' }}>Notebook Content Blocks (Optional Detailed Case View)</h4>
             
             {blocks.map((block, index) => (
-              <div key={block.id} style={{ background: 'var(--bg-secondary)', padding: 'var(--spacing-md)', borderRadius: 'var(--radius-md)', marginBottom: 'var(--spacing-md)', border: '1px solid var(--border-glass)', position: 'relative' }}>
+              <div key={block.id} style={{ background: 'var(--bg-secondary)', padding: 'var(--spacing-md)', borderRadius: 'var(--radius-md)', marginBottom: 'var(--spacing-md)', border: '1px solid var(--border-subtle)', position: 'relative' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 'var(--spacing-sm)' }}>
-                  <span style={{ fontSize: '0.8rem', color: 'var(--accent-secondary)', textTransform: 'uppercase', fontWeight: 'bold' }}>{block.type} BLOCK</span>
+                  <span style={{ fontSize: '0.8rem', color: 'var(--accent-primary)', textTransform: 'uppercase', fontWeight: 'bold' }}>{block.type} BLOCK</span>
                   <div style={{ display: 'flex', gap: '8px' }}>
                     <button type="button" onClick={() => moveBlock(index, -1)} style={{ background: 'transparent', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}><ArrowUp size={16} /></button>
                     <button type="button" onClick={() => moveBlock(index, 1)} style={{ background: 'transparent', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}><ArrowDown size={16} /></button>
@@ -180,7 +241,7 @@ export default function ProjectEditor() {
                     <div style={{ display: 'flex', gap: 'var(--spacing-sm)', alignItems: 'center', marginBottom: 'var(--spacing-sm)' }}>
                       <input type="url" className="form-input" placeholder="https://..." value={block.url || ''} onChange={(e) => updateBlock(block.id, 'url', e.target.value)} disabled={!!block.file} />
                       <span style={{ color: 'var(--text-secondary)' }}>OR</span>
-                      <label className="btn-primary" style={{ background: 'var(--bg-glass)', border: '1px solid var(--border-glass)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', padding: '0.6rem 1rem', whiteSpace: 'nowrap' }}>
+                      <label className="btn-primary" style={{ background: 'var(--bg-glass)', border: '1px solid var(--border-subtle)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', padding: '0.6rem 1rem', whiteSpace: 'nowrap', fontSize: '0.85rem' }}>
                         <UploadCloud size={18} /> {block.file ? block.file.name : 'Upload File'}
                         <input type="file" style={{ display: 'none' }} accept={block.mediaType === 'pdf' ? '.pdf' : block.mediaType === 'image' ? 'image/*' : 'video/*'} onChange={(e) => updateBlock(block.id, 'file', e.target.files[0])} />
                       </label>
@@ -203,19 +264,19 @@ export default function ProjectEditor() {
             ))}
 
             <div style={{ display: 'flex', gap: 'var(--spacing-md)', flexWrap: 'wrap', marginTop: 'var(--spacing-md)' }}>
-              <button type="button" className="btn-primary" style={{ background: 'rgba(255,255,255,0.1)' }} onClick={() => addBlock('text')}><Plus size={16} /> Add Text</button>
-              <button type="button" className="btn-primary" style={{ background: 'rgba(255,255,255,0.1)' }} onClick={() => addBlock('code')}><Plus size={16} /> Add Code</button>
-              <button type="button" className="btn-primary" style={{ background: 'rgba(255,255,255,0.1)' }} onClick={() => addBlock('media')}><Plus size={16} /> Add Media/PDF</button>
-              <button type="button" className="btn-primary" style={{ background: 'rgba(255,255,255,0.1)' }} onClick={() => addBlock('link')}><Plus size={16} /> Add Link</button>
+              <button type="button" className="btn-primary" style={{ background: 'rgba(255,255,255,0.04)', borderColor: 'var(--border-subtle)', fontSize: '0.85rem' }} onClick={() => addBlock('text')}><Plus size={16} /> Add Text</button>
+              <button type="button" className="btn-primary" style={{ background: 'rgba(255,255,255,0.04)', borderColor: 'var(--border-subtle)', fontSize: '0.85rem' }} onClick={() => addBlock('code')}><Plus size={16} /> Add Code</button>
+              <button type="button" className="btn-primary" style={{ background: 'rgba(255,255,255,0.04)', borderColor: 'var(--border-subtle)', fontSize: '0.85rem' }} onClick={() => addBlock('media')}><Plus size={16} /> Add Media/PDF</button>
+              <button type="button" className="btn-primary" style={{ background: 'rgba(255,255,255,0.04)', borderColor: 'var(--border-subtle)', fontSize: '0.85rem' }} onClick={() => addBlock('link')}><Plus size={16} /> Add Link</button>
             </div>
           </div>
 
-          <div style={{ display: 'flex', gap: 'var(--spacing-sm)', marginTop: 'var(--spacing-2xl)', paddingTop: 'var(--spacing-md)', borderTop: '1px solid var(--border-glass)' }}>
+          <div style={{ display: 'flex', gap: 'var(--spacing-sm)', marginTop: 'var(--spacing-2xl)', paddingTop: 'var(--spacing-md)', borderTop: '1px solid var(--border-subtle)' }}>
             <button type="submit" className="btn-primary" disabled={uploading}>
-              <Save size={18} /> {uploading ? 'Saving & Uploading...' : (editingId ? 'Save Project Notebook' : 'Publish Project')}
+              <Save size={18} /> {uploading ? 'Saving & Uploading...' : (editingId ? 'Save Project Case Study' : 'Publish Project')}
             </button>
             {editingId && (
-              <button type="button" className="btn-primary" style={{ background: 'transparent', border: '1px solid var(--border-glass)', color: 'white' }} onClick={cancelEdit}>
+              <button type="button" className="btn-secondary" onClick={cancelEdit}>
                 Cancel
               </button>
             )}
