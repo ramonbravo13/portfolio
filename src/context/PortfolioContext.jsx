@@ -122,7 +122,10 @@ export function PortfolioProvider({ children }) {
   const uploadFile = async (file, folderPath) => {
     if (!file) return null;
     const fileRef = ref(storage, `${folderPath}/${Date.now()}_${file.name}`);
-    await uploadBytes(fileRef, file);
+    const metadata = {
+      contentType: file.type || 'application/octet-stream'
+    };
+    await uploadBytes(fileRef, file, metadata);
     return await getDownloadURL(fileRef);
   };
   
