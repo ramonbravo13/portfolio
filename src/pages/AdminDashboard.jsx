@@ -2,6 +2,7 @@ import { Link, Navigate } from 'react-router-dom';
 import { usePortfolio } from '../context/PortfolioContext';
 import { LogOut, Home as HomeIcon } from 'lucide-react';
 import ProfileEditor from '../components/Admin/ProfileEditor';
+import ExperienceEditor from '../components/Admin/ExperienceEditor';
 import ProjectEditor from '../components/Admin/ProjectEditor';
 
 export default function AdminDashboard() {
@@ -30,8 +31,9 @@ export default function AdminDashboard() {
 
       <main>
         <ProfileEditor />
+        <ExperienceEditor />
         <ProjectEditor />
       </main>
     </div>
-  )
+  );
 }

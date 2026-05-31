@@ -160,31 +160,6 @@ export default function Home() {
     setContactForm({ name: '', email: '', message: '' });
     setTimeout(() => setFormSubmitted(false), 5000);
   };
-
-  const experienceData = [
-    {
-      role: "Lead AI & Software Architect",
-      company: "Proyectos Empresariales & Consultoría",
-      period: "2023 - Presente",
-      tag: "Inteligencia Artificial y Transformación Digital",
-      desc: "Liderazgo técnico en la creación de arquitecturas de software empresarial e integración de modelos de lenguaje avanzados (LLMs) y pipelines de Ciencia de Datos para automatización."
-    },
-    {
-      role: "Senior Software Engineer & Tech Lead",
-      company: "Tech Development Corp",
-      period: "2019 - 2023",
-      tag: "Desarrollo de Software y Gestión de Proyectos",
-      desc: "Dirección de equipos de desarrollo ágiles para aplicaciones web robustas de alta escalabilidad. Diseño de APIs, integraciones y optimizaciones de infraestructura en la nube (AWS)."
-    },
-    {
-      role: "Data Scientist & Analytics Lead",
-      company: "Data Solutions Inc",
-      period: "2016 - 2019",
-      tag: "Ciencia de Datos y Soluciones Predictivas",
-      desc: "Extracción de insights estratégicos a partir de grandes volúmenes de datos. Desarrollo de modelos predictivos y entrenamiento de algoritmos de Machine Learning."
-    }
-  ];
-
   return (
     <div style={{ backgroundColor: 'var(--bg-primary)', minHeight: '100vh' }}>
       <Navbar />
@@ -390,7 +365,12 @@ export default function Home() {
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-xl)' }}>
-            {experienceData.map((item, idx) => (
+            {(profile.experiences || []).length === 0 ? (
+              <p style={{ color: 'var(--text-secondary)', textAlign: 'center', padding: 'var(--spacing-lg)' }}>
+                No se ha registrado experiencia profesional aún.
+              </p>
+            ) : (
+              (profile.experiences || []).map((item, idx) => (
               <div key={idx} className="premium-card" style={{
                 display: 'flex',
                 flexDirection: 'column',
@@ -414,7 +394,8 @@ export default function Home() {
                   {item.desc}
                 </p>
               </div>
-            ))}
+            ))
+            )}
           </div>
 
           {/* Certifications Box within Experience Section */}

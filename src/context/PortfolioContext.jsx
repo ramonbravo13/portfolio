@@ -12,7 +12,8 @@ export function PortfolioProvider({ children }) {
     profileImage: "",
     bio: "",
     skills: [],
-    certs: []
+    certs: [],
+    experiences: []
   });
 
   const [projects, setProjects] = useState([]);
@@ -33,6 +34,29 @@ export function PortfolioProvider({ children }) {
     certs: [
       { id: 1, title: 'AWS Certified Solutions Architect', url: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf' },
       { id: 2, title: 'Meta Front-End Developer', url: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf' }
+    ],
+    experiences: [
+      {
+        role: "Lead AI & Software Architect",
+        company: "Proyectos Empresariales & Consultoría",
+        period: "2023 - Presente",
+        tag: "Inteligencia Artificial y Transformación Digital",
+        desc: "Liderazgo técnico en la creación de arquitecturas de software empresarial e integración de modelos de lenguaje avanzados (LLMs) y pipelines de Ciencia de Datos para automatización."
+      },
+      {
+        role: "Senior Software Engineer & Tech Lead",
+        company: "Tech Development Corp",
+        period: "2019 - 2023",
+        tag: "Desarrollo de Software y Gestión de Proyectos",
+        desc: "Dirección de equipos de desarrollo ágiles para aplicaciones web robustas de alta escalabilidad. Diseño de APIs, integraciones y optimizaciones de infraestructura en la nube (AWS)."
+      },
+      {
+        role: "Data Scientist & Analytics Lead",
+        company: "Data Solutions Inc",
+        period: "2016 - 2019",
+        tag: "Ciencia de Datos y Soluciones Predictivas",
+        desc: "Extracción de insights estratégicos a partir de grandes volúmenes de datos. Desarrollo de modelos predictivos y entrenamiento de algoritmos de Machine Learning."
+      }
     ]
   };
 
@@ -64,7 +88,8 @@ export function PortfolioProvider({ children }) {
         setProfile({
           ...data,
           skills: data.skills || [],
-          certs: data.certs || []
+          certs: data.certs || [],
+          experiences: data.experiences || []
         });
       } else {
         // Fallback to default if somehow the doc is deleted
