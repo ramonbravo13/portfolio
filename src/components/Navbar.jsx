@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, Calendar, Edit, LogOut } from 'lucide-react';
+import { Menu, X, MessageCircle, Edit, LogOut } from 'lucide-react';
 import { usePortfolio } from '../context/PortfolioContext';
 
 export default function Navbar() {
@@ -112,9 +112,9 @@ export default function Navbar() {
               </>
             )}
             
-            <button onClick={() => handleNavClick('contacto')} className="btn-primary" style={{ padding: '0.5rem 1.25rem', fontSize: '0.85rem', borderRadius: 'var(--radius-sm)' }}>
-              <Calendar size={14} /> Agendar reunión
-            </button>
+            <a href="https://wa.me/523315004877" target="_blank" rel="noopener noreferrer" className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '0.5rem 1.25rem', fontSize: '0.85rem', borderRadius: 'var(--radius-sm)', textDecoration: 'none' }}>
+              <MessageCircle size={14} /> WhatsApp
+            </a>
           </div>
         </div>
 
@@ -180,9 +180,9 @@ export default function Navbar() {
               </>
             )}
 
-            <button onClick={() => handleNavClick('contacto')} className="btn-primary" style={{ justifyContent: 'center' }}>
-              <Calendar size={16} /> Agendar reunión
-            </button>
+            <a href="https://wa.me/523315004877" target="_blank" rel="noopener noreferrer" className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', justifyContent: 'center', textDecoration: 'none' }}>
+              <MessageCircle size={16} /> WhatsApp
+            </a>
           </div>
         </div>
       )}

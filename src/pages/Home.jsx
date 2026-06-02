@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { 
-  ArrowRight, Calendar, Code, Terminal, Database, Award, Rocket, 
+  ArrowRight, MessageCircle, Code, Terminal, Database, Award, Rocket, 
   Cpu, TrendingUp, Layers, Mail, Phone, MapPin, Briefcase 
 } from 'lucide-react';
 import CertificationViewer from '../components/CertificationViewer';
@@ -124,7 +124,7 @@ function CounterSection() {
   return (
     <div ref={sectionRef} style={{
       display: 'grid',
-      gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+      gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 220px), 1fr))',
       gap: 'var(--spacing-lg)',
       marginTop: 'var(--spacing-2xl)',
       marginBottom: 'var(--spacing-3xl)'
@@ -164,7 +164,7 @@ export default function Home() {
         {/* HERO SECTION */}
         <section id="inicio" style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))',
           gap: 'var(--spacing-2xl)',
           alignItems: 'center',
           minHeight: '80vh',
@@ -275,7 +275,7 @@ export default function Home() {
               return (
                 <div key={project.id} className="premium-card" style={{ 
                   display: 'grid', 
-                  gridTemplateColumns: project.thumbnailUrl ? 'repeat(auto-fit, minmax(320px, 1fr))' : '1fr',
+                  gridTemplateColumns: project.thumbnailUrl ? 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))' : '1fr',
                   gap: 'var(--spacing-2xl)',
                   padding: 'var(--spacing-2xl)',
                   borderRadius: 'var(--radius-lg)'
@@ -395,7 +395,7 @@ export default function Home() {
           {/* Certifications Box within Experience Section */}
           <div className="premium-card" style={{ marginTop: 'var(--spacing-2xl)', borderRadius: 'var(--radius-md)' }}>
             <h3 style={{ marginBottom: 'var(--spacing-lg)' }}>Certificaciones y Acreditaciones</h3>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 'var(--spacing-md)' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: 'var(--spacing-md)' }}>
               {(profile.certs || []).map((cert, idx) => (
                 <div key={idx} onClick={() => setSelectedCert(cert)} style={{
                   padding: 'var(--spacing-md)',
@@ -445,15 +445,15 @@ export default function Home() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)', marginTop: 'var(--spacing-sm)', alignItems: 'center' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px', color: 'var(--text-secondary)' }}>
                   <Mail size={18} style={{ color: 'var(--accent-primary)' }} />
-                  <span>juanbravolopez@outlook.com</span>
+                  <span>ramonbravo13@gmail.com</span>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px', color: 'var(--text-secondary)' }}>
                   <MapPin size={18} style={{ color: 'var(--accent-primary)' }} />
-                  <span>San José, Costa Rica</span>
+                  <span>Guadalajara Jalisco México</span>
                 </div>
               </div>
 
-              {/* Calendly / Schedule Card */}
+              {/* WhatsApp Card */}
               <div className="premium-card" style={{ 
                 marginTop: 'var(--spacing-md)', 
                 borderRadius: 'var(--radius-md)', 
@@ -464,13 +464,13 @@ export default function Home() {
                 textAlign: 'center'
               }}>
                 <h4 style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontSize: '1.05rem', marginBottom: 'var(--spacing-xs)' }}>
-                  <Calendar size={18} style={{ color: 'var(--accent-primary)' }} /> Videollamada de 15 min
+                  <MessageCircle size={18} style={{ color: 'var(--accent-primary)' }} /> Chat directo
                 </h4>
                 <p style={{ fontSize: '0.88rem', color: 'var(--text-secondary)', marginBottom: 'var(--spacing-md)' }}>
-                  Agenda una sesión de consultoría técnica sin costo para revisar tus objetivos.
+                  Envíame un mensaje por WhatsApp para una comunicación rápida y directa.
                 </p>
-                <a href="https://calendly.com" target="_blank" rel="noopener noreferrer" className="btn-primary" style={{ display: 'inline-block', fontSize: '0.85rem', padding: '0.6rem 1.2rem' }}>
-                  Reservar en Calendly
+                <a href="https://wa.me/523315004877" target="_blank" rel="noopener noreferrer" className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem', padding: '0.6rem 1.2rem', textDecoration: 'none', backgroundColor: '#25D366', color: '#000', border: 'none' }}>
+                  <MessageCircle size={16} /> Enviar WhatsApp
                 </a>
               </div>
             </div>
