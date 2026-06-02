@@ -140,8 +140,7 @@ function CounterSection() {
 export default function Home() {
   const [selectedCert, setSelectedCert] = useState(null);
   const { profile, projects } = usePortfolio();
-  const [contactForm, setContactForm] = useState({ name: '', email: '', message: '' });
-  const [formSubmitted, setFormSubmitted] = useState(false);
+
 
   const getIcon = (type) => {
     switch(type) {
@@ -154,12 +153,7 @@ export default function Home() {
     }
   }
 
-  const handleContactSubmit = (e) => {
-    e.preventDefault();
-    setFormSubmitted(true);
-    setContactForm({ name: '', email: '', message: '' });
-    setTimeout(() => setFormSubmitted(false), 5000);
-  };
+
   return (
     <div style={{ backgroundColor: 'var(--bg-primary)', minHeight: '100vh' }}>
       <Navbar />
@@ -435,10 +429,10 @@ export default function Home() {
 
         {/* CONTACT SECTION */}
         <section id="contacto" className="section-container" style={{ borderTop: '1px solid var(--border-subtle)' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 'var(--spacing-3xl)' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', maxWidth: '600px', margin: '0 auto', gap: 'var(--spacing-xl)' }}>
             
-            {/* Left side */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-lg)', justifyContent: 'center' }}>
+            {/* Contact details */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-lg)', alignItems: 'center', width: '100%' }}>
               <div>
                 <span className="mono" style={{ color: 'var(--accent-primary)', fontSize: '0.85rem', fontWeight: 600, letterSpacing: '0.15em', textTransform: 'uppercase' }}>Contacto</span>
                 <h2 style={{ display: 'block', marginTop: 'var(--spacing-xs)', fontSize: '2.5rem', marginBottom: 'var(--spacing-md)' }}>Hablemos de tu próximo proyecto</h2>
@@ -448,7 +442,7 @@ export default function Home() {
                 ¿Tienes un problema de software, ciencia de datos o inteligencia artificial que requiera una solución de ingeniería sofisticada? Escríbeme o agenda una videollamada directamente.
               </p>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)', marginTop: 'var(--spacing-sm)' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)', marginTop: 'var(--spacing-sm)', alignItems: 'center' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px', color: 'var(--text-secondary)' }}>
                   <Mail size={18} style={{ color: 'var(--accent-primary)' }} />
                   <span>juanbravolopez@outlook.com</span>
@@ -464,73 +458,21 @@ export default function Home() {
                 marginTop: 'var(--spacing-md)', 
                 borderRadius: 'var(--radius-md)', 
                 borderColor: 'var(--accent-primary)',
-                background: 'linear-gradient(135deg, rgba(37,99,235,0.03) 0%, transparent 100%)' 
+                background: 'linear-gradient(135deg, rgba(37,99,235,0.03) 0%, transparent 100%)',
+                width: '100%',
+                maxWidth: '400px',
+                textAlign: 'center'
               }}>
-                <h4 style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '1.05rem', marginBottom: 'var(--spacing-xs)' }}>
+                <h4 style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontSize: '1.05rem', marginBottom: 'var(--spacing-xs)' }}>
                   <Calendar size={18} style={{ color: 'var(--accent-primary)' }} /> Videollamada de 15 min
                 </h4>
                 <p style={{ fontSize: '0.88rem', color: 'var(--text-secondary)', marginBottom: 'var(--spacing-md)' }}>
                   Agenda una sesión de consultoría técnica sin costo para revisar tus objetivos.
                 </p>
-                <a href="https://calendly.com" target="_blank" rel="noopener noreferrer" className="btn-primary" style={{ fontSize: '0.85rem', padding: '0.6rem 1.2rem' }}>
+                <a href="https://calendly.com" target="_blank" rel="noopener noreferrer" className="btn-primary" style={{ display: 'inline-block', fontSize: '0.85rem', padding: '0.6rem 1.2rem' }}>
                   Reservar en Calendly
                 </a>
               </div>
-            </div>
-
-            {/* Right side form */}
-            <div className="premium-card" style={{ borderRadius: 'var(--radius-lg)', padding: 'var(--spacing-2xl)' }}>
-              <h3 style={{ marginBottom: 'var(--spacing-xl)', fontSize: '1.25rem' }}>Enviar un mensaje</h3>
-              
-              {formSubmitted ? (
-                <div style={{ 
-                  background: 'rgba(16,185,129,0.06)', 
-                  border: '1px solid #10b981', 
-                  borderRadius: 'var(--radius-sm)', 
-                  padding: 'var(--spacing-lg)', 
-                  textAlign: 'center' 
-                }}>
-                  <h4 style={{ color: '#10b981', marginBottom: '4px' }}>¡Mensaje enviado con éxito!</h4>
-                  <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--text-secondary)' }}>Gracias por contactar. Te responderé a la brevedad.</p>
-                </div>
-              ) : (
-                <form onSubmit={handleContactSubmit}>
-                  <div className="form-group">
-                    <label className="form-label">Nombre</label>
-                    <input 
-                      type="text" 
-                      className="form-input" 
-                      value={contactForm.name} 
-                      onChange={e => setContactForm({...contactForm, name: e.target.value})} 
-                      required 
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label className="form-label">Correo electrónico</label>
-                    <input 
-                      type="email" 
-                      className="form-input" 
-                      value={contactForm.email} 
-                      onChange={e => setContactForm({...contactForm, email: e.target.value})} 
-                      required 
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label className="form-label">Mensaje</label>
-                    <textarea 
-                      className="form-input" 
-                      rows="5" 
-                      value={contactForm.message} 
-                      onChange={e => setContactForm({...contactForm, message: e.target.value})} 
-                      required 
-                    />
-                  </div>
-                  
-                  <button type="submit" className="btn-primary" style={{ width: '100%', justifyContent: 'center', marginTop: 'var(--spacing-sm)' }}>
-                    Enviar mensaje
-                  </button>
-                </form>
-              )}
             </div>
 
           </div>

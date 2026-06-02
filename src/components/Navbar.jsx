@@ -62,7 +62,7 @@ export default function Navbar() {
       }}>
         {/* Logo */}
         <Link to="/" style={{ fontSize: '1.25rem', fontWeight: 800, letterSpacing: '-0.03em', display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <span style={{ color: 'var(--accent-primary)' }}>R</span>B
+          <span style={{ color: 'var(--accent-primary)' }}>Ramón</span> Bravo
         </Link>
 
         {/* Desktop Menu */}
