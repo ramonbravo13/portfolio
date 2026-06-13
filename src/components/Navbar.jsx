@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, MessageCircle, Edit, LogOut } from 'lucide-react';
+import { Menu, X, MessageCircle, Edit, LogOut, LogIn } from 'lucide-react';
 import { usePortfolio } from '../context/PortfolioContext';
 
 export default function Navbar() {
@@ -104,7 +104,7 @@ export default function Navbar() {
             <button onClick={toggleLanguage} className="btn-secondary" style={{ padding: '0.4rem 0.6rem', fontSize: '0.8rem', minWidth: '40px' }}>
               {language === 'es' ? 'EN' : 'ES'}
             </button>
-            {isAdminAuth && (
+            {isAdminAuth ? (
               <>
                 <Link to="/admin" className="btn-secondary" style={{ padding: '0.5rem 1rem', fontSize: '0.85rem' }}>
                   <Edit size={14} /> Admin
@@ -115,6 +115,10 @@ export default function Navbar() {
                   <LogOut size={14} />
                 </button>
               </>
+            ) : (
+              <Link to="/login" className="btn-secondary" style={{ padding: '0.4rem 0.6rem', fontSize: '0.8rem' }} title={isEnglish ? "Admin Login" : "Acceso Admin"}>
+                <LogIn size={14} />
+              </Link>
             )}
             
             <a href="https://wa.me/523315004877" target="_blank" rel="noopener noreferrer" className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '0.5rem 1.25rem', fontSize: '0.85rem', borderRadius: 'var(--radius-sm)', textDecoration: 'none' }}>
@@ -178,7 +182,7 @@ export default function Navbar() {
               {isEnglish ? 'Cambiar a Español' : 'Switch to English'}
             </button>
 
-            {isAdminAuth && (
+            {isAdminAuth ? (
               <>
                 <Link to="/admin" onClick={() => setIsOpen(false)} className="btn-secondary" style={{ justifyContent: 'center' }}>
                   <Edit size={16} /> Admin Panel
@@ -187,6 +191,10 @@ export default function Navbar() {
                   <LogOut size={16} /> {isEnglish ? 'Logout' : 'Cerrar sesión'}
                 </button>
               </>
+            ) : (
+              <Link to="/login" onClick={() => setIsOpen(false)} className="btn-secondary" style={{ justifyContent: 'center' }}>
+                <LogIn size={16} /> {isEnglish ? 'Admin Login' : 'Acceso Admin'}
+              </Link>
             )}
 
             <a href="https://wa.me/523315004877" target="_blank" rel="noopener noreferrer" className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', justifyContent: 'center', textDecoration: 'none' }}>
