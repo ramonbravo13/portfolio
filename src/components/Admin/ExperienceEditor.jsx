@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { usePortfolio } from '../../context/PortfolioContext';
-import { Plus, Trash2, Edit, Save, ArrowUp, ArrowDown } from 'lucide-react';
+import { Plus, Trash2, Edit, Save, ArrowUp, ArrowDown, Languages } from 'lucide-react';
+import { autoTranslate } from '../../utils/translate';
 
 export default function ExperienceEditor() {
   const { profile, updateProfile } = usePortfolio();
@@ -8,13 +9,14 @@ export default function ExperienceEditor() {
   const [editingIndex, setEditingIndex] = useState(null);
   const [saving, setSaving] = useState(false);
   const [successMsg, setSuccessMsg] = useState('');
+  const [translating, setTranslating] = useState(false);
 
   const [formData, setFormData] = useState({
-    role: '',
+    role: '', role_en: '',
     company: '',
-    period: '',
-    tag: '',
-    desc: ''
+    period: '', period_en: '',
+    tag: '', tag_en: '',
+    desc: '', desc_en: ''
   });
 
   // Sync with profile experiences when loaded
@@ -26,6 +28,29 @@ export default function ExperienceEditor() {
 
   const handleChange = (e) => {
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  const handleTranslate = async () => {
+    setTranslating(true);
+    try {
+      const translatedRole = await autoTranslate(formData.role);
+      const translatedPeriod = await autoTranslate(formData.period);
+      const translatedTag = await autoTranslate(formData.tag);
+      const translatedDesc = await autoTranslate(formData.desc);
+      
+      setFormData(prev => ({
+        ...prev,
+        role_en: translatedRole || prev.role_en,
+        period_en: translatedPeriod || prev.period_en,
+        tag_en: translatedTag || prev.tag_en,
+        desc_en: translatedDesc || prev.desc_en
+      }));
+    } catch (err) {
+      console.error(err);
+      alert('Error translating text.');
+    } finally {
+      setTranslating(false);
+    }
   };
 
   const handleAddOrUpdate = (e) => {
@@ -42,7 +67,7 @@ export default function ExperienceEditor() {
       setExperiences([...experiences, formData]);
     }
 
-    setFormData({ role: '', company: '', period: '', tag: '', desc: '' });
+    setFormData({ role: '', role_en: '', company: '', period: '', period_en: '', tag: '', tag_en: '', desc: '', desc_en: '' });
   };
 
   const handleEditClick = (index) => {
@@ -56,7 +81,7 @@ export default function ExperienceEditor() {
       setExperiences(updated);
       if (editingIndex === index) {
         setEditingIndex(null);
-        setFormData({ role: '', company: '', period: '', tag: '', desc: '' });
+        setFormData({ role: '', role_en: '', company: '', period: '', period_en: '', tag: '', tag_en: '', desc: '', desc_en: '' });
       } else if (editingIndex > index) {
         setEditingIndex(editingIndex - 1);
       }
@@ -137,36 +162,63 @@ export default function ExperienceEditor() {
 
       {/* Add / Edit Form */}
       <div style={{ background: 'rgba(0,0,0,0.2)', padding: 'var(--spacing-md)', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)' }}>
-        <h3 style={{ marginBottom: 'var(--spacing-md)', fontSize: '1.1rem' }}>
-          {editingIndex !== null ? 'Edit Experience Item' : 'Add New Experience Item'}
-        </h3>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--spacing-md)' }}>
+          <h3 style={{ fontSize: '1.1rem', margin: 0 }}>
+            {editingIndex !== null ? 'Edit Experience Item' : 'Add New Experience Item'}
+          </h3>
+          <button type="button" className="btn-secondary" onClick={handleTranslate} disabled={translating} style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem' }}>
+            <Languages size={14} /> {translating ? 'Translating...' : 'Auto-Translate to EN'}
+          </button>
+        </div>
         
         <form onSubmit={handleAddOrUpdate}>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--spacing-md)' }}>
             <div className="form-group">
-              <label className="form-label">Role / Cargo</label>
-              <input name="role" type="text" className="form-input" value={formData.role} onChange={handleChange} placeholder="e.g. Senior AI Engineer" required />
+              <label className="form-label">Role / Cargo (ES)</label>
+              <input name="role" type="text" className="form-input" value={formData.role} onChange={handleChange} placeholder="e.g. Ingeniero Senior" required />
             </div>
             <div className="form-group">
-              <label className="form-label">Company / Empresa</label>
-              <input name="company" type="text" className="form-input" value={formData.company} onChange={handleChange} placeholder="e.g. Vercel Inc" required />
+              <label className="form-label">Role (EN)</label>
+              <input name="role_en" type="text" className="form-input" value={formData.role_en} onChange={handleChange} placeholder="e.g. Senior AI Engineer" />
+            </div>
+          </div>
+          
+          <div className="form-group" style={{ marginTop: 'var(--spacing-md)' }}>
+            <label className="form-label">Company / Empresa</label>
+            <input name="company" type="text" className="form-input" value={formData.company} onChange={handleChange} placeholder="e.g. Vercel Inc" required />
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--spacing-md)', marginTop: 'var(--spacing-md)' }}>
+            <div className="form-group">
+              <label className="form-label">Period / Período (ES)</label>
+              <input name="period" type="text" className="form-input" value={formData.period} onChange={handleChange} placeholder="e.g. 2023 - Presente" required />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Period (EN)</label>
+              <input name="period_en" type="text" className="form-input" value={formData.period_en} onChange={handleChange} placeholder="e.g. 2023 - Present" />
             </div>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--spacing-md)' }}>
             <div className="form-group">
-              <label className="form-label">Period / Período</label>
-              <input name="period" type="text" className="form-input" value={formData.period} onChange={handleChange} placeholder="e.g. 2023 - Presente" required />
+              <label className="form-label">Tag / Área de Especialidad (ES)</label>
+              <input name="tag" type="text" className="form-input" value={formData.tag} onChange={handleChange} placeholder="e.g. Inteligencia Artificial" required />
             </div>
             <div className="form-group">
-              <label className="form-label">Tag / Área de Especialidad</label>
-              <input name="tag" type="text" className="form-input" value={formData.tag} onChange={handleChange} placeholder="e.g. Inteligencia Artificial y Datos" required />
+              <label className="form-label">Tag (EN)</label>
+              <input name="tag_en" type="text" className="form-input" value={formData.tag_en} onChange={handleChange} placeholder="e.g. Artificial Intelligence" />
             </div>
           </div>
 
-          <div className="form-group">
-            <label className="form-label">Description / Descripción de logros</label>
-            <textarea name="desc" className="form-input" rows="3" value={formData.desc} onChange={handleChange} placeholder="Describe tus responsabilidades y aportes clave..." required />
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--spacing-md)' }}>
+            <div className="form-group">
+              <label className="form-label">Description / Descripción (ES)</label>
+              <textarea name="desc" className="form-input" rows="3" value={formData.desc} onChange={handleChange} placeholder="Describe tus responsabilidades..." required />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Description (EN)</label>
+              <textarea name="desc_en" className="form-input" rows="3" value={formData.desc_en} onChange={handleChange} placeholder="Describe your responsibilities..." />
+            </div>
           </div>
 
           <div style={{ display: 'flex', gap: '8px', marginTop: 'var(--spacing-md)' }}>
@@ -174,7 +226,7 @@ export default function ExperienceEditor() {
               <Plus size={16} /> {editingIndex !== null ? 'Actualizar en Lista' : 'Agregar a Lista'}
             </button>
             {editingIndex !== null && (
-              <button type="button" className="btn-secondary" style={{ fontSize: '0.85rem', padding: '0.5rem 1rem' }} onClick={() => { setEditingIndex(null); setFormData({ role: '', company: '', period: '', tag: '', desc: '' }); }}>
+              <button type="button" className="btn-secondary" style={{ fontSize: '0.85rem', padding: '0.5rem 1rem' }} onClick={() => { setEditingIndex(null); setFormData({ role: '', role_en: '', company: '', period: '', period_en: '', tag: '', tag_en: '', desc: '', desc_en: '' }); }}>
                 Cancelar
               </button>
             )}

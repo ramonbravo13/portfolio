@@ -1,33 +1,36 @@
 import { useState } from 'react';
 import { usePortfolio } from '../../context/PortfolioContext';
-import { Plus, Trash2, Edit, Save, ArrowUp, ArrowDown, UploadCloud } from 'lucide-react';
+import { Plus, Trash2, Edit, Save, ArrowUp, ArrowDown, UploadCloud, Languages } from 'lucide-react';
+import { autoTranslate } from '../../utils/translate';
 
 export default function ProjectEditor() {
   const { projects, addProject, updateProject, deleteProject, uploadFile } = usePortfolio();
   const [editingId, setEditingId] = useState(null);
 
   const [formData, setFormData] = useState({
-    title: '',
-    tags: '',
+    title: '', title_en: '',
+    tags: '', tags_en: '',
     iconType: 'Code',
-    problem: '',
-    solution: '',
-    result: '',
+    problem: '', problem_en: '',
+    solution: '', solution_en: '',
+    result: '', result_en: '',
     thumbnailUrl: ''
   });
   const [thumbnailFile, setThumbnailFile] = useState(null);
   const [blocks, setBlocks] = useState([]);
   const [uploading, setUploading] = useState(false);
+  const [translating, setTranslating] = useState(false);
 
   const handleEdit = (project) => {
     setEditingId(project.id);
     setFormData({
-      title: project.title,
-      tags: project.tags.join(', '),
+      title: project.title, title_en: project.title_en || '',
+      tags: project.tags ? project.tags.join(', ') : '',
+      tags_en: project.tags_en ? project.tags_en.join(', ') : '',
       iconType: project.iconType,
-      problem: project.problem || '',
-      solution: project.solution || '',
-      result: project.result || '',
+      problem: project.problem || '', problem_en: project.problem_en || '',
+      solution: project.solution || '', solution_en: project.solution_en || '',
+      result: project.result || '', result_en: project.result_en || '',
       thumbnailUrl: project.thumbnailUrl || ''
     });
     setBlocks(project.blocks || []);
@@ -57,12 +60,13 @@ export default function ProjectEditor() {
       }
 
       const data = {
-        title: formData.title,
+        title: formData.title, title_en: formData.title_en,
         tags: formData.tags.split(',').map(s => s.trim()).filter(s => s),
+        tags_en: formData.tags_en.split(',').map(s => s.trim()).filter(s => s),
         iconType: formData.iconType,
-        problem: formData.problem,
-        solution: formData.solution,
-        result: formData.result,
+        problem: formData.problem, problem_en: formData.problem_en,
+        solution: formData.solution, solution_en: formData.solution_en,
+        result: formData.result, result_en: formData.result_en,
         thumbnailUrl: finalThumbnailUrl,
         blocks: processedBlocks
       };
@@ -73,7 +77,7 @@ export default function ProjectEditor() {
       } else {
         await addProject(data);
       }
-      setFormData({ title: '', tags: '', iconType: 'Code', problem: '', solution: '', result: '', thumbnailUrl: '' });
+      setFormData({ title: '', title_en: '', tags: '', tags_en: '', iconType: 'Code', problem: '', problem_en: '', solution: '', solution_en: '', result: '', result_en: '', thumbnailUrl: '' });
       setBlocks([]);
       setThumbnailFile(null);
     } catch (err) {
@@ -86,9 +90,45 @@ export default function ProjectEditor() {
 
   const cancelEdit = () => {
     setEditingId(null);
-    setFormData({ title: '', tags: '', iconType: 'Code', problem: '', solution: '', result: '', thumbnailUrl: '' });
+    setFormData({ title: '', title_en: '', tags: '', tags_en: '', iconType: 'Code', problem: '', problem_en: '', solution: '', solution_en: '', result: '', result_en: '', thumbnailUrl: '' });
     setBlocks([]);
     setThumbnailFile(null);
+  };
+
+  const handleTranslate = async () => {
+    setTranslating(true);
+    try {
+      const translatedTitle = await autoTranslate(formData.title);
+      const translatedTags = await autoTranslate(formData.tags);
+      const translatedProblem = await autoTranslate(formData.problem);
+      const translatedSolution = await autoTranslate(formData.solution);
+      const translatedResult = await autoTranslate(formData.result);
+      
+      setFormData(prev => ({
+        ...prev,
+        title_en: translatedTitle || prev.title_en,
+        tags_en: translatedTags || prev.tags_en,
+        problem_en: translatedProblem || prev.problem_en,
+        solution_en: translatedSolution || prev.solution_en,
+        result_en: translatedResult || prev.result_en
+      }));
+
+      // Also translate text blocks
+      const translatedBlocks = await Promise.all(blocks.map(async (block) => {
+        if (block.type === 'text') {
+          const transContent = await autoTranslate(block.content);
+          return { ...block, content_en: transContent || block.content_en };
+        }
+        return block;
+      }));
+      setBlocks(translatedBlocks);
+
+    } catch (err) {
+      console.error(err);
+      alert('Error translating text.');
+    } finally {
+      setTranslating(false);
+    }
   };
 
   const addBlock = (type) => {
@@ -141,30 +181,45 @@ export default function ProjectEditor() {
 
       {/* Add / Edit Form */}
       <div style={{ background: 'rgba(0,0,0,0.2)', padding: 'var(--spacing-md)', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)' }}>
-        <h3 style={{ marginBottom: 'var(--spacing-md)', fontSize: '1.2rem' }}>{editingId ? 'Edit Project Case Study' : 'Create New Project Case Study'}</h3>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--spacing-md)' }}>
+          <h3 style={{ fontSize: '1.2rem', margin: 0 }}>{editingId ? 'Edit Project Case Study' : 'Create New Project Case Study'}</h3>
+          <button type="button" className="btn-secondary" onClick={handleTranslate} disabled={translating} style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem' }}>
+            <Languages size={14} /> {translating ? 'Translating...' : 'Auto-Translate to EN'}
+          </button>
+        </div>
         
         <form onSubmit={handleSave}>
           {/* Basic Details */}
-          <div className="form-group">
-            <label className="form-label">Project Title</label>
-            <input type="text" className="form-input" value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} required />
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--spacing-md)' }}>
+            <div className="form-group">
+              <label className="form-label">Project Title (ES)</label>
+              <input type="text" className="form-input" value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} required />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Project Title (EN)</label>
+              <input type="text" className="form-input" value={formData.title_en} onChange={e => setFormData({...formData, title_en: e.target.value})} />
+            </div>
           </div>
           
-          <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 'var(--spacing-md)' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--spacing-md)', marginTop: 'var(--spacing-md)' }}>
             <div className="form-group">
-              <label className="form-label">Tags (comma separated)</label>
+              <label className="form-label">Tags ES (comma separated)</label>
               <input type="text" className="form-input" value={formData.tags} onChange={e => setFormData({...formData, tags: e.target.value})} required />
             </div>
             <div className="form-group">
-              <label className="form-label">Display Icon</label>
-              <select className="form-input" value={formData.iconType} onChange={e => setFormData({...formData, iconType: e.target.value})}>
-                <option value="Code">Code</option>
-                <option value="Terminal">Terminal</option>
-                <option value="Database">Database</option>
-                <option value="Award">Certification / Award</option>
-                <option value="Rocket">Launched / Sold App</option>
-              </select>
+              <label className="form-label">Tags EN</label>
+              <input type="text" className="form-input" value={formData.tags_en} onChange={e => setFormData({...formData, tags_en: e.target.value})} />
             </div>
+          </div>
+          <div className="form-group" style={{ marginTop: 'var(--spacing-md)' }}>
+            <label className="form-label">Display Icon</label>
+            <select className="form-input" value={formData.iconType} onChange={e => setFormData({...formData, iconType: e.target.value})}>
+              <option value="Code">Code</option>
+              <option value="Terminal">Terminal</option>
+              <option value="Database">Database</option>
+              <option value="Award">Certification / Award</option>
+              <option value="Rocket">Launched / Sold App</option>
+            </select>
           </div>
 
           {/* Case Study Details */}
@@ -183,19 +238,37 @@ export default function ProjectEditor() {
             </div>
           </div>
 
-          <div className="form-group">
-            <label className="form-label">The Problem (El Problema)</label>
-            <textarea className="form-input" rows="3" placeholder="Describe the challenges or requirements..." value={formData.problem} onChange={e => setFormData({...formData, problem: e.target.value})} />
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--spacing-md)' }}>
+            <div className="form-group">
+              <label className="form-label">The Problem / El Problema (ES)</label>
+              <textarea className="form-input" rows="3" placeholder="Describe the challenges..." value={formData.problem} onChange={e => setFormData({...formData, problem: e.target.value})} />
+            </div>
+            <div className="form-group">
+              <label className="form-label">The Problem (EN)</label>
+              <textarea className="form-input" rows="3" placeholder="Describe the challenges..." value={formData.problem_en} onChange={e => setFormData({...formData, problem_en: e.target.value})} />
+            </div>
           </div>
 
-          <div className="form-group">
-            <label className="form-label">The Solution (La Solución)</label>
-            <textarea className="form-input" rows="3" placeholder="Describe how you solved it..." value={formData.solution} onChange={e => setFormData({...formData, solution: e.target.value})} />
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--spacing-md)' }}>
+            <div className="form-group">
+              <label className="form-label">The Solution / La Solución (ES)</label>
+              <textarea className="form-input" rows="3" placeholder="Describe how you solved it..." value={formData.solution} onChange={e => setFormData({...formData, solution: e.target.value})} />
+            </div>
+            <div className="form-group">
+              <label className="form-label">The Solution (EN)</label>
+              <textarea className="form-input" rows="3" placeholder="Describe how you solved it..." value={formData.solution_en} onChange={e => setFormData({...formData, solution_en: e.target.value})} />
+            </div>
           </div>
 
-          <div className="form-group">
-            <label className="form-label">The Result (El Resultado)</label>
-            <textarea className="form-input" rows="3" placeholder="Describe the measurable outcome, metrics or impact..." value={formData.result} onChange={e => setFormData({...formData, result: e.target.value})} />
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--spacing-md)' }}>
+            <div className="form-group">
+              <label className="form-label">The Result / El Resultado (ES)</label>
+              <textarea className="form-input" rows="3" placeholder="Describe the measurable outcome..." value={formData.result} onChange={e => setFormData({...formData, result: e.target.value})} />
+            </div>
+            <div className="form-group">
+              <label className="form-label">The Result (EN)</label>
+              <textarea className="form-input" rows="3" placeholder="Describe the measurable outcome..." value={formData.result_en} onChange={e => setFormData({...formData, result_en: e.target.value})} />
+            </div>
           </div>
 
           {/* Block Editor Section */}
@@ -214,7 +287,16 @@ export default function ProjectEditor() {
                 </div>
 
                 {block.type === 'text' && (
-                  <textarea className="form-input" rows="3" placeholder="Markdown or plain text content..." value={block.content} onChange={(e) => updateBlock(block.id, 'content', e.target.value)} required />
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--spacing-md)' }}>
+                    <div>
+                      <label className="form-label" style={{ fontSize: '0.8rem' }}>ES Content</label>
+                      <textarea className="form-input" rows="3" placeholder="Markdown or plain text content..." value={block.content} onChange={(e) => updateBlock(block.id, 'content', e.target.value)} required />
+                    </div>
+                    <div>
+                      <label className="form-label" style={{ fontSize: '0.8rem' }}>EN Content</label>
+                      <textarea className="form-input" rows="3" placeholder="English text content..." value={block.content_en} onChange={(e) => updateBlock(block.id, 'content_en', e.target.value)} />
+                    </div>
+                  </div>
                 )}
 
                 {block.type === 'code' && (

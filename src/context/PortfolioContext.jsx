@@ -6,6 +6,10 @@ import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 const PortfolioContext = createContext();
 
 export function PortfolioProvider({ children }) {
+  const [language, setLanguage] = useState(() => {
+    return localStorage.getItem('portfolio_lang') || 'es';
+  });
+
   const [profile, setProfile] = useState({
     name: "Loading...",
     title: "",
@@ -28,8 +32,10 @@ export function PortfolioProvider({ children }) {
   const defaultProfile = {
     name: "Juan Bravo Lopez",
     title: "Software Engineer & Data Scientist",
+    title_en: "Software Engineer & Data Scientist",
     profileImage: "https://images.unsplash.com/photo-1568602471122-7832951cc4c5?q=80&w=2070&auto=format&fit=crop",
     bio: "Passionate developer with a strong background in both full-stack web development and data science. I build scalable applications and extract actionable insights from complex datasets. Constantly learning and exploring new technologies.",
+    bio_en: "Passionate developer with a strong background in both full-stack web development and data science. I build scalable applications and extract actionable insights from complex datasets. Constantly learning and exploring new technologies.",
     skills: ['React', 'Node.js', 'Python', 'Machine Learning', 'Data Analysis', 'SQL', 'TypeScript', 'AWS'],
     certs: [
       { id: 1, title: 'AWS Certified Solutions Architect', url: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf' },
@@ -38,24 +44,36 @@ export function PortfolioProvider({ children }) {
     experiences: [
       {
         role: "Lead AI & Software Architect",
+        role_en: "Lead AI & Software Architect",
         company: "Proyectos Empresariales & Consultoría",
         period: "2023 - Presente",
+        period_en: "2023 - Present",
         tag: "Inteligencia Artificial y Transformación Digital",
-        desc: "Liderazgo técnico en la creación de arquitecturas de software empresarial e integración de modelos de lenguaje avanzados (LLMs) y pipelines de Ciencia de Datos para automatización."
+        tag_en: "Artificial Intelligence and Digital Transformation",
+        desc: "Liderazgo técnico en la creación de arquitecturas de software empresarial e integración de modelos de lenguaje avanzados (LLMs) y pipelines de Ciencia de Datos para automatización.",
+        desc_en: "Technical leadership in creating enterprise software architectures and integrating advanced language models (LLMs) and Data Science pipelines for automation."
       },
       {
         role: "Senior Software Engineer & Tech Lead",
+        role_en: "Senior Software Engineer & Tech Lead",
         company: "Tech Development Corp",
         period: "2019 - 2023",
+        period_en: "2019 - 2023",
         tag: "Desarrollo de Software y Gestión de Proyectos",
-        desc: "Dirección de equipos de desarrollo ágiles para aplicaciones web robustas de alta escalabilidad. Diseño de APIs, integraciones y optimizaciones de infraestructura en la nube (AWS)."
+        tag_en: "Software Development and Project Management",
+        desc: "Dirección de equipos de desarrollo ágiles para aplicaciones web robustas de alta escalabilidad. Diseño de APIs, integraciones y optimizaciones de infraestructura en la nube (AWS).",
+        desc_en: "Directed agile development teams for robust, high-scalability web applications. Designed APIs, integrations, and optimized cloud infrastructure (AWS)."
       },
       {
         role: "Data Scientist & Analytics Lead",
+        role_en: "Data Scientist & Analytics Lead",
         company: "Data Solutions Inc",
         period: "2016 - 2019",
+        period_en: "2016 - 2019",
         tag: "Ciencia de Datos y Soluciones Predictivas",
-        desc: "Extracción de insights estratégicos a partir de grandes volúmenes de datos. Desarrollo de modelos predictivos y entrenamiento de algoritmos de Machine Learning."
+        tag_en: "Data Science and Predictive Solutions",
+        desc: "Extracción de insights estratégicos a partir de grandes volúmenes de datos. Desarrollo de modelos predictivos y entrenamiento de algoritmos de Machine Learning.",
+        desc_en: "Extracted strategic insights from large data volumes. Developed predictive models and trained Machine Learning algorithms."
       }
     ]
   };
@@ -124,6 +142,14 @@ export function PortfolioProvider({ children }) {
     localStorage.setItem('portfolio_admin_auth', isAdminAuth);
   }, [isAdminAuth]);
 
+  useEffect(() => {
+    localStorage.setItem('portfolio_lang', language);
+  }, [language]);
+
+  const toggleLanguage = () => {
+    setLanguage(prev => prev === 'es' ? 'en' : 'es');
+  };
+
   // Actions
   const updateProfile = async (data) => {
     const profileRef = doc(db, 'portfolio', 'profile');
@@ -173,7 +199,7 @@ export function PortfolioProvider({ children }) {
 
   return (
     <PortfolioContext.Provider value={{
-      profile, projects, isAdminAuth, loading,
+      profile, projects, isAdminAuth, loading, language, setLanguage, toggleLanguage,
       updateProfile, addProject, updateProject, deleteProject, uploadFile,
       loginAdmin, logoutAdmin
     }}>

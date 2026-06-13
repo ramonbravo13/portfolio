@@ -6,9 +6,11 @@ import { usePortfolio } from '../context/PortfolioContext';
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const { isAdminAuth, logoutAdmin } = usePortfolio();
+  const { isAdminAuth, logoutAdmin, language, toggleLanguage } = usePortfolio();
   const location = useLocation();
   const navigate = useNavigate();
+
+  const isEnglish = language === 'en';
 
   useEffect(() => {
     const handleScroll = () => {
@@ -72,33 +74,36 @@ export default function Navbar() {
               <button onClick={() => handleNavClick('inicio')} style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', fontSize: '0.9rem', fontWeight: 500 }}
                 onMouseOver={e => e.currentTarget.style.color = 'var(--text-primary)'}
                 onMouseOut={e => e.currentTarget.style.color = 'var(--text-secondary)'}>
-                Inicio
+                {isEnglish ? 'Home' : 'Inicio'}
               </button>
             </li>
             <li>
               <button onClick={() => handleNavClick('proyectos')} style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', fontSize: '0.9rem', fontWeight: 500 }}
                 onMouseOver={e => e.currentTarget.style.color = 'var(--text-primary)'}
                 onMouseOut={e => e.currentTarget.style.color = 'var(--text-secondary)'}>
-                Proyectos
+                {isEnglish ? 'Projects' : 'Proyectos'}
               </button>
             </li>
             <li>
               <button onClick={() => handleNavClick('experiencia')} style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', fontSize: '0.9rem', fontWeight: 500 }}
                 onMouseOver={e => e.currentTarget.style.color = 'var(--text-primary)'}
                 onMouseOut={e => e.currentTarget.style.color = 'var(--text-secondary)'}>
-                Experiencia
+                {isEnglish ? 'Experience' : 'Experiencia'}
               </button>
             </li>
             <li>
               <button onClick={() => handleNavClick('contacto')} style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', fontSize: '0.9rem', fontWeight: 500 }}
                 onMouseOver={e => e.currentTarget.style.color = 'var(--text-primary)'}
                 onMouseOut={e => e.currentTarget.style.color = 'var(--text-secondary)'}>
-                Contacto
+                {isEnglish ? 'Contact' : 'Contacto'}
               </button>
             </li>
           </ul>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-md)' }}>
+            <button onClick={toggleLanguage} className="btn-secondary" style={{ padding: '0.4rem 0.6rem', fontSize: '0.8rem', minWidth: '40px' }}>
+              {language === 'es' ? 'EN' : 'ES'}
+            </button>
             {isAdminAuth && (
               <>
                 <Link to="/admin" className="btn-secondary" style={{ padding: '0.5rem 1rem', fontSize: '0.85rem' }}>
@@ -148,34 +153,38 @@ export default function Navbar() {
           <ul style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-lg)', listStyle: 'none' }}>
             <li>
               <button onClick={() => handleNavClick('inicio')} style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', fontSize: '1.1rem', fontWeight: 500, width: '100%', textAlign: 'left' }}>
-                Inicio
+                {isEnglish ? 'Home' : 'Inicio'}
               </button>
             </li>
             <li>
               <button onClick={() => handleNavClick('proyectos')} style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', fontSize: '1.1rem', fontWeight: 500, width: '100%', textAlign: 'left' }}>
-                Proyectos
+                {isEnglish ? 'Projects' : 'Proyectos'}
               </button>
             </li>
             <li>
               <button onClick={() => handleNavClick('experiencia')} style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', fontSize: '1.1rem', fontWeight: 500, width: '100%', textAlign: 'left' }}>
-                Experiencia
+                {isEnglish ? 'Experience' : 'Experiencia'}
               </button>
             </li>
             <li>
               <button onClick={() => handleNavClick('contacto')} style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', fontSize: '1.1rem', fontWeight: 500, width: '100%', textAlign: 'left' }}>
-                Contacto
+                {isEnglish ? 'Contact' : 'Contacto'}
               </button>
             </li>
           </ul>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)', marginTop: 'var(--spacing-md)' }}>
+            <button onClick={() => { toggleLanguage(); setIsOpen(false); }} className="btn-secondary" style={{ justifyContent: 'center' }}>
+              {isEnglish ? 'Cambiar a Español' : 'Switch to English'}
+            </button>
+
             {isAdminAuth && (
               <>
                 <Link to="/admin" onClick={() => setIsOpen(false)} className="btn-secondary" style={{ justifyContent: 'center' }}>
                   <Edit size={16} /> Admin Panel
                 </Link>
                 <button onClick={() => { logoutAdmin(); setIsOpen(false); }} className="btn-secondary" style={{ justifyContent: 'center', borderColor: '#ef4444', color: '#ef4444' }}>
-                  <LogOut size={16} /> Cerrar sesión
+                  <LogOut size={16} /> {isEnglish ? 'Logout' : 'Cerrar sesión'}
                 </button>
               </>
             )}

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { usePortfolio } from '../../context/PortfolioContext';
-import { Save, UploadCloud } from 'lucide-react';
+import { Save, UploadCloud, Languages } from 'lucide-react';
+import { autoTranslate } from '../../utils/translate';
 
 export default function ProfileEditor() {
   const { profile, updateProfile, uploadFile } = usePortfolio();
@@ -8,8 +9,10 @@ export default function ProfileEditor() {
   const [formData, setFormData] = useState({
     name: '',
     title: '',
+    title_en: '',
     profileImage: '',
     bio: '',
+    bio_en: '',
     skillsArray: ''
   });
 
@@ -19,8 +22,10 @@ export default function ProfileEditor() {
       setFormData({
         name: profile.name || '',
         title: profile.title || '',
+        title_en: profile.title_en || '',
         profileImage: profile.profileImage || '',
         bio: profile.bio || '',
+        bio_en: profile.bio_en || '',
         skillsArray: (profile.skills || []).join(', ')
       });
     }
@@ -29,9 +34,31 @@ export default function ProfileEditor() {
   const [successMsg, setSuccessMsg] = useState('');
   const [imageFile, setImageFile] = useState(null);
   const [uploading, setUploading] = useState(false);
+  const [translating, setTranslating] = useState(false);
 
   const handleChange = (e) => {
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  const handleTranslate = async () => {
+    setTranslating(true);
+    try {
+      const translatedTitle = await autoTranslate(formData.title);
+      const translatedBio = await autoTranslate(formData.bio);
+      
+      setFormData(prev => ({
+        ...prev,
+        title_en: translatedTitle || prev.title_en,
+        bio_en: translatedBio || prev.bio_en
+      }));
+      setSuccessMsg('Translation applied. Review English fields.');
+      setTimeout(() => setSuccessMsg(''), 3000);
+    } catch (err) {
+      console.error(err);
+      alert('Error translating text.');
+    } finally {
+      setTranslating(false);
+    }
   };
 
   const handleSave = async (e) => {
@@ -66,18 +93,28 @@ export default function ProfileEditor() {
     <div className="glass-panel animate-fade-in" style={{ marginBottom: 'var(--spacing-2xl)' }}>
       <h2 style={{ marginBottom: 'var(--spacing-lg)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <span>Edit Profile Details</span>
-        {successMsg && <span style={{ fontSize: '0.9rem', color: '#10b981', fontWeight: 'normal' }}>{successMsg}</span>}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-md)' }}>
+          {successMsg && <span style={{ fontSize: '0.9rem', color: '#10b981', fontWeight: 'normal' }}>{successMsg}</span>}
+          <button type="button" className="btn-secondary" onClick={handleTranslate} disabled={translating} style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem' }}>
+            <Languages size={14} /> {translating ? 'Translating...' : 'Auto-Translate to English'}
+          </button>
+        </div>
       </h2>
       
       <form onSubmit={handleSave}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--spacing-md)' }}>
-          <div className="form-group">
+        <div className="form-group">
             <label className="form-label">Full Name</label>
             <input name="name" type="text" className="form-input" value={formData.name} onChange={handleChange} required />
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--spacing-md)' }}>
+          <div className="form-group">
+            <label className="form-label">Professional Title (ES)</label>
+            <input name="title" type="text" className="form-input" value={formData.title} onChange={handleChange} required />
           </div>
           <div className="form-group">
-            <label className="form-label">Professional Title</label>
-            <input name="title" type="text" className="form-input" value={formData.title} onChange={handleChange} required />
+            <label className="form-label">Professional Title (EN)</label>
+            <input name="title_en" type="text" className="form-input" value={formData.title_en} onChange={handleChange} />
           </div>
         </div>
 
@@ -96,9 +133,15 @@ export default function ProfileEditor() {
           </div>
         </div>
 
-        <div className="form-group">
-          <label className="form-label">Biography</label>
-          <textarea name="bio" className="form-input" rows="4" value={formData.bio} onChange={handleChange} required />
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--spacing-md)' }}>
+          <div className="form-group">
+            <label className="form-label">Biography (ES)</label>
+            <textarea name="bio" className="form-input" rows="4" value={formData.bio} onChange={handleChange} required />
+          </div>
+          <div className="form-group">
+            <label className="form-label">Biography (EN)</label>
+            <textarea name="bio_en" className="form-input" rows="4" value={formData.bio_en} onChange={handleChange} />
+          </div>
         </div>
 
         <div className="form-group">
