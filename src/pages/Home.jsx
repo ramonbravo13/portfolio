@@ -175,9 +175,11 @@ export default function Home() {
           {/* Left Column */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-lg)' }}>
             <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-              <span className="mono" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border-subtle)', padding: '4px 10px', borderRadius: '4px', color: 'var(--text-secondary)', fontSize: '0.75rem' }}>{isEnglish ? 'SOFTWARE DEVELOPMENT' : 'DESARROLLO DE SOFTWARE'}</span>
-              <span className="mono" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border-subtle)', padding: '4px 10px', borderRadius: '4px', color: 'var(--text-secondary)', fontSize: '0.75rem' }}>{isEnglish ? 'DATA SCIENCE' : 'CIENCIA DE DATOS'}</span>
-              <span className="mono" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border-subtle)', padding: '4px 10px', borderRadius: '4px', color: 'var(--text-secondary)', fontSize: '0.75rem' }}>{isEnglish ? 'ARTIFICIAL INTELLIGENCE' : 'INTELIGENCIA ARTIFICIAL'}</span>
+              {(isEnglish && profile.skills_en && profile.skills_en.length > 0 ? profile.skills_en : (profile.skills || [])).map((tag, idx) => (
+                <span key={idx} className="mono" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border-subtle)', padding: '4px 10px', borderRadius: '4px', color: 'var(--text-secondary)', fontSize: '0.75rem' }}>
+                  {tag}
+                </span>
+              ))}
             </div>
             
             <h1 style={{ 

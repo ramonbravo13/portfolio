@@ -13,7 +13,8 @@ export default function ProfileEditor() {
     profileImage: '',
     bio: '',
     bio_en: '',
-    skillsArray: ''
+    skillsArray: '',
+    skillsArray_en: ''
   });
 
   // Sync with profile data when it loads or changes
@@ -26,7 +27,8 @@ export default function ProfileEditor() {
         profileImage: profile.profileImage || '',
         bio: profile.bio || '',
         bio_en: profile.bio_en || '',
-        skillsArray: (profile.skills || []).join(', ')
+        skillsArray: (profile.skills || []).join(', '),
+        skillsArray_en: (profile.skills_en || []).join(', ')
       });
     }
   }, [profile]);
@@ -45,11 +47,13 @@ export default function ProfileEditor() {
     try {
       const translatedTitle = await autoTranslate(formData.title);
       const translatedBio = await autoTranslate(formData.bio);
+      const translatedSkills = await autoTranslate(formData.skillsArray);
       
       setFormData(prev => ({
         ...prev,
         title_en: translatedTitle || prev.title_en,
-        bio_en: translatedBio || prev.bio_en
+        bio_en: translatedBio || prev.bio_en,
+        skillsArray_en: translatedSkills || prev.skillsArray_en
       }));
       setSuccessMsg('Translation applied. Review English fields.');
       setTimeout(() => setSuccessMsg(''), 3000);
@@ -75,7 +79,8 @@ export default function ProfileEditor() {
       await updateProfile({
         ...formData,
         profileImage: finalImageUrl,
-        skills: formData.skillsArray.split(',').map(s => s.trim()).filter(s => s)
+        skills: formData.skillsArray.split(',').map(s => s.trim()).filter(s => s),
+        skills_en: formData.skillsArray_en.split(',').map(s => s.trim()).filter(s => s)
       });
       
       setImageFile(null);
@@ -144,9 +149,15 @@ export default function ProfileEditor() {
           </div>
         </div>
 
-        <div className="form-group">
-          <label className="form-label">Skills (comma separated)</label>
-          <input name="skillsArray" type="text" className="form-input" value={formData.skillsArray} onChange={handleChange} />
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--spacing-md)' }}>
+          <div className="form-group">
+            <label className="form-label">Hero Tags (ES) (comma separated)</label>
+            <input name="skillsArray" type="text" className="form-input" value={formData.skillsArray} onChange={handleChange} />
+          </div>
+          <div className="form-group">
+            <label className="form-label">Hero Tags (EN)</label>
+            <input name="skillsArray_en" type="text" className="form-input" value={formData.skillsArray_en} onChange={handleChange} />
+          </div>
         </div>
 
         <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 'var(--spacing-lg)' }}>

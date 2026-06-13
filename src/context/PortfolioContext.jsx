@@ -34,9 +34,10 @@ export function PortfolioProvider({ children }) {
     title: "Software Engineer & Data Scientist",
     title_en: "Software Engineer & Data Scientist",
     profileImage: "https://images.unsplash.com/photo-1568602471122-7832951cc4c5?q=80&w=2070&auto=format&fit=crop",
-    bio: "Passionate developer with a strong background in both full-stack web development and data science. I build scalable applications and extract actionable insights from complex datasets. Constantly learning and exploring new technologies.",
-    bio_en: "Passionate developer with a strong background in both full-stack web development and data science. I build scalable applications and extract actionable insights from complex datasets. Constantly learning and exploring new technologies.",
-    skills: ['React', 'Node.js', 'Python', 'Machine Learning', 'Data Analysis', 'SQL', 'TypeScript', 'AWS'],
+    bio: 'Desarrollo software, inteligencia artificial y soluciones de datos que generan resultados medibles y potencian la transformación digital.',
+    bio_en: 'I develop software, artificial intelligence, and data solutions that generate measurable results and empower digital transformation.',
+    skills: ['DESARROLLO DE SOFTWARE', 'CIENCIA DE DATOS', 'INTELIGENCIA ARTIFICIAL'],
+    skills_en: ['SOFTWARE DEVELOPMENT', 'DATA SCIENCE', 'ARTIFICIAL INTELLIGENCE'],
     certs: [
       { id: 1, title: 'AWS Certified Solutions Architect', url: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf' },
       { id: 2, title: 'Meta Front-End Developer', url: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf' }
@@ -105,9 +106,10 @@ export function PortfolioProvider({ children }) {
         const data = docSnap.data();
         setProfile({
           ...data,
+          bio_en: data.bio_en || '',
           skills: data.skills || [],
-          certs: data.certs || [],
-          experiences: data.experiences || []
+          skills_en: data.skills_en || [],
+          experiences: data.experiences || [],
         });
       } else {
         // Fallback to default if somehow the doc is deleted
