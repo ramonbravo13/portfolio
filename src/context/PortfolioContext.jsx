@@ -16,7 +16,9 @@ export function PortfolioProvider({ children }) {
     name: "Loading...",
     title: "",
     profileImage: "",
+    profileImage: "",
     bio: "",
+    metrics: {},
     skills: [],
     certs: [],
     experiences: []
@@ -36,6 +38,13 @@ export function PortfolioProvider({ children }) {
     profileImage: "https://images.unsplash.com/photo-1568602471122-7832951cc4c5?q=80&w=2070&auto=format&fit=crop",
     bio: 'Desarrollo software, inteligencia artificial y soluciones de datos que generan resultados medibles y potencian la transformación digital.',
     bio_en: 'I develop software, artificial intelligence, and data solutions that generate measurable results and empower digital transformation.',
+    metrics: {
+      yearsExp: "10+",
+      projectsCount: "50+",
+      appsCount: "2",
+      specialist: "IA y Ciencia de Datos",
+      specialist_en: "AI & Data Science"
+    },
     skills: ['DESARROLLO DE SOFTWARE', 'CIENCIA DE DATOS', 'INTELIGENCIA ARTIFICIAL'],
     skills_en: ['SOFTWARE DEVELOPMENT', 'DATA SCIENCE', 'ARTIFICIAL INTELLIGENCE'],
     certs: [
@@ -125,6 +134,7 @@ export function PortfolioProvider({ children }) {
         setProfile({
           ...data,
           bio_en: data.bio_en || '',
+          metrics: data.metrics || { yearsExp: "10+", projectsCount: "50+", appsCount: "2", specialist: "IA y Ciencia de Datos", specialist_en: "AI & Data Science" },
           skills: data.skills || [],
           skills_en: data.skills_en || [],
           certs: data.certs || [],

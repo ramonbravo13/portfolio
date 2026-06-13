@@ -13,6 +13,11 @@ export default function ProfileEditor() {
     profileImage: '',
     bio: '',
     bio_en: '',
+    yearsExp: '',
+    projectsCount: '',
+    appsCount: '',
+    specialist: '',
+    specialist_en: '',
     skillsArray: '',
     skillsArray_en: ''
   });
@@ -27,6 +32,11 @@ export default function ProfileEditor() {
         profileImage: profile.profileImage || '',
         bio: profile.bio || '',
         bio_en: profile.bio_en || '',
+        yearsExp: profile.metrics?.yearsExp || '',
+        projectsCount: profile.metrics?.projectsCount || '',
+        appsCount: profile.metrics?.appsCount || '',
+        specialist: profile.metrics?.specialist || '',
+        specialist_en: profile.metrics?.specialist_en || '',
         skillsArray: (profile.skills || []).join(', '),
         skillsArray_en: (profile.skills_en || []).join(', ')
       });
@@ -48,12 +58,14 @@ export default function ProfileEditor() {
       const translatedTitle = await autoTranslate(formData.title);
       const translatedBio = await autoTranslate(formData.bio);
       const translatedSkills = await autoTranslate(formData.skillsArray);
+      const translatedSpecialist = await autoTranslate(formData.specialist);
       
       setFormData(prev => ({
         ...prev,
         title_en: translatedTitle || prev.title_en,
         bio_en: translatedBio || prev.bio_en,
-        skillsArray_en: translatedSkills || prev.skillsArray_en
+        skillsArray_en: translatedSkills || prev.skillsArray_en,
+        specialist_en: translatedSpecialist || prev.specialist_en
       }));
       setSuccessMsg('Translation applied. Review English fields.');
       setTimeout(() => setSuccessMsg(''), 3000);
@@ -79,6 +91,13 @@ export default function ProfileEditor() {
       await updateProfile({
         ...formData,
         profileImage: finalImageUrl,
+        metrics: {
+          yearsExp: formData.yearsExp,
+          projectsCount: formData.projectsCount,
+          appsCount: formData.appsCount,
+          specialist: formData.specialist,
+          specialist_en: formData.specialist_en
+        },
         skills: formData.skillsArray.split(',').map(s => s.trim()).filter(s => s),
         skills_en: formData.skillsArray_en.split(',').map(s => s.trim()).filter(s => s)
       });
@@ -146,6 +165,34 @@ export default function ProfileEditor() {
           <div className="form-group">
             <label className="form-label">Biography (EN)</label>
             <textarea name="bio_en" className="form-input" rows="4" value={formData.bio_en} onChange={handleChange} />
+          </div>
+        </div>
+
+        <h3 style={{ marginTop: 'var(--spacing-xl)', marginBottom: 'var(--spacing-md)', fontSize: '1.2rem', color: 'var(--text-primary)' }}>Metrics & Statistics</h3>
+        
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 'var(--spacing-md)' }}>
+          <div className="form-group">
+            <label className="form-label">Years of Experience</label>
+            <input name="yearsExp" type="text" className="form-input" value={formData.yearsExp} onChange={handleChange} placeholder="e.g. 10+" />
+          </div>
+          <div className="form-group">
+            <label className="form-label">Projects Developed</label>
+            <input name="projectsCount" type="text" className="form-input" value={formData.projectsCount} onChange={handleChange} placeholder="e.g. 50+" />
+          </div>
+          <div className="form-group">
+            <label className="form-label">Apps Published</label>
+            <input name="appsCount" type="text" className="form-input" value={formData.appsCount} onChange={handleChange} placeholder="e.g. 2" />
+          </div>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--spacing-md)', marginTop: 'var(--spacing-md)', marginBottom: 'var(--spacing-xl)' }}>
+          <div className="form-group">
+            <label className="form-label">Specialist In (ES)</label>
+            <input name="specialist" type="text" className="form-input" value={formData.specialist} onChange={handleChange} placeholder="e.g. IA y Ciencia de Datos" />
+          </div>
+          <div className="form-group">
+            <label className="form-label">Specialist In (EN)</label>
+            <input name="specialist_en" type="text" className="form-input" value={formData.specialist_en} onChange={handleChange} placeholder="e.g. AI & Data Science" />
           </div>
         </div>
 

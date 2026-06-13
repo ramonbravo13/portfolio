@@ -96,6 +96,15 @@ function MetricCard({ title, value, startTrigger, icon: Icon }) {
 
 // Metrics Counter Section with Scroll Trigger
 function CounterSection({ isEnglish }) {
+  const { profile } = usePortfolio();
+  const metrics = profile.metrics || {
+    yearsExp: "10+",
+    projectsCount: "50+",
+    appsCount: "2",
+    specialist: "IA y Ciencia de Datos",
+    specialist_en: "AI & Data Science"
+  };
+
   const [visible, setVisible] = useState(false);
   const sectionRef = useRef(null);
 
@@ -129,10 +138,10 @@ function CounterSection({ isEnglish }) {
       marginTop: 'var(--spacing-2xl)',
       marginBottom: 'var(--spacing-3xl)'
     }}>
-      <MetricCard title={isEnglish ? "Years of experience" : "Años de experiencia"} value="10+" startTrigger={visible} icon={Briefcase} />
-      <MetricCard title={isEnglish ? "Projects developed" : "Proyectos desarrollados"} value="50+" startTrigger={visible} icon={Cpu} />
-      <MetricCard title={isEnglish ? "Apps published" : "Aplicaciones publicadas"} value="2" startTrigger={visible} icon={Rocket} />
-      <MetricCard title={isEnglish ? "Specialist in" : "Especialista en"} value={isEnglish ? "AI & Data Science" : "IA y Ciencia de Datos"} startTrigger={visible} icon={Layers} />
+      <MetricCard title={isEnglish ? "Years of experience" : "Años de experiencia"} value={metrics.yearsExp} startTrigger={visible} icon={Briefcase} />
+      <MetricCard title={isEnglish ? "Projects developed" : "Proyectos desarrollados"} value={metrics.projectsCount} startTrigger={visible} icon={Cpu} />
+      <MetricCard title={isEnglish ? "Apps published" : "Aplicaciones publicadas"} value={metrics.appsCount} startTrigger={visible} icon={Rocket} />
+      <MetricCard title={isEnglish ? "Specialist in" : "Especialista en"} value={isEnglish && metrics.specialist_en ? metrics.specialist_en : metrics.specialist} startTrigger={visible} icon={Layers} />
     </div>
   );
 }
