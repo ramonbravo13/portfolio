@@ -1,9 +1,13 @@
 import { Link, Navigate } from 'react-router-dom';
 import { Mail, Lock, LogIn } from 'lucide-react';
 import { usePortfolio } from '../context/PortfolioContext';
+import { auth } from '../config/firebase';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { useState } from 'react';
 
 export default function Login() {
-  const { loginAdmin, isAdminAuth } = usePortfolio();
+  const { isAdminAuth } = usePortfolio();
+  const [loading, setLoading] = useState(false);
 
   if (isAdminAuth) {
     return <Navigate to="/admin" replace />;
@@ -17,16 +21,20 @@ export default function Login() {
           Sign in to your portfolio workspace
         </p>
 
-        <form onSubmit={(e) => { 
+        <form onSubmit={async (e) => { 
           e.preventDefault(); 
+          setLoading(true);
           const email = e.target[0].value;
           const password = e.target[1].value;
           
-          if (email === 'juan@portfolio.com' && password === 'admin123') {
-            loginAdmin();
-            window.location.href = '/admin'; 
-          } else {
-            alert('Credenciales incorrectas. Solo acceso para el administrador.');
+          try {
+            await signInWithEmailAndPassword(auth, email, password);
+            // Si el login es exitoso, el onAuthStateChanged del context nos redirigirá automáticamente
+          } catch (error) {
+            console.error(error);
+            alert('Credenciales incorrectas o error de conexión. Detalle: ' + error.message);
+          } finally {
+            setLoading(false);
           }
         }}>
           <div className="form-group">
@@ -48,8 +56,8 @@ export default function Login() {
             </div>
           </div>
 
-          <button type="submit" className="btn-primary" style={{ width: '100%', justifyContent: 'center', padding: '0.75rem' }}>
-            Sign In <LogIn size={18} />
+          <button type="submit" className="btn-primary" disabled={loading} style={{ width: '100%', justifyContent: 'center', padding: '0.75rem' }}>
+            {loading ? 'Verificando...' : 'Sign In'} <LogIn size={18} />
           </button>
         </form>
 

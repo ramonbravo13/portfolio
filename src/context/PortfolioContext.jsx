@@ -2,6 +2,8 @@ import { createContext, useContext, useState, useEffect } from 'react';
 import { db, storage } from '../config/firebase';
 import { doc, getDoc, setDoc, onSnapshot, collection, deleteDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { auth } from '../config/firebase';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
 
 const PortfolioContext = createContext();
 
@@ -22,9 +24,7 @@ export function PortfolioProvider({ children }) {
 
   const [projects, setProjects] = useState([]);
 
-  const [isAdminAuth, setIsAdminAuth] = useState(() => {
-    return localStorage.getItem('portfolio_admin_auth') === 'true';
-  });
+  const [isAdminAuth, setIsAdminAuth] = useState(false);
 
   const [loading, setLoading] = useState(true);
 
@@ -157,11 +157,14 @@ export function PortfolioProvider({ children }) {
       unsubProfile();
       unsubProjects();
     }
-  }, [loading]); // Added loading to dependency array to match timeout logic if needed, but [] is also fine
+  }, [loading]);
 
   useEffect(() => {
-    localStorage.setItem('portfolio_admin_auth', isAdminAuth);
-  }, [isAdminAuth]);
+    const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
+      setIsAdminAuth(!!user);
+    });
+    return () => unsubscribeAuth();
+  }, []);
 
   useEffect(() => {
     localStorage.setItem('portfolio_lang', language);
@@ -215,14 +218,19 @@ export function PortfolioProvider({ children }) {
     return await getDownloadURL(fileRef);
   };
   
-  const loginAdmin = () => setIsAdminAuth(true);
-  const logoutAdmin = () => setIsAdminAuth(false);
+  const logoutAdmin = async () => {
+    try {
+      await signOut(auth);
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
+  };
 
   return (
     <PortfolioContext.Provider value={{
       profile, projects, isAdminAuth, loading, language, setLanguage, toggleLanguage,
       updateProfile, addProject, updateProject, deleteProject, uploadFile,
-      loginAdmin, logoutAdmin
+      logoutAdmin
     }}>
       {!loading ? children : <div className="page-container" style={{display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh'}}><h2 className="text-gradient">Loading Portfolio...</h2></div>}
     </PortfolioContext.Provider>
