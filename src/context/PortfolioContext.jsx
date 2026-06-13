@@ -39,8 +39,26 @@ export function PortfolioProvider({ children }) {
     skills: ['DESARROLLO DE SOFTWARE', 'CIENCIA DE DATOS', 'INTELIGENCIA ARTIFICIAL'],
     skills_en: ['SOFTWARE DEVELOPMENT', 'DATA SCIENCE', 'ARTIFICIAL INTELLIGENCE'],
     certs: [
-      { id: 1, title: 'AWS Certified Solutions Architect', url: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf' },
-      { id: 2, title: 'Meta Front-End Developer', url: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf' }
+      { 
+        id: 1, 
+        title: 'AWS Certified Solutions Architect',
+        title_en: 'AWS Certified Solutions Architect',
+        tags: 'Cloud, AWS, Arquitectura',
+        tags_en: 'Cloud, AWS, Architecture',
+        desc: 'Certificación oficial para diseño avanzado de sistemas escalables y de alta disponibilidad.',
+        desc_en: 'Official certification for advanced design of highly available, cost-efficient, fault-tolerant, and scalable distributed systems.',
+        url: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf' 
+      },
+      { 
+        id: 2, 
+        title: 'Meta Front-End Developer',
+        title_en: 'Meta Front-End Developer',
+        tags: 'React, Frontend',
+        tags_en: 'React, Frontend',
+        desc: 'Certificación profesional en desarrollo de interfaces modernas con React.',
+        desc_en: 'Professional certification in modern interface development using React.',
+        url: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf' 
+      }
     ],
     experiences: [
       {
@@ -109,6 +127,7 @@ export function PortfolioProvider({ children }) {
           bio_en: data.bio_en || '',
           skills: data.skills || [],
           skills_en: data.skills_en || [],
+          certs: data.certs || [],
           experiences: data.experiences || [],
         });
       } else {

@@ -361,6 +361,65 @@ export default function Home() {
           </div>
         </section>
 
+        {/* CERTIFICATIONS SECTION */}
+        <section id="certificaciones" className="section-container" style={{ borderTop: '1px solid var(--border-subtle)' }}>
+          <div style={{ marginBottom: 'var(--spacing-3xl)' }}>
+            <span className="mono" style={{ color: 'var(--accent-primary)', fontSize: '0.85rem', fontWeight: 600, letterSpacing: '0.15em', textTransform: 'uppercase' }}>{isEnglish ? 'Credentials' : 'Credenciales'}</span>
+            <h2 style={{ display: 'block', marginTop: 'var(--spacing-xs)', fontSize: '2.5rem' }}>{isEnglish ? 'Certifications & Awards' : 'Certificaciones y Reconocimientos'}</h2>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))', gap: 'var(--spacing-xl)' }}>
+            {(profile.certs || []).length === 0 ? (
+              <p style={{ color: 'var(--text-secondary)', textAlign: 'center', gridColumn: '1 / -1', padding: 'var(--spacing-lg)' }}>
+                {isEnglish ? 'No certifications added yet.' : 'Aún no se han agregado certificaciones.'}
+              </p>
+            ) : (
+              (profile.certs || []).map((cert, idx) => {
+                const title = isEnglish && cert.title_en ? cert.title_en : cert.title;
+                const tags = isEnglish && cert.tags_en ? cert.tags_en : cert.tags;
+                const desc = isEnglish && cert.desc_en ? cert.desc_en : cert.desc;
+
+                return (
+                  <div key={cert.id || idx} onClick={() => setSelectedCert(cert)} className="premium-card" style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 'var(--spacing-md)',
+                    padding: 'var(--spacing-xl)',
+                    borderRadius: 'var(--radius-lg)',
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease',
+                    position: 'relative'
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-md)' }}>
+                      <Award size={24} style={{ color: 'var(--accent-primary)' }} />
+                      <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 700 }}>{title}</h3>
+                    </div>
+                    {tags && (
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                        {tags.split(',').map((tag, tagIdx) => (
+                          <span key={tagIdx} className="mono" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border-subtle)', padding: '3px 8px', borderRadius: '4px', fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                            {tag.trim()}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                    {desc && (
+                      <p style={{ margin: 0, fontSize: '0.95rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+                        {desc}
+                      </p>
+                    )}
+                    <div style={{ marginTop: 'auto', paddingTop: 'var(--spacing-md)', borderTop: '1px solid var(--border-subtle)' }}>
+                      <span className="mono" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', color: 'var(--text-primary)', fontSize: '0.8rem', fontWeight: 600 }}>
+                        {isEnglish ? 'View PDF Document' : 'Ver Documento PDF'} <ArrowRight size={14} />
+                      </span>
+                    </div>
+                  </div>
+                );
+              })
+            )}
+          </div>
+        </section>
+
         {/* EXPERIENCE SECTION */}
         <section id="experiencia" className="section-container" style={{ borderTop: '1px solid var(--border-subtle)' }}>
           <div style={{ marginBottom: 'var(--spacing-3xl)' }}>
@@ -409,39 +468,6 @@ export default function Home() {
             )}
           </div>
 
-          {/* Certifications Box within Experience Section */}
-          <div className="premium-card" style={{ marginTop: 'var(--spacing-2xl)', borderRadius: 'var(--radius-md)' }}>
-            <h3 style={{ marginBottom: 'var(--spacing-lg)' }}>{isEnglish ? 'Certifications & Accreditations' : 'Certificaciones y Acreditaciones'}</h3>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: 'var(--spacing-md)' }}>
-              {(profile.certs || []).map((cert, idx) => (
-                <div key={idx} onClick={() => setSelectedCert(cert)} style={{
-                  padding: 'var(--spacing-md)',
-                  borderRadius: 'var(--radius-sm)',
-                  border: '1px solid var(--border-subtle)',
-                  background: 'rgba(255, 255, 255, 0.01)',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  transition: 'all 0.2s ease'
-                }}
-                onMouseOver={(e) => {
-                  e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)';
-                  e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.02)';
-                }}
-                onMouseOut={(e) => {
-                  e.currentTarget.style.borderColor = 'var(--border-subtle)';
-                  e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.01)';
-                }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-md)' }}>
-                    <Award size={20} style={{ color: 'var(--accent-primary)' }} />
-                    <span style={{ fontSize: '0.9rem', fontWeight: 500, color: 'var(--text-primary)' }}>{cert.title}</span>
-                  </div>
-                  <span className="mono" style={{ color: 'var(--text-secondary)', fontSize: '0.75rem' }}>PDF ↗</span>
-                </div>
-              ))}
-            </div>
-          </div>
         </section>
 
         {/* CONTACT SECTION */}
