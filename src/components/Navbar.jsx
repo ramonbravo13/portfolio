@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, MessageCircle, Edit, LogOut, LogIn } from 'lucide-react';
+import { Menu, X, MessageCircle, Edit, LogOut, LogIn, Github, Linkedin } from 'lucide-react';
 import { usePortfolio } from '../context/PortfolioContext';
 
 export default function Navbar() {
@@ -121,6 +121,12 @@ export default function Navbar() {
               </Link>
             )}
             
+            <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="btn-secondary" style={{ padding: '0.5rem', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }} title="GitHub">
+              <Github size={18} />
+            </a>
+            <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="btn-secondary" style={{ padding: '0.5rem', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }} title="LinkedIn">
+              <Linkedin size={18} />
+            </a>
             <a href="https://wa.me/523315004877" target="_blank" rel="noopener noreferrer" className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '0.5rem 1.25rem', fontSize: '0.85rem', borderRadius: 'var(--radius-sm)', textDecoration: 'none' }}>
               <MessageCircle size={14} /> WhatsApp
             </a>
@@ -197,6 +203,14 @@ export default function Navbar() {
               </Link>
             )}
 
+            <div style={{ display: 'flex', gap: 'var(--spacing-md)', justifyContent: 'center', marginTop: 'var(--spacing-xs)' }}>
+              <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="btn-secondary" style={{ padding: '0.6rem', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Github size={20} />
+              </a>
+              <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="btn-secondary" style={{ padding: '0.6rem', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Linkedin size={20} />
+              </a>
+            </div>
             <a href="https://wa.me/523315004877" target="_blank" rel="noopener noreferrer" className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', justifyContent: 'center', textDecoration: 'none' }}>
               <MessageCircle size={16} /> WhatsApp
             </a>

@@ -182,10 +182,10 @@ export default function Home() {
           paddingBottom: 'var(--spacing-3xl)'
         }}>
           {/* Left Column */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-lg)' }}>
+          <div className="animate-fade-up" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-lg)' }}>
             <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
               {(isEnglish && profile.skills_en && profile.skills_en.length > 0 ? profile.skills_en : (profile.skills || [])).map((tag, idx) => (
-                <span key={idx} className="mono" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border-subtle)', padding: '4px 10px', borderRadius: '4px', color: 'var(--text-secondary)', fontSize: '0.75rem' }}>
+                <span key={idx} className="mono tech-badge">
                   {tag}
                 </span>
               ))}
@@ -198,7 +198,7 @@ export default function Home() {
               letterSpacing: '-0.04em',
               color: 'var(--text-primary)'
             }}>
-              {isEnglish && profile.title_en ? profile.title_en : profile.title}
+              {(isEnglish && profile.title_en ? profile.title_en : profile.title).replace('Cientifico', 'Científico')}
             </h1>
             
             <p style={{ 
@@ -223,17 +223,14 @@ export default function Home() {
           </div>
 
           {/* Right Column - Premium image frame */}
-          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-            <div style={{
+          <div className="animate-fade-up delay-200" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+            <div className="glass-panel" style={{
               position: 'relative',
               width: '100%',
               maxWidth: '440px',
               aspectRatio: '1/1',
               borderRadius: 'var(--radius-lg)',
-              backgroundColor: 'var(--bg-secondary)',
-              border: '1px solid var(--border-subtle)',
               padding: '16px',
-              boxShadow: 'var(--shadow-card)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -308,7 +305,7 @@ export default function Home() {
 
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', margin: '4px 0' }}>
                       {tags.map(tag => (
-                        <span key={tag} className="mono" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border-subtle)', padding: '3px 8px', borderRadius: '4px', fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                        <span key={tag} className="mono tech-badge">
                           {tag}
                         </span>
                       ))}
@@ -342,10 +339,16 @@ export default function Home() {
                       </p>
                     )}
 
-                    <div style={{ marginTop: 'var(--spacing-md)' }}>
-                      <Link to={`/project/${project.id}`} className="btn-secondary" style={{ padding: '0.65rem 1.25rem', fontSize: '0.85rem' }}>
+                    <div style={{ marginTop: 'var(--spacing-md)', display: 'flex', gap: 'var(--spacing-sm)', flexWrap: 'wrap' }}>
+                      <Link to={`/project/${project.id}`} className="btn-primary" style={{ padding: '0.65rem 1.25rem', fontSize: '0.85rem' }}>
                         {isEnglish ? 'View full case study' : 'Ver caso completo'} <ArrowRight size={14} />
                       </Link>
+                      <a href={project.liveUrl || "#"} target="_blank" rel="noreferrer" className="btn-secondary" style={{ padding: '0.65rem 1.25rem', fontSize: '0.85rem' }}>
+                        Live Demo
+                      </a>
+                      <a href={project.githubUrl || "#"} target="_blank" rel="noreferrer" className="btn-secondary" style={{ padding: '0.65rem 1.25rem', fontSize: '0.85rem' }}>
+                        GitHub
+                      </a>
                     </div>
                   </div>
 
@@ -384,7 +387,7 @@ export default function Home() {
               </p>
             ) : (
               (profile.certs || []).map((cert, idx) => {
-                const title = isEnglish && cert.title_en ? cert.title_en : cert.title;
+                const title = (isEnglish && cert.title_en ? cert.title_en : cert.title).replace('Datoss', 'Datos');
                 const tags = isEnglish && cert.tags_en ? cert.tags_en : cert.tags;
                 const desc = isEnglish && cert.desc_en ? cert.desc_en : cert.desc;
 
@@ -406,7 +409,7 @@ export default function Home() {
                     {tags && (
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
                         {tags.split(',').map((tag, tagIdx) => (
-                          <span key={tagIdx} className="mono" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border-subtle)', padding: '3px 8px', borderRadius: '4px', fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                          <span key={tagIdx} className="mono tech-badge">
                             {tag.trim()}
                           </span>
                         ))}
@@ -436,7 +439,7 @@ export default function Home() {
             <h2 style={{ display: 'block', marginTop: 'var(--spacing-xs)', fontSize: '2.5rem' }}>{isEnglish ? 'Professional experience' : 'Experiencia profesional'}</h2>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-xl)' }}>
+          <div className="timeline-container animate-fade-up">
             {(profile.experiences || []).length === 0 ? (
               <p style={{ color: 'var(--text-secondary)', textAlign: 'center', padding: 'var(--spacing-lg)' }}>
                 {isEnglish ? 'No professional experience registered yet.' : 'No se ha registrado experiencia profesional aún.'}
@@ -449,28 +452,30 @@ export default function Home() {
                 const desc = isEnglish && item.desc_en ? item.desc_en : item.desc;
                 
                 return (
-                  <div key={idx} className="premium-card" style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: 'var(--spacing-sm)',
-                    borderRadius: 'var(--radius-md)',
-                    position: 'relative'
-                  }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 'var(--spacing-sm)' }}>
-                      <div>
-                        <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 700 }}>{role}</h3>
-                        <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--text-secondary)', fontWeight: 500 }}>{item.company}</p>
+                  <div key={idx} className="timeline-item">
+                    <div className="timeline-dot"></div>
+                    <div className="premium-card" style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 'var(--spacing-sm)',
+                      borderRadius: 'var(--radius-md)'
+                    }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 'var(--spacing-sm)' }}>
+                        <div>
+                          <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 700 }}>{role}</h3>
+                          <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--text-secondary)', fontWeight: 500 }}>{item.company}</p>
+                        </div>
+                        <span className="mono" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border-subtle)', padding: '4px 10px', borderRadius: '4px', color: 'var(--accent-primary)', fontSize: '0.8rem', fontWeight: 500 }}>
+                          {period}
+                        </span>
                       </div>
-                      <span className="mono" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border-subtle)', padding: '4px 10px', borderRadius: '4px', color: 'var(--accent-primary)', fontSize: '0.8rem', fontWeight: 500 }}>
-                        {period}
-                      </span>
+                      <div className="mono tech-badge" style={{ alignSelf: 'flex-start', margin: '4px 0' }}>
+                        {tag}
+                      </div>
+                      <p style={{ margin: 'var(--spacing-xs) 0 0 0', fontSize: '0.95rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+                        {desc}
+                      </p>
                     </div>
-                    <div className="mono" style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', opacity: 0.85, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                      {tag}
-                    </div>
-                    <p style={{ margin: 'var(--spacing-sm) 0 0 0', fontSize: '0.95rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
-                      {desc}
-                    </p>
                   </div>
                 );
               })
