@@ -15,8 +15,8 @@ export default function Login() {
 
   return (
     <div className="page-container" style={{ justifyContent: 'center', alignItems: 'center' }}>
-      <div className="glass-panel animate-fade-in" style={{ width: '100%', maxWidth: '420px', display: 'flex', flexDirection: 'column' }}>
-        <h1 className="text-gradient" style={{ textAlign: 'center', marginBottom: 'var(--spacing-xs)', fontSize: '2rem' }}>Welcome Back</h1>
+      <div className="premium-card animate-fade-in" style={{ width: '100%', maxWidth: '420px', display: 'flex', flexDirection: 'column', padding: 'var(--spacing-2xl) var(--spacing-xl)', border: '1px solid var(--border-light)' }}>
+        <h1 style={{ textAlign: 'center', marginBottom: 'var(--spacing-xs)', fontSize: '2rem' }}>Welcome Back</h1>
         <p style={{ textAlign: 'center', color: 'var(--text-secondary)', marginBottom: 'var(--spacing-xl)' }}>
           Sign in to your portfolio workspace
         </p>
@@ -61,7 +61,7 @@ export default function Login() {
           </button>
         </form>
 
-        <p style={{ textAlign: 'center', marginTop: 'var(--spacing-lg)', fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
+        <p className="mono" style={{ textAlign: 'center', marginTop: 'var(--spacing-lg)', color: 'var(--text-secondary)' }}>
           Portfolio Admin Access Only
         </p>
       </div>

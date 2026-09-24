@@ -16,7 +16,7 @@ export default function ProjectNotebook() {
   if (!project) {
     return (
       <div className="page-container" style={{ textAlign: 'center', paddingTop: '5rem' }}>
-        <h1 className="text-gradient">{isEnglish ? 'Project not found' : 'Proyecto no encontrado'}</h1>
+        <h1>{isEnglish ? 'Project not found' : 'Proyecto no encontrado'}</h1>
         <Link to="/" className="btn-primary" style={{ marginTop: 'var(--spacing-md)' }}><ArrowLeft size={18}/> {isEnglish ? 'Back Home' : 'Volver al Inicio'}</Link>
       </div>
     )
@@ -40,7 +40,7 @@ export default function ProjectNotebook() {
         <h1 style={{ fontSize: '3rem', margin: '0 0 var(--spacing-md) 0', lineHeight: 1.1 }}>{title}</h1>
         <div style={{ display: 'flex', gap: 'var(--spacing-sm)' }}>
           {tags.map(tag => (
-            <span key={tag} className="mono" style={{ background: 'var(--bg-glass)', border: '1px solid var(--border-glass)', padding: '2px 10px', borderRadius: '4px', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+            <span key={tag} className="mono tech-badge">
               {tag}
             </span>
           ))}

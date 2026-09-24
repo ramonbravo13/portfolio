@@ -7,96 +7,203 @@ import {
 import CertificationViewer from '../components/CertificationViewer';
 import Navbar from '../components/Navbar';
 import { usePortfolio } from '../context/PortfolioContext';
+import gsap from 'gsap';
 
-// Animated Counter Component
-function AnimatedCounter({ value, duration = 1200 }) {
-  const [count, setCount] = useState(0);
+// --- VISUAL REDESIGN COMPONENTS ---
 
+// ImageTrail Component
+function ImageTrail({ images }) {
   useEffect(() => {
-    const isSpecialty = isNaN(parseInt(value.replace(/\D/g, ''), 10));
-    if (isSpecialty) {
-      setCount(value);
-      return;
-    }
+    // Only initialize if we have valid images and it's not a small screen
+    if (!images || images.length === 0 || window.innerWidth < 768) return;
+    
+    // Filter out undefined/null images
+    const validImages = images.filter(Boolean);
+    if (validImages.length === 0) return;
+    
+    let currentIndex = 0;
+    let lastRenderTime = 0;
+    let zIndexCounter = 100;
+    let mouseX = window.innerWidth / 2;
+    let mouseY = window.innerHeight / 2;
+    let requestRef;
+    
+    // Pre-create DOM elements
+    const imgElements = validImages.map(src => {
+      const img = document.createElement('img');
+      img.src = src;
+      Object.assign(img.style, {
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '320px',
+        height: '420px',
+        objectFit: 'cover',
+        pointerEvents: 'none',
+        opacity: '0',
+        transform: 'translate(-50%, -50%) scale(0.8)',
+        zIndex: '0',
+        display: 'none',
+        border: '1px solid var(--border-light)',
+        boxShadow: '0 20px 40px rgba(0,0,0,0.1)'
+      });
+      document.body.appendChild(img);
+      return img;
+    });
 
-    const numericValue = parseInt(value.replace(/\D/g, ''), 10);
-    const suffix = value.replace(/[0-9]/g, '');
-    let start = 0;
-    const end = numericValue;
-    if (start === end) return;
-
-    let startTime = null;
-
-    const animate = (timestamp) => {
-      if (!startTime) startTime = timestamp;
-      const progress = timestamp - startTime;
-      const percentage = Math.min(progress / duration, 1);
+    const handleMouseMove = (e) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
       
-      const easeProgress = percentage * (2 - percentage); // Ease out quad
-      const currentCount = Math.floor(easeProgress * (end - start) + start);
+      const now = Date.now();
+      if (now - lastRenderTime < 100) return; // 100ms throttle for trail density
+      lastRenderTime = now;
       
-      setCount(currentCount);
-
-      if (percentage < 1) {
-        requestAnimationFrame(animate);
-      } else {
-        setCount(end);
-      }
+      const img = imgElements[currentIndex];
+      if (!img) return;
+      
+      img.style.display = 'block';
+      img.style.zIndex = zIndexCounter++;
+      
+      // GSAP Animation
+      gsap.fromTo(img, 
+        { 
+          x: mouseX, 
+          y: mouseY, 
+          scale: 0.8, 
+          opacity: 0,
+          rotation: Math.random() * 10 - 5
+        },
+        { 
+          scale: 1, 
+          opacity: 1, 
+          duration: 0.4,
+          ease: 'power2.out',
+          onComplete: () => {
+            gsap.to(img, {
+              opacity: 0,
+              scale: 0.9,
+              duration: 0.6,
+              delay: 0.5,
+              ease: 'power2.in',
+              onComplete: () => {
+                img.style.display = 'none';
+              }
+            });
+          }
+        }
+      );
+      
+      currentIndex = (currentIndex + 1) % validImages.length;
     };
 
-    requestAnimationFrame(animate);
-  }, [value, duration]);
+    window.addEventListener('mousemove', handleMouseMove);
+    
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      if (requestRef) cancelAnimationFrame(requestRef);
+      imgElements.forEach(img => {
+        if (img && img.parentNode) {
+          gsap.killTweensOf(img);
+          img.parentNode.removeChild(img);
+        }
+      });
+    };
+  }, [images]);
 
-  const isNumeric = !isNaN(parseInt(value.replace(/\D/g, ''), 10));
-  return <span>{isNumeric ? `${count}${value.replace(/[0-9]/g, '')}` : value}</span>;
+  return null;
 }
 
-// Metric Card Component
-function MetricCard({ title, value, startTrigger, icon: Icon }) {
+// Editorial Project Card
+function EditorialProject({ project, index, isEnglish, getIcon }) {
+  const hasCaseStudy = project.problem || project.solution || project.result;
+  const title = isEnglish && project.title_en ? project.title_en : project.title;
+  const tags = isEnglish && project.tags_en && project.tags_en.length > 0 ? project.tags_en : (project.tags || []);
+  const problem = isEnglish && project.problem_en ? project.problem_en : project.problem;
+  
+  const formattedIndex = (index + 1).toString().padStart(2, '0');
+
   return (
-    <div className="premium-card animate-fade-in" style={{ 
-      display: 'flex', 
-      flexDirection: 'column', 
-      alignItems: 'center', 
-      justifyContent: 'center', 
-      textAlign: 'center',
-      padding: 'var(--spacing-xl) var(--spacing-md)',
+    <div className="premium-card animate-fade-up" style={{ 
       position: 'relative',
-      overflow: 'hidden'
+      paddingBottom: 'var(--spacing-xl)',
+      borderTop: '1px solid var(--border-subtle)',
+      display: 'grid',
+      gridTemplateColumns: 'auto 1fr',
+      gap: 'var(--spacing-lg)',
+      alignItems: 'start'
     }}>
-      <div style={{
-        position: 'absolute',
-        top: '10px',
-        right: '10px',
-        opacity: 0.03,
-        color: 'var(--text-primary)'
-      }}>
-        {Icon && <Icon size={64} />}
+      <div className="mono" style={{ paddingTop: '8px' }}>{formattedIndex}</div>
+      
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'baseline', gap: 'var(--spacing-md)' }}>
+          <h3 style={{ margin: 0, fontSize: 'clamp(2rem, 4vw, 3.5rem)', textTransform: 'uppercase', lineHeight: 1 }}>{title}</h3>
+          
+          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+            {tags.slice(0, 3).map(tag => (
+              <span key={tag} className="mono tech-badge">{tag}</span>
+            ))}
+          </div>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 'var(--spacing-xl)', marginTop: 'var(--spacing-sm)' }}>
+          <div>
+            <p style={{ margin: 0, maxWidth: '600px' }}>
+              {problem ? problem : (isEnglish ? 'Documented technological case study.' : 'Caso de estudio tecnológico documentado.')}
+            </p>
+          </div>
+          
+          <div style={{ display: 'flex', gap: 'var(--spacing-sm)', alignItems: 'center', justifyContent: 'flex-start', flexWrap: 'wrap' }}>
+            <Link to={`/project/${project.id}`} className="hover-underline mono" style={{ fontSize: '0.85rem', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+              {isEnglish ? 'Read Case Study' : 'Leer Caso de Estudio'} <ArrowRight size={14} />
+            </Link>
+            {project.liveUrl && (
+              <a href={project.liveUrl} target="_blank" rel="noreferrer" className="hover-underline mono" style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)' }}>
+                Live Demo
+              </a>
+            )}
+            {project.githubUrl && (
+              <a href={project.githubUrl} target="_blank" rel="noreferrer" className="hover-underline mono" style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)' }}>
+                GitHub
+              </a>
+            )}
+          </div>
+        </div>
       </div>
-      <h3 style={{ 
-        fontSize: '2.5rem', 
-        fontWeight: 800, 
-        color: 'var(--text-primary)', 
-        marginBottom: 'var(--spacing-xs)',
-        letterSpacing: '-0.03em'
-      }}>
-        {startTrigger ? <AnimatedCounter value={value} /> : '0'}
-      </h3>
-      <p style={{ 
-        margin: 0, 
-        fontSize: '0.75rem', 
-        color: 'var(--text-secondary)', 
-        fontWeight: 600, 
-        textTransform: 'uppercase',
-        letterSpacing: '0.1em'
-      }}>{title}</p>
     </div>
   );
 }
 
-// Metrics Counter Section with Scroll Trigger
-function CounterSection({ isEnglish }) {
-  const { profile } = usePortfolio();
+// Counter/Metrics Component (Minimal Editorial Version)
+function EditorialMetric({ title, value }) {
+  return (
+    <div style={{ padding: 'var(--spacing-md) 0', borderBottom: '1px solid var(--border-light)' }}>
+      <p className="mono" style={{ margin: 0, marginBottom: '8px', color: 'var(--text-secondary)' }}>{title}</p>
+      <div style={{ fontSize: '3rem', fontFamily: 'var(--font-serif)', lineHeight: 1 }}>{value}</div>
+    </div>
+  );
+}
+
+// Main Component
+export default function Home() {
+  const [selectedCert, setSelectedCert] = useState(null);
+  const { profile, projects, language } = usePortfolio();
+  const isEnglish = language === 'en';
+
+  const getIcon = (type) => {
+    switch(type) {
+      case 'Database': return <Database size={20} />;
+      case 'Terminal': return <Terminal size={20} />;
+      case 'Code': return <Code size={20} />;
+      case 'Award': return <Award size={20} />;
+      case 'Rocket': return <Rocket size={20} />;
+      default: return <Code size={20} />;
+    }
+  };
+
+  // Collect all project images for the ImageTrail
+  const projectImages = projects.map(p => p.thumbnailUrl).filter(Boolean);
+
   const metrics = profile.metrics || {
     yearsExp: "10+",
     projectsCount: "50+",
@@ -105,324 +212,145 @@ function CounterSection({ isEnglish }) {
     specialist_en: "AI & Data Science"
   };
 
-  const [visible, setVisible] = useState(false);
-  const sectionRef = useRef(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setVisible(true);
-          observer.unobserve(entry.target);
-        }
-      },
-      { threshold: 0.1 }
-    );
-
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
-
-    return () => {
-      if (sectionRef.current) {
-        observer.unobserve(sectionRef.current);
-      }
-    };
-  }, []);
-
-  return (
-    <div ref={sectionRef} style={{
-      display: 'grid',
-      gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 220px), 1fr))',
-      gap: 'var(--spacing-lg)',
-      marginTop: 'var(--spacing-2xl)',
-      marginBottom: 'var(--spacing-3xl)'
-    }}>
-      <MetricCard title={isEnglish ? "Years of experience" : "Años de experiencia"} value={metrics.yearsExp} startTrigger={visible} icon={Briefcase} />
-      <MetricCard title={isEnglish ? "Projects developed" : "Proyectos desarrollados"} value={metrics.projectsCount} startTrigger={visible} icon={Cpu} />
-      <MetricCard title={isEnglish ? "Apps published" : "Aplicaciones publicadas"} value={metrics.appsCount} startTrigger={visible} icon={Rocket} />
-      <MetricCard title={isEnglish ? "Specialist in" : "Especialista en"} value={isEnglish && metrics.specialist_en ? metrics.specialist_en : metrics.specialist} startTrigger={visible} icon={Layers} />
-    </div>
-  );
-}
-
-export default function Home() {
-  const [selectedCert, setSelectedCert] = useState(null);
-  const { profile, projects, language } = usePortfolio();
-  
-  const isEnglish = language === 'en';
-
-
-  const getIcon = (type) => {
-    switch(type) {
-      case 'Database': return <Database size={20} style={{ color: 'var(--accent-primary)' }} />;
-      case 'Terminal': return <Terminal size={20} style={{ color: 'var(--accent-primary)' }} />;
-      case 'Code': return <Code size={20} style={{ color: 'var(--accent-primary)' }} />;
-      case 'Award': return <Award size={20} style={{ color: 'var(--accent-primary)' }} />;
-      case 'Rocket': return <Rocket size={20} style={{ color: 'var(--accent-primary)' }} />;
-      default: return <Code size={20} style={{ color: 'var(--accent-primary)' }} />;
-    }
-  }
-
-
   return (
     <div style={{ backgroundColor: 'var(--bg-primary)', minHeight: '100vh' }}>
       <Navbar />
+      
+      {/* Visual Effect: Image Trail (only uses existing project images) */}
+      {projectImages.length > 0 && <ImageTrail images={projectImages} />}
 
-      {/* Main Content Layout */}
       <main className="page-container animate-fade-in" style={{ paddingTop: 'calc(var(--nav-height) + var(--spacing-xl))' }}>
         
         {/* HERO SECTION */}
         <section id="inicio" style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))',
-          gap: 'var(--spacing-2xl)',
-          alignItems: 'center',
           minHeight: '80vh',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
           paddingBottom: 'var(--spacing-3xl)'
         }}>
-          {/* Left Column */}
-          <div className="animate-fade-up" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-lg)' }}>
-            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+          <div className="animate-fade-up" style={{ maxWidth: '1000px' }}>
+            <span className="mono" style={{ display: 'block', marginBottom: 'var(--spacing-md)' }}>
+              {isEnglish ? 'Portfolio & Archive' : 'Portafolio y Archivo'} — 2026
+            </span>
+            
+            <h1 style={{ marginBottom: 'var(--spacing-lg)' }}>
+              {(isEnglish && profile.title_en ? profile.title_en : profile.title).replace('Cientifico', 'Científico')}
+            </h1>
+            
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--spacing-xl)', alignItems: 'flex-end' }}>
+              <p style={{ maxWidth: '600px', margin: 0, fontSize: 'clamp(1.1rem, 2vw, 1.5rem)' }}>
+                {isEnglish && profile.bio_en ? profile.bio_en : profile.bio}
+              </p>
+              
+              <div style={{ display: 'flex', gap: 'var(--spacing-sm)' }}>
+                <a href="#proyectos" className="btn-primary">
+                  {isEnglish ? 'Selected Works' : 'Trabajos Seleccionados'} <ArrowRight size={16} />
+                </a>
+              </div>
+            </div>
+            
+            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: 'var(--spacing-xl)' }}>
               {(isEnglish && profile.skills_en && profile.skills_en.length > 0 ? profile.skills_en : (profile.skills || [])).map((tag, idx) => (
                 <span key={idx} className="mono tech-badge">
                   {tag}
                 </span>
               ))}
             </div>
-            
-            <h1 style={{ 
-              fontSize: 'clamp(2.5rem, 5vw, 4.25rem)', 
-              fontWeight: 800, 
-              lineHeight: 1.1, 
-              letterSpacing: '-0.04em',
-              color: 'var(--text-primary)'
-            }}>
-              {(isEnglish && profile.title_en ? profile.title_en : profile.title).replace('Cientifico', 'Científico')}
-            </h1>
-            
-            <p style={{ 
-              fontSize: 'clamp(1.1rem, 2vw, 1.4rem)', 
-              color: 'var(--text-secondary)', 
-              lineHeight: 1.6,
-              fontWeight: 400,
-              maxWidth: '600px',
-              margin: 0
-            }}>
-              {isEnglish && profile.bio_en ? profile.bio_en : profile.bio}
-            </p>
-            
-            <div style={{ display: 'flex', gap: 'var(--spacing-md)', marginTop: 'var(--spacing-sm)' }}>
-              <a href="#proyectos" className="btn-primary" style={{ padding: '0.85rem 1.75rem' }}>
-                {isEnglish ? 'View projects' : 'Ver proyectos'} <ArrowRight size={16} />
-              </a>
-              <a href="#contacto" className="btn-secondary" style={{ padding: '0.85rem 1.75rem' }}>
-                {isEnglish ? 'Contact' : 'Contactar'}
-              </a>
-            </div>
-          </div>
-
-          {/* Right Column - Premium image frame */}
-          <div className="animate-fade-up delay-200" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-            <div className="glass-panel" style={{
-              position: 'relative',
-              width: '100%',
-              maxWidth: '440px',
-              aspectRatio: '1/1',
-              borderRadius: 'var(--radius-lg)',
-              padding: '16px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              overflow: 'hidden'
-            }}>
-              {profile.profileImage ? (
-                <img 
-                  src={profile.profileImage} 
-                  alt={profile.name} 
-                  style={{ 
-                    width: '100%', 
-                    height: '100%', 
-                    objectFit: 'cover', 
-                    borderRadius: 'calc(var(--radius-lg) - 10px)'
-                  }} 
-                />
-              ) : (
-                // Stunning geometric tech fallback
-                <div style={{
-                  width: '100%',
-                  height: '100%',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  background: 'radial-gradient(circle at center, rgba(37,99,235,0.05) 0%, transparent 70%)',
-                  gap: 'var(--spacing-md)'
-                }}>
-                  <Cpu size={80} style={{ color: 'var(--border-subtle)', opacity: 0.5 }} />
-                  <span className="mono" style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>RB // CORE_ACTIVE</span>
-                </div>
-              )}
-            </div>
           </div>
         </section>
 
-        {/* METRICS SECTION */}
-        <section style={{ borderTop: '1px solid var(--border-subtle)', paddingTop: 'var(--spacing-2xl)' }}>
-          <CounterSection isEnglish={isEnglish} />
+        {/* METRICS / OVERVIEW SECTION */}
+        <section style={{ paddingBottom: 'var(--spacing-3xl)' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 'var(--spacing-xl)' }}>
+            <EditorialMetric title={isEnglish ? "Experience" : "Experiencia"} value={metrics.yearsExp} />
+            <EditorialMetric title={isEnglish ? "Projects" : "Proyectos"} value={metrics.projectsCount} />
+            <EditorialMetric title={isEnglish ? "Specialty" : "Especialidad"} value={isEnglish && metrics.specialist_en ? metrics.specialist_en : metrics.specialist} />
+          </div>
         </section>
 
         {/* PROJECTS SECTION */}
-        <section id="proyectos" className="section-container" style={{ borderTop: '1px solid var(--border-subtle)' }}>
-          <div style={{ marginBottom: 'var(--spacing-3xl)' }}>
-            <span className="mono" style={{ color: 'var(--accent-primary)', fontSize: '0.85rem', fontWeight: 600, letterSpacing: '0.15em', textTransform: 'uppercase' }}>{isEnglish ? 'Portfolio' : 'Portafolio'}</span>
-            <h2 style={{ display: 'block', marginTop: 'var(--spacing-xs)', fontSize: '2.5rem' }}>{isEnglish ? 'Featured projects' : 'Proyectos destacados'}</h2>
+        <section id="proyectos" className="section-container">
+          <div style={{ marginBottom: 'var(--spacing-xl)' }}>
+            <h2 style={{ margin: 0 }}>{isEnglish ? 'Index of Work' : 'Índice de Trabajo'}</h2>
+            <div style={{ width: '100%', height: '1px', backgroundColor: 'var(--border-subtle)', marginTop: 'var(--spacing-md)' }}></div>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-3xl)' }}>
-            {projects.map(project => {
-              const hasCaseStudy = project.problem || project.solution || project.result;
-              const title = isEnglish && project.title_en ? project.title_en : project.title;
-              const tags = isEnglish && project.tags_en && project.tags_en.length > 0 ? project.tags_en : (project.tags || []);
-              const problem = isEnglish && project.problem_en ? project.problem_en : project.problem;
-              const solution = isEnglish && project.solution_en ? project.solution_en : project.solution;
-              const result = isEnglish && project.result_en ? project.result_en : project.result;
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            {projects.map((project, idx) => (
+              <EditorialProject key={project.id} project={project} index={idx} isEnglish={isEnglish} getIcon={getIcon} />
+            ))}
+          </div>
+        </section>
 
-              return (
-                <div key={project.id} className="premium-card" style={{ 
-                  display: 'grid', 
-                  gridTemplateColumns: project.thumbnailUrl ? 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))' : '1fr',
-                  gap: 'var(--spacing-2xl)',
-                  padding: 'var(--spacing-2xl)',
-                  borderRadius: 'var(--radius-lg)'
-                }}>
-                  {/* Left (or full) details */}
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)', justifyContent: 'center' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-sm)' }}>
-                      {getIcon(project.iconType)}
-                      <h3 style={{ margin: 0, fontSize: '1.75rem', fontWeight: 700 }}>{title}</h3>
+        {/* EXPERIENCE SECTION */}
+        <section id="experiencia" className="section-container">
+          <div style={{ marginBottom: 'var(--spacing-xl)' }}>
+            <h2 style={{ margin: 0 }}>{isEnglish ? 'Trajectory' : 'Trayectoria'}</h2>
+            <div style={{ width: '100%', height: '1px', backgroundColor: 'var(--border-subtle)', marginTop: 'var(--spacing-md)' }}></div>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
+            {(profile.experiences || []).length === 0 ? (
+              <p>{isEnglish ? 'No professional experience registered yet.' : 'No se ha registrado experiencia profesional aún.'}</p>
+            ) : (
+              (profile.experiences || []).map((item, idx) => {
+                const role = isEnglish && item.role_en ? item.role_en : item.role;
+                const period = isEnglish && item.period_en ? item.period_en : item.period;
+                const desc = isEnglish && item.desc_en ? item.desc_en : item.desc;
+                
+                return (
+                  <div key={idx} className="premium-card animate-fade-up" style={{ 
+                    display: 'grid', 
+                    gridTemplateColumns: '1fr 2fr', 
+                    gap: 'var(--spacing-lg)',
+                    alignItems: 'start'
+                  }}>
+                    <div>
+                      <h3 style={{ fontSize: '1.5rem', marginBottom: '8px' }}>{item.company}</h3>
+                      <span className="mono">{period}</span>
                     </div>
-
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', margin: '4px 0' }}>
-                      {tags.map(tag => (
-                        <span key={tag} className="mono tech-badge">
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-
-                    {hasCaseStudy ? (
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)', marginTop: 'var(--spacing-sm)' }}>
-                        {problem && (
-                          <div>
-                            <h4 style={{ fontSize: '0.8rem', textTransform: 'uppercase', color: 'var(--text-primary)', letterSpacing: '0.05em', marginBottom: '4px' }}>{isEnglish ? 'The Problem' : 'El Problema'}</h4>
-                            <p style={{ margin: 0, fontSize: '0.92rem', color: 'var(--text-secondary)' }}>{problem}</p>
-                          </div>
-                        )}
-                        {solution && (
-                          <div>
-                            <h4 style={{ fontSize: '0.8rem', textTransform: 'uppercase', color: 'var(--text-primary)', letterSpacing: '0.05em', marginBottom: '4px' }}>{isEnglish ? 'The Solution' : 'La Solución'}</h4>
-                            <p style={{ margin: 0, fontSize: '0.92rem', color: 'var(--text-secondary)' }}>{solution}</p>
-                          </div>
-                        )}
-                        {result && (
-                          <div>
-                            <h4 style={{ fontSize: '0.8rem', textTransform: 'uppercase', color: 'var(--text-primary)', letterSpacing: '0.05em', marginBottom: '4px' }}>{isEnglish ? 'The Result' : 'El Resultado'}</h4>
-                            <p style={{ margin: 0, fontSize: '0.92rem', color: 'var(--text-secondary)' }}>{result}</p>
-                          </div>
-                        )}
-                      </div>
-                    ) : (
-                      // Fallback for projects with only notebook blocks
-                      <p style={{ color: 'var(--text-secondary)', margin: 'var(--spacing-sm) 0' }}>
-                        {isEnglish ? 'Documented technological case study. Click the button below to view full specifications, diagrams, and code.' : 'Caso de estudio tecnológico documentado. Haz clic en el botón de abajo para ver la especificación completa, diagramas y código.'}
-                      </p>
-                    )}
-
-                    <div style={{ marginTop: 'var(--spacing-md)', display: 'flex', gap: 'var(--spacing-sm)', flexWrap: 'wrap' }}>
-                      <Link to={`/project/${project.id}`} className="btn-primary" style={{ padding: '0.65rem 1.25rem', fontSize: '0.85rem' }}>
-                        {isEnglish ? 'View full case study' : 'Ver caso completo'} <ArrowRight size={14} />
-                      </Link>
-                      <a href={project.liveUrl || "#"} target="_blank" rel="noreferrer" className="btn-secondary" style={{ padding: '0.65rem 1.25rem', fontSize: '0.85rem' }}>
-                        Live Demo
-                      </a>
-                      <a href={project.githubUrl || "#"} target="_blank" rel="noreferrer" className="btn-secondary" style={{ padding: '0.65rem 1.25rem', fontSize: '0.85rem' }}>
-                        GitHub
-                      </a>
+                    <div>
+                      <h4 style={{ fontSize: '1.25rem', fontFamily: 'var(--font-sans)', fontWeight: 500, marginBottom: 'var(--spacing-sm)' }}>{role}</h4>
+                      <p style={{ margin: 0 }}>{desc}</p>
                     </div>
                   </div>
-
-                  {/* Right featured image */}
-                  {project.thumbnailUrl && (
-                    <div style={{
-                      borderRadius: 'var(--radius-md)',
-                      overflow: 'hidden',
-                      border: '1px solid var(--border-subtle)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      backgroundColor: 'rgba(0,0,0,0.1)',
-                      maxHeight: '380px'
-                    }}>
-                      <img src={project.thumbnailUrl} alt={project.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                    </div>
-                  )}
-                </div>
-              );
-            })}
+                );
+              })
+            )}
           </div>
         </section>
 
         {/* CERTIFICATIONS SECTION */}
-        <section id="certificaciones" className="section-container" style={{ borderTop: '1px solid var(--border-subtle)' }}>
-          <div style={{ marginBottom: 'var(--spacing-3xl)' }}>
-            <span className="mono" style={{ color: 'var(--accent-primary)', fontSize: '0.85rem', fontWeight: 600, letterSpacing: '0.15em', textTransform: 'uppercase' }}>{isEnglish ? 'Credentials' : 'Credenciales'}</span>
-            <h2 style={{ display: 'block', marginTop: 'var(--spacing-xs)', fontSize: '2.5rem' }}>{isEnglish ? 'Certifications & Awards' : 'Certificaciones y Reconocimientos'}</h2>
+        <section id="certificaciones" className="section-container">
+          <div style={{ marginBottom: 'var(--spacing-xl)' }}>
+            <h2 style={{ margin: 0 }}>{isEnglish ? 'Credentials' : 'Credenciales'}</h2>
+            <div style={{ width: '100%', height: '1px', backgroundColor: 'var(--border-subtle)', marginTop: 'var(--spacing-md)' }}></div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))', gap: 'var(--spacing-xl)' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 'var(--spacing-xl)' }}>
             {(profile.certs || []).length === 0 ? (
-              <p style={{ color: 'var(--text-secondary)', textAlign: 'center', gridColumn: '1 / -1', padding: 'var(--spacing-lg)' }}>
-                {isEnglish ? 'No certifications added yet.' : 'Aún no se han agregado certificaciones.'}
-              </p>
+              <p>{isEnglish ? 'No certifications added yet.' : 'Aún no se han agregado certificaciones.'}</p>
             ) : (
               (profile.certs || []).map((cert, idx) => {
                 const title = (isEnglish && cert.title_en ? cert.title_en : cert.title).replace('Datoss', 'Datos');
-                const tags = isEnglish && cert.tags_en ? cert.tags_en : cert.tags;
                 const desc = isEnglish && cert.desc_en ? cert.desc_en : cert.desc;
 
                 return (
-                  <div key={cert.id || idx} onClick={() => setSelectedCert(cert)} className="premium-card" style={{
+                  <div key={cert.id || idx} onClick={() => setSelectedCert(cert)} className="premium-card animate-fade-up" style={{
+                    cursor: 'pointer',
                     display: 'flex',
                     flexDirection: 'column',
-                    gap: 'var(--spacing-md)',
-                    padding: 'var(--spacing-xl)',
-                    borderRadius: 'var(--radius-lg)',
-                    cursor: 'pointer',
-                    transition: 'all 0.3s ease',
-                    position: 'relative'
+                    justifyContent: 'space-between',
+                    minHeight: '200px'
                   }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-md)' }}>
-                      <Award size={24} style={{ color: 'var(--accent-primary)' }} />
-                      <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 700 }}>{title}</h3>
+                    <div>
+                      <h3 style={{ fontSize: '1.5rem', marginBottom: '16px' }}>{title}</h3>
+                      {desc && <p style={{ fontSize: '1rem' }}>{desc}</p>}
                     </div>
-                    {tags && (
-                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                        {tags.split(',').map((tag, tagIdx) => (
-                          <span key={tagIdx} className="mono tech-badge">
-                            {tag.trim()}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                    {desc && (
-                      <p style={{ margin: 0, fontSize: '0.95rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
-                        {desc}
-                      </p>
-                    )}
-                    <div style={{ marginTop: 'auto', paddingTop: 'var(--spacing-md)', borderTop: '1px solid var(--border-subtle)' }}>
-                      <span className="mono" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', color: 'var(--text-primary)', fontSize: '0.8rem', fontWeight: 600 }}>
-                        {isEnglish ? 'View PDF Document' : 'Ver Documento PDF'} <ArrowRight size={14} />
+                    <div style={{ marginTop: 'var(--spacing-md)' }}>
+                      <span className="hover-underline mono" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontWeight: 600 }}>
+                        {isEnglish ? 'View Document' : 'Ver Documento'} <ArrowRight size={14} />
                       </span>
                     </div>
                   </div>
@@ -432,106 +360,28 @@ export default function Home() {
           </div>
         </section>
 
-        {/* EXPERIENCE SECTION */}
-        <section id="experiencia" className="section-container" style={{ borderTop: '1px solid var(--border-subtle)' }}>
-          <div style={{ marginBottom: 'var(--spacing-3xl)' }}>
-            <span className="mono" style={{ color: 'var(--accent-primary)', fontSize: '0.85rem', fontWeight: 600, letterSpacing: '0.15em', textTransform: 'uppercase' }}>{isEnglish ? 'Trajectory' : 'Trayectoria'}</span>
-            <h2 style={{ display: 'block', marginTop: 'var(--spacing-xs)', fontSize: '2.5rem' }}>{isEnglish ? 'Professional experience' : 'Experiencia profesional'}</h2>
-          </div>
-
-          <div className="timeline-container animate-fade-up">
-            {(profile.experiences || []).length === 0 ? (
-              <p style={{ color: 'var(--text-secondary)', textAlign: 'center', padding: 'var(--spacing-lg)' }}>
-                {isEnglish ? 'No professional experience registered yet.' : 'No se ha registrado experiencia profesional aún.'}
-              </p>
-            ) : (
-              (profile.experiences || []).map((item, idx) => {
-                const role = isEnglish && item.role_en ? item.role_en : item.role;
-                const period = isEnglish && item.period_en ? item.period_en : item.period;
-                const tag = isEnglish && item.tag_en ? item.tag_en : item.tag;
-                const desc = isEnglish && item.desc_en ? item.desc_en : item.desc;
-                
-                return (
-                  <div key={idx} className="timeline-item">
-                    <div className="timeline-dot"></div>
-                    <div className="premium-card" style={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: 'var(--spacing-sm)',
-                      borderRadius: 'var(--radius-md)'
-                    }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 'var(--spacing-sm)' }}>
-                        <div>
-                          <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 700 }}>{role}</h3>
-                          <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--text-secondary)', fontWeight: 500 }}>{item.company}</p>
-                        </div>
-                        <span className="mono" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border-subtle)', padding: '4px 10px', borderRadius: '4px', color: 'var(--accent-primary)', fontSize: '0.8rem', fontWeight: 500 }}>
-                          {period}
-                        </span>
-                      </div>
-                      <div className="mono tech-badge" style={{ alignSelf: 'flex-start', margin: '4px 0' }}>
-                        {tag}
-                      </div>
-                      <p style={{ margin: 'var(--spacing-xs) 0 0 0', fontSize: '0.95rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
-                        {desc}
-                      </p>
-                    </div>
-                  </div>
-                );
-              })
-            )}
-          </div>
-
-        </section>
-
         {/* CONTACT SECTION */}
-        <section id="contacto" className="section-container" style={{ borderTop: '1px solid var(--border-subtle)' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', maxWidth: '600px', margin: '0 auto', gap: 'var(--spacing-xl)' }}>
+        <section id="contacto" className="section-container" style={{ textAlign: 'center', paddingBottom: 'var(--spacing-2xl)' }}>
+          <div style={{ maxWidth: '800px', margin: '0 auto' }}>
+            <h2 style={{ fontSize: 'clamp(3rem, 6vw, 5rem)', marginBottom: 'var(--spacing-lg)' }}>
+              {isEnglish ? "Let's Talk" : 'Hablemos'}
+            </h2>
+            <p style={{ fontSize: '1.25rem', marginBottom: 'var(--spacing-xl)' }}>
+              {isEnglish ? 'Do you have a software, data science or artificial intelligence problem that requires a sophisticated engineering solution? Write me directly.' : '¿Tienes un problema de software, ciencia de datos o inteligencia artificial que requiera una solución de ingeniería sofisticada? Escríbeme.'}
+            </p>
             
-            {/* Contact details */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-lg)', alignItems: 'center', width: '100%' }}>
-              <div>
-                <span className="mono" style={{ color: 'var(--accent-primary)', fontSize: '0.85rem', fontWeight: 600, letterSpacing: '0.15em', textTransform: 'uppercase' }}>{isEnglish ? 'Contact' : 'Contacto'}</span>
-                <h2 style={{ display: 'block', marginTop: 'var(--spacing-xs)', fontSize: '2.5rem', marginBottom: 'var(--spacing-md)' }}>{isEnglish ? "Let's talk about your next project" : 'Hablemos de tu próximo proyecto'}</h2>
-              </div>
-              
-              <p style={{ fontSize: '1.05rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
-                {isEnglish ? 'Do you have a software, data science or artificial intelligence problem that requires a sophisticated engineering solution? Write me or schedule a video call directly.' : '¿Tienes un problema de software, ciencia de datos o inteligencia artificial que requiera una solución de ingeniería sofisticada? Escríbeme o agenda una videollamada directamente.'}
-              </p>
-
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)', marginTop: 'var(--spacing-sm)', alignItems: 'center' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', color: 'var(--text-secondary)' }}>
-                  <Mail size={18} style={{ color: 'var(--accent-primary)' }} />
-                  <span>ramonbravo13@gmail.com</span>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', color: 'var(--text-secondary)' }}>
-                  <MapPin size={18} style={{ color: 'var(--accent-primary)' }} />
-                  <span>Guadalajara Jalisco México</span>
-                </div>
-              </div>
-
-              {/* WhatsApp Card */}
-              <div className="premium-card" style={{ 
-                marginTop: 'var(--spacing-md)', 
-                borderRadius: 'var(--radius-md)', 
-                borderColor: 'var(--accent-primary)',
-                background: 'linear-gradient(135deg, rgba(37,99,235,0.03) 0%, transparent 100%)',
-                width: '100%',
-                maxWidth: '400px',
-                textAlign: 'center'
-              }}>
-                <h4 style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontSize: '1.05rem', marginBottom: 'var(--spacing-xs)' }}>
-                  <MessageCircle size={18} style={{ color: 'var(--accent-primary)' }} /> {isEnglish ? 'Direct chat' : 'Chat directo'}
-                </h4>
-                <p style={{ fontSize: '0.88rem', color: 'var(--text-secondary)', marginBottom: 'var(--spacing-md)' }}>
-                  {isEnglish ? 'Send me a WhatsApp message for fast and direct communication.' : 'Envíame un mensaje por WhatsApp para una comunicación rápida y directa.'}
-                </p>
-                <a href="https://wa.me/523315004877" target="_blank" rel="noopener noreferrer" className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem', padding: '0.6rem 1.2rem', textDecoration: 'none', backgroundColor: '#25D366', color: '#000', border: 'none' }}>
-                  <MessageCircle size={16} /> {isEnglish ? 'Send WhatsApp' : 'Enviar WhatsApp'}
-                </a>
-              </div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 'var(--spacing-md)' }}>
+              <a href="mailto:ramonbravo13@gmail.com" className="btn-primary">
+                <Mail size={16} /> ramonbravo13@gmail.com
+              </a>
+              <a href="https://wa.me/523315004877" target="_blank" rel="noopener noreferrer" className="btn-secondary">
+                <MessageCircle size={16} /> WhatsApp
+              </a>
             </div>
-
+            
+            <div style={{ marginTop: 'var(--spacing-2xl)', color: 'var(--text-secondary)' }} className="mono">
+              <MapPin size={14} style={{ display: 'inline', marginRight: '4px' }} /> Guadalajara, Jalisco, México
+            </div>
           </div>
         </section>
 

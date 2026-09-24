@@ -46,15 +46,15 @@ export default function Navbar() {
       left: 0,
       right: 0,
       height: 'var(--nav-height)',
-      backgroundColor: scrolled ? 'rgba(10, 10, 10, 0.75)' : 'transparent',
+      backgroundColor: scrolled ? 'var(--bg-navbar)' : 'transparent',
       backdropFilter: scrolled ? 'blur(16px)' : 'none',
       WebkitBackdropFilter: scrolled ? 'blur(16px)' : 'none',
-      borderBottom: scrolled ? '1px solid var(--border-subtle)' : '1px solid transparent',
+      borderBottom: scrolled ? '1px solid var(--border-light)' : '1px solid transparent',
       zIndex: 999,
-      transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
+      transition: 'all 0.3s ease'
     }}>
       <div style={{
-        maxWidth: '1200px',
+        maxWidth: '1440px',
         height: '100%',
         margin: '0 auto',
         padding: '0 var(--spacing-lg)',
@@ -63,8 +63,8 @@ export default function Navbar() {
         justifyContent: 'space-between'
       }}>
         {/* Logo */}
-        <Link to="/" style={{ fontSize: '1.25rem', fontWeight: 800, letterSpacing: '-0.03em', display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <span style={{ color: 'var(--accent-primary)' }}>Ramón</span> Bravo
+        <Link to="/" style={{ fontSize: '1.25rem', fontFamily: 'var(--font-serif)', fontWeight: 400, letterSpacing: '-0.02em', display: 'flex', alignItems: 'center', gap: '8px', textTransform: 'uppercase' }}>
+          <span>Ramón</span> Bravo
         </Link>
 
         {/* Desktop Menu */}
@@ -152,8 +152,8 @@ export default function Navbar() {
           top: 'var(--nav-height)',
           left: 0,
           right: 0,
-          backgroundColor: '#0A0A0A',
-          borderBottom: '1px solid var(--border-subtle)',
+          backgroundColor: 'var(--bg-primary)',
+          borderBottom: '1px solid var(--border-light)',
           padding: 'var(--spacing-xl) var(--spacing-lg)',
           display: 'flex',
           flexDirection: 'column',
