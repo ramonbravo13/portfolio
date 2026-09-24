@@ -366,6 +366,32 @@ export default function Home() {
                     justifyContent: 'space-between',
                     minHeight: '200px'
                   }}>
+                    {cert.url && (
+                      <div style={{
+                        width: '100%',
+                        aspectRatio: '1.414 / 1',
+                        marginBottom: 'var(--spacing-md)',
+                        overflow: 'hidden',
+                        position: 'relative',
+                        border: '1px solid var(--border-light)',
+                        backgroundColor: 'var(--bg-secondary)'
+                      }}>
+                        <iframe 
+                          src={`${cert.url}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`} 
+                          style={{
+                            width: '200%',
+                            height: '200%',
+                            transform: 'scale(0.5)',
+                            transformOrigin: 'top left',
+                            border: 'none',
+                            pointerEvents: 'none'
+                          }}
+                          title={title}
+                          tabIndex={-1}
+                        />
+                        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 10 }}></div>
+                      </div>
+                    )}
                     <div>
                       <h3 style={{ fontSize: '1.5rem', marginBottom: '16px' }}>{title}</h3>
                       {desc && <p style={{ fontSize: '1rem' }}>{desc}</p>}
