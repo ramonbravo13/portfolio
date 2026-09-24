@@ -224,39 +224,61 @@ export default function Home() {
         {/* HERO SECTION */}
         <section id="inicio" style={{
           minHeight: '80vh',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 400px), 1fr))',
+          gap: 'var(--spacing-2xl)',
+          alignItems: 'center',
           paddingBottom: 'var(--spacing-3xl)'
         }}>
-          <div className="animate-fade-up" style={{ maxWidth: '1000px' }}>
-            <span className="mono" style={{ display: 'block', marginBottom: 'var(--spacing-md)' }}>
+          <div className="animate-fade-up" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
+            <span className="mono" style={{ display: 'block', marginBottom: 'var(--spacing-xs)' }}>
               {isEnglish ? 'Portfolio & Archive' : 'Portafolio y Archivo'} — 2026
             </span>
             
-            <h1 style={{ marginBottom: 'var(--spacing-lg)' }}>
+            <h1 style={{ margin: 0 }}>
               {(isEnglish && profile.title_en ? profile.title_en : profile.title).replace('Cientifico', 'Científico')}
             </h1>
             
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--spacing-xl)', alignItems: 'flex-end' }}>
-              <p style={{ maxWidth: '600px', margin: 0, fontSize: 'clamp(1.1rem, 2vw, 1.5rem)' }}>
-                {isEnglish && profile.bio_en ? profile.bio_en : profile.bio}
-              </p>
-              
-              <div style={{ display: 'flex', gap: 'var(--spacing-sm)' }}>
-                <a href="#proyectos" className="btn-primary">
-                  {isEnglish ? 'Selected Works' : 'Trabajos Seleccionados'} <ArrowRight size={16} />
-                </a>
-              </div>
+            <p style={{ maxWidth: '600px', margin: 0, fontSize: 'clamp(1.1rem, 2vw, 1.5rem)', marginBottom: 'var(--spacing-sm)' }}>
+              {isEnglish && profile.bio_en ? profile.bio_en : profile.bio}
+            </p>
+            
+            <div style={{ display: 'flex', gap: 'var(--spacing-sm)' }}>
+              <a href="#proyectos" className="btn-primary">
+                {isEnglish ? 'Selected Works' : 'Trabajos Seleccionados'} <ArrowRight size={16} />
+              </a>
             </div>
             
-            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: 'var(--spacing-xl)' }}>
+            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: 'var(--spacing-sm)' }}>
               {(isEnglish && profile.skills_en && profile.skills_en.length > 0 ? profile.skills_en : (profile.skills || [])).map((tag, idx) => (
                 <span key={idx} className="mono tech-badge">
                   {tag}
                 </span>
               ))}
             </div>
+          </div>
+
+          <div className="animate-fade-up delay-200" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+            {profile.profileImage && (
+              <div style={{
+                width: '100%',
+                maxWidth: '420px',
+                aspectRatio: '4/5',
+                border: '1px solid var(--border-subtle)',
+                padding: '12px',
+                backgroundColor: 'transparent'
+              }}>
+                <img 
+                  src={profile.profileImage} 
+                  alt={profile.name || "Profile"} 
+                  style={{ 
+                    width: '100%', 
+                    height: '100%', 
+                    objectFit: 'cover'
+                  }} 
+                />
+              </div>
+            )}
           </div>
         </section>
 
