@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 import { usePortfolio } from '../../context/PortfolioContext';
 import { Plus, Trash2, Edit, Save, ArrowUp, ArrowDown, Languages } from 'lucide-react';
 import { autoTranslate } from '../../utils/translate';
-import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css';
+import ReactQuill from 'react-quill-new';
+import 'react-quill-new/dist/quill.snow.css';
 
 export default function ExperienceEditor() {
   const { profile, updateProfile } = usePortfolio();
