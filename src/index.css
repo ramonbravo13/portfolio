@@ -298,3 +298,32 @@ a {
     justify-content: center;
   }
 }
+
+/* --- Quill Editor Styles --- */
+.ql-toolbar {
+  background: var(--bg-primary);
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+}
+.ql-container {
+  border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+  background: var(--color-linen);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+}
+.ql-editor {
+  min-height: 120px;
+}
+
+.quill-render p {
+  margin-bottom: 0.8rem;
+}
+.quill-render p:last-child {
+  margin-bottom: 0;
+}
+.quill-render ul, .quill-render ol {
+  margin-bottom: 0.8rem;
+  padding-left: 1.5rem;
+}
+.quill-render strong {
+  font-weight: 600;
+}

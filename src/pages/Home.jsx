@@ -336,9 +336,11 @@ export default function Home() {
                     <div>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 'var(--spacing-sm)', marginBottom: 'var(--spacing-sm)' }}>
                         <h4 style={{ margin: 0, fontSize: '1.25rem', fontFamily: 'var(--font-sans)', fontWeight: 500 }}>{role}</h4>
-                        {tag && <span className="mono tech-badge">{tag}</span>}
+                        {tag && (
+                          <div className="mono tech-badge quill-render" dangerouslySetInnerHTML={{ __html: tag }} style={{ padding: '8px 12px' }} />
+                        )}
                       </div>
-                      <p style={{ margin: 0 }}>{desc}</p>
+                      <div className="quill-render" style={{ margin: 0 }} dangerouslySetInnerHTML={{ __html: desc }} />
                     </div>
                   </div>
                 );

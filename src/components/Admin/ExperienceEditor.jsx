@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { usePortfolio } from '../../context/PortfolioContext';
 import { Plus, Trash2, Edit, Save, ArrowUp, ArrowDown, Languages } from 'lucide-react';
 import { autoTranslate } from '../../utils/translate';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 
 export default function ExperienceEditor() {
   const { profile, updateProfile } = usePortfolio();
@@ -28,6 +30,10 @@ export default function ExperienceEditor() {
 
   const handleChange = (e) => {
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  const handleQuillChange = (value, name) => {
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
   const handleTranslate = async () => {
@@ -200,24 +206,24 @@ export default function ExperienceEditor() {
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--spacing-md)' }}>
-            <div className="form-group">
+            <div className="form-group" style={{ marginBottom: '40px' }}>
               <label className="form-label">Tag / Área de Especialidad (ES)</label>
-              <input name="tag" type="text" className="form-input" value={formData.tag} onChange={handleChange} placeholder="e.g. Inteligencia Artificial" required />
+              <ReactQuill theme="snow" value={formData.tag || ''} onChange={(val) => handleQuillChange(val, 'tag')} placeholder="e.g. Inteligencia Artificial" />
             </div>
-            <div className="form-group">
+            <div className="form-group" style={{ marginBottom: '40px' }}>
               <label className="form-label">Tag (EN)</label>
-              <input name="tag_en" type="text" className="form-input" value={formData.tag_en} onChange={handleChange} placeholder="e.g. Artificial Intelligence" />
+              <ReactQuill theme="snow" value={formData.tag_en || ''} onChange={(val) => handleQuillChange(val, 'tag_en')} placeholder="e.g. Artificial Intelligence" />
             </div>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--spacing-md)' }}>
-            <div className="form-group">
+            <div className="form-group" style={{ marginBottom: '40px' }}>
               <label className="form-label">Description / Descripción (ES)</label>
-              <textarea name="desc" className="form-input" rows="3" value={formData.desc} onChange={handleChange} placeholder="Describe tus responsabilidades..." required />
+              <ReactQuill theme="snow" value={formData.desc || ''} onChange={(val) => handleQuillChange(val, 'desc')} placeholder="Describe tus responsabilidades..." />
             </div>
-            <div className="form-group">
+            <div className="form-group" style={{ marginBottom: '40px' }}>
               <label className="form-label">Description (EN)</label>
-              <textarea name="desc_en" className="form-input" rows="3" value={formData.desc_en} onChange={handleChange} placeholder="Describe your responsibilities..." />
+              <ReactQuill theme="snow" value={formData.desc_en || ''} onChange={(val) => handleQuillChange(val, 'desc_en')} placeholder="Describe your responsibilities..." />
             </div>
           </div>
 
