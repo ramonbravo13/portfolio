@@ -235,7 +235,7 @@ export default function Home() {
               {isEnglish ? 'Portfolio & Archive' : 'Portafolio y Archivo'} — 2026
             </span>
             
-            <h1 style={{ margin: 0 }}>
+            <h1 style={{ margin: 0, fontSize: profile.titleFontSize ? profile.titleFontSize : undefined }}>
               {(isEnglish && profile.title_en ? profile.title_en : profile.title).replace('Cientifico', 'Científico')}
             </h1>
             

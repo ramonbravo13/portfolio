@@ -10,6 +10,7 @@ export default function ProfileEditor() {
     name: '',
     title: '',
     title_en: '',
+    titleFontSize: '',
     profileImage: '',
     bio: '',
     bio_en: '',
@@ -29,6 +30,7 @@ export default function ProfileEditor() {
         name: profile.name || '',
         title: profile.title || '',
         title_en: profile.title_en || '',
+        titleFontSize: profile.titleFontSize || '',
         profileImage: profile.profileImage || '',
         bio: profile.bio || '',
         bio_en: profile.bio_en || '',
@@ -91,6 +93,7 @@ export default function ProfileEditor() {
       await updateProfile({
         ...formData,
         profileImage: finalImageUrl,
+        titleFontSize: formData.titleFontSize,
         metrics: {
           yearsExp: formData.yearsExp,
           projectsCount: formData.projectsCount,
@@ -140,6 +143,12 @@ export default function ProfileEditor() {
             <label className="form-label">Professional Title (EN)</label>
             <input name="title_en" type="text" className="form-input" value={formData.title_en} onChange={handleChange} />
           </div>
+        </div>
+
+        <div className="form-group">
+          <label className="form-label">Title Font Size / Tamaño del Título (Opcional)</label>
+          <input name="titleFontSize" type="text" className="form-input" value={formData.titleFontSize || ''} onChange={handleChange} placeholder="e.g. 5rem, 80px, clamp(3rem, 5vw, 6rem)..." />
+          <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Si lo dejas en blanco, se usará el tamaño predeterminado de la plantilla.</span>
         </div>
 
         <div className="form-group">
