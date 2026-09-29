@@ -320,6 +320,7 @@ export default function Home() {
                 const role = isEnglish && item.role_en ? item.role_en : item.role;
                 const period = isEnglish && item.period_en ? item.period_en : item.period;
                 const desc = isEnglish && item.desc_en ? item.desc_en : item.desc;
+                const tag = isEnglish && item.tag_en ? item.tag_en : item.tag;
                 
                 return (
                   <div key={idx} className="premium-card animate-fade-up" style={{ 
@@ -333,7 +334,10 @@ export default function Home() {
                       <span className="mono">{period}</span>
                     </div>
                     <div>
-                      <h4 style={{ fontSize: '1.25rem', fontFamily: 'var(--font-sans)', fontWeight: 500, marginBottom: 'var(--spacing-sm)' }}>{role}</h4>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 'var(--spacing-sm)', marginBottom: 'var(--spacing-sm)' }}>
+                        <h4 style={{ margin: 0, fontSize: '1.25rem', fontFamily: 'var(--font-sans)', fontWeight: 500 }}>{role}</h4>
+                        {tag && <span className="mono tech-badge">{tag}</span>}
+                      </div>
                       <p style={{ margin: 0 }}>{desc}</p>
                     </div>
                   </div>
