@@ -337,10 +337,10 @@ export default function Home() {
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 'var(--spacing-sm)', marginBottom: 'var(--spacing-sm)' }}>
                         <h4 style={{ margin: 0, fontSize: '1.25rem', fontFamily: 'var(--font-sans)', fontWeight: 500 }}>{role}</h4>
                         {tag && (
-                          <div className="mono tech-badge quill-render" dangerouslySetInnerHTML={{ __html: tag }} style={{ padding: '8px 12px' }} />
+                          <div className="mono tech-badge quill-render" dangerouslySetInnerHTML={{ __html: tag || '' }} style={{ padding: '8px 12px' }} />
                         )}
                       </div>
-                      <div className="quill-render" style={{ margin: 0 }} dangerouslySetInnerHTML={{ __html: desc }} />
+                      <div className="quill-render" style={{ margin: 0 }} dangerouslySetInnerHTML={{ __html: desc || '' }} />
                     </div>
                   </div>
                 );
