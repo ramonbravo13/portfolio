@@ -44,7 +44,7 @@ export default function CVGenerator() {
       };
 
       const genAI = new GoogleGenerativeAI(apiKey);
-      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+      const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
       const prompt = `
 Actúa como un experto reclutador Tech y redactor de CVs para Roles de Ciencia de Datos e IA.
