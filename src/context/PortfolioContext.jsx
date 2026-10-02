@@ -16,7 +16,6 @@ export function PortfolioProvider({ children }) {
     name: "Loading...",
     title: "",
     profileImage: "",
-    profileImage: "",
     bio: "",
     metrics: {},
     skills: [],
