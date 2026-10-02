@@ -82,7 +82,8 @@ export default function ProjectNotebook() {
           switch (block.type) {
             case 'text':
               const textContent = isEnglish && block.content_en ? block.content_en : block.content;
-              return <TextBlock key={idx} content={textContent} />;
+              const blockTitle = isEnglish && block.title_en ? block.title_en : block.title;
+              return <TextBlock key={idx} content={textContent} title={blockTitle} />;
             case 'code':
               return <CodeBlock key={idx} code={block.code} language={block.language} isExecutable={block.isExecutable} />;
             case 'media':

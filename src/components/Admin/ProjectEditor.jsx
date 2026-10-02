@@ -26,13 +26,17 @@ export default function ProjectEditor() {
   const handleEdit = (project) => {
     setEditingId(project.id);
     setFormData({
-      title: project.title, title_en: project.title_en || '',
-      tags: project.tags ? project.tags.join(', ') : '',
-      tags_en: project.tags_en ? project.tags_en.join(', ') : '',
-      iconType: project.iconType,
-      problem: project.problem || '', problem_en: project.problem_en || '',
-      solution: project.solution || '', solution_en: project.solution_en || '',
-      result: project.result || '', result_en: project.result_en || '',
+      title: project.title || '', 
+      title_en: project.title_en || '',
+      tags: Array.isArray(project.tags) ? project.tags.join(', ') : (project.tags || ''),
+      tags_en: Array.isArray(project.tags_en) ? project.tags_en.join(', ') : (project.tags_en || ''),
+      iconType: project.iconType || 'Code',
+      problem: project.problem || '', 
+      problem_en: project.problem_en || '',
+      solution: project.solution || '', 
+      solution_en: project.solution_en || '',
+      result: project.result || '', 
+      result_en: project.result_en || '',
       thumbnailUrl: project.thumbnailUrl || ''
     });
     setBlocks(project.blocks || []);
@@ -62,15 +66,15 @@ export default function ProjectEditor() {
       }
 
       const data = {
-        title: formData.title, title_en: formData.title_en,
-        tags: formData.tags.split(',').map(s => s.trim()).filter(s => s),
-        tags_en: formData.tags_en.split(',').map(s => s.trim()).filter(s => s),
-        iconType: formData.iconType,
-        problem: formData.problem, problem_en: formData.problem_en,
-        solution: formData.solution, solution_en: formData.solution_en,
-        result: formData.result, result_en: formData.result_en,
-        thumbnailUrl: finalThumbnailUrl,
-        blocks: processedBlocks
+        title: formData.title || '', title_en: formData.title_en || '',
+        tags: (formData.tags || '').split(',').map(s => s.trim()).filter(s => s),
+        tags_en: (formData.tags_en || '').split(',').map(s => s.trim()).filter(s => s),
+        iconType: formData.iconType || 'Code',
+        problem: formData.problem || '', problem_en: formData.problem_en || '',
+        solution: formData.solution || '', solution_en: formData.solution_en || '',
+        result: formData.result || '', result_en: formData.result_en || '',
+        thumbnailUrl: finalThumbnailUrl || '',
+        blocks: processedBlocks || []
       };
 
       if (editingId) {
@@ -119,7 +123,12 @@ export default function ProjectEditor() {
       const translatedBlocks = await Promise.all(blocks.map(async (block) => {
         if (block.type === 'text') {
           const transContent = await autoTranslate(block.content);
-          return { ...block, content_en: transContent || block.content_en };
+          const transTitle = await autoTranslate(block.title);
+          return { 
+            ...block, 
+            content_en: transContent || block.content_en,
+            title_en: transTitle || block.title_en
+          };
         }
         return block;
       }));
@@ -135,7 +144,7 @@ export default function ProjectEditor() {
 
   const addBlock = (type) => {
     const newBlock = { id: Date.now().toString(), type };
-    if (type === 'text') newBlock.content = '';
+    if (type === 'text') { newBlock.title = ''; newBlock.title_en = ''; newBlock.content = ''; newBlock.content_en = ''; }
     if (type === 'code') { newBlock.language = 'javascript'; newBlock.code = ''; newBlock.isExecutable = false; }
     if (type === 'media') { newBlock.mediaType = 'image'; newBlock.url = ''; newBlock.caption = ''; }
     if (type === 'link') { newBlock.url = ''; newBlock.label = ''; }
@@ -144,20 +153,22 @@ export default function ProjectEditor() {
   };
 
   const updateBlock = (id, field, value) => {
-    setBlocks(blocks.map(b => b.id === id ? { ...b, [field]: value } : b));
+    setBlocks(prev => prev.map(b => b.id === id ? { ...b, [field]: value } : b));
   };
 
   const removeBlock = (id) => {
-    setBlocks(blocks.filter(b => b.id !== id));
+    setBlocks(prev => prev.filter(b => b.id !== id));
   };
 
   const moveBlock = (index, direction) => {
-    if (index + direction < 0 || index + direction >= blocks.length) return;
-    const newBlocks = [...blocks];
-    const temp = newBlocks[index];
-    newBlocks[index] = newBlocks[index + direction];
-    newBlocks[index + direction] = temp;
-    setBlocks(newBlocks);
+    setBlocks(prev => {
+      if (index + direction < 0 || index + direction >= prev.length) return prev;
+      const newBlocks = [...prev];
+      const temp = newBlocks[index];
+      newBlocks[index] = newBlocks[index + direction];
+      newBlocks[index + direction] = temp;
+      return newBlocks;
+    });
   };
 
   return (
@@ -195,27 +206,27 @@ export default function ProjectEditor() {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--spacing-md)' }}>
             <div className="form-group">
               <label className="form-label">Project Title (ES)</label>
-              <input type="text" className="form-input" value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} required />
+              <input type="text" className="form-input" value={formData.title} onChange={e => setFormData(prev => ({...prev, title: e.target.value}))} required />
             </div>
             <div className="form-group">
               <label className="form-label">Project Title (EN)</label>
-              <input type="text" className="form-input" value={formData.title_en} onChange={e => setFormData({...formData, title_en: e.target.value})} />
+              <input type="text" className="form-input" value={formData.title_en} onChange={e => setFormData(prev => ({...prev, title_en: e.target.value}))} />
             </div>
           </div>
           
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--spacing-md)', marginTop: 'var(--spacing-md)' }}>
             <div className="form-group">
               <label className="form-label">Tags ES (comma separated)</label>
-              <input type="text" className="form-input" value={formData.tags} onChange={e => setFormData({...formData, tags: e.target.value})} required />
+              <input type="text" className="form-input" value={formData.tags} onChange={e => setFormData(prev => ({...prev, tags: e.target.value}))} required />
             </div>
             <div className="form-group">
               <label className="form-label">Tags EN</label>
-              <input type="text" className="form-input" value={formData.tags_en} onChange={e => setFormData({...formData, tags_en: e.target.value})} />
+              <input type="text" className="form-input" value={formData.tags_en} onChange={e => setFormData(prev => ({...prev, tags_en: e.target.value}))} />
             </div>
           </div>
           <div className="form-group" style={{ marginTop: 'var(--spacing-md)' }}>
             <label className="form-label">Display Icon</label>
-            <select className="form-input" value={formData.iconType} onChange={e => setFormData({...formData, iconType: e.target.value})}>
+            <select className="form-input" value={formData.iconType} onChange={e => setFormData(prev => ({...prev, iconType: e.target.value}))}>
               <option value="Code">Code</option>
               <option value="Terminal">Terminal</option>
               <option value="Database">Database</option>
@@ -228,7 +239,7 @@ export default function ProjectEditor() {
           <div className="form-group" style={{ marginTop: 'var(--spacing-md)' }}>
             <label className="form-label">Featured Case Study Image (URL or Upload)</label>
             <div style={{ display: 'flex', gap: 'var(--spacing-sm)', alignItems: 'center' }}>
-              <input type="url" className="form-input" placeholder="https://..." value={formData.thumbnailUrl} onChange={e => setFormData({...formData, thumbnailUrl: e.target.value})} disabled={!!thumbnailFile} />
+              <input type="url" className="form-input" placeholder="https://..." value={formData.thumbnailUrl} onChange={e => setFormData(prev => ({...prev, thumbnailUrl: e.target.value}))} disabled={!!thumbnailFile} />
               <span style={{ color: 'var(--text-secondary)' }}>OR</span>
               <label className="btn-primary" style={{ background: 'var(--bg-glass)', border: '1px solid var(--border-subtle)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', padding: '0.6rem 1rem', whiteSpace: 'nowrap' }}>
                 <UploadCloud size={18} /> {thumbnailFile ? thumbnailFile.name : 'Upload Thumbnail'}
@@ -243,33 +254,33 @@ export default function ProjectEditor() {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--spacing-md)' }}>
             <div className="form-group" style={{ marginBottom: '40px' }}>
               <label className="form-label">The Problem / El Problema (ES)</label>
-              <ReactQuill theme="snow" value={formData.problem || ''} onChange={val => setFormData({...formData, problem: val})} placeholder="Describe the challenges..." />
+              <ReactQuill theme="snow" value={formData.problem || ''} onChange={val => setFormData(prev => ({...prev, problem: val}))} placeholder="Describe the challenges..." />
             </div>
             <div className="form-group" style={{ marginBottom: '40px' }}>
               <label className="form-label">The Problem (EN)</label>
-              <ReactQuill theme="snow" value={formData.problem_en || ''} onChange={val => setFormData({...formData, problem_en: val})} placeholder="Describe the challenges..." />
+              <ReactQuill theme="snow" value={formData.problem_en || ''} onChange={val => setFormData(prev => ({...prev, problem_en: val}))} placeholder="Describe the challenges..." />
             </div>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--spacing-md)' }}>
             <div className="form-group" style={{ marginBottom: '40px' }}>
               <label className="form-label">The Solution / La Solución (ES)</label>
-              <ReactQuill theme="snow" value={formData.solution || ''} onChange={val => setFormData({...formData, solution: val})} placeholder="Describe how you solved it..." />
+              <ReactQuill theme="snow" value={formData.solution || ''} onChange={val => setFormData(prev => ({...prev, solution: val}))} placeholder="Describe how you solved it..." />
             </div>
             <div className="form-group" style={{ marginBottom: '40px' }}>
               <label className="form-label">The Solution (EN)</label>
-              <ReactQuill theme="snow" value={formData.solution_en || ''} onChange={val => setFormData({...formData, solution_en: val})} placeholder="Describe how you solved it..." />
+              <ReactQuill theme="snow" value={formData.solution_en || ''} onChange={val => setFormData(prev => ({...prev, solution_en: val}))} placeholder="Describe how you solved it..." />
             </div>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--spacing-md)' }}>
             <div className="form-group" style={{ marginBottom: '40px' }}>
               <label className="form-label">The Result / El Resultado (ES)</label>
-              <ReactQuill theme="snow" value={formData.result || ''} onChange={val => setFormData({...formData, result: val})} placeholder="Describe the measurable outcome..." />
+              <ReactQuill theme="snow" value={formData.result || ''} onChange={val => setFormData(prev => ({...prev, result: val}))} placeholder="Describe the measurable outcome..." />
             </div>
             <div className="form-group" style={{ marginBottom: '40px' }}>
               <label className="form-label">The Result (EN)</label>
-              <ReactQuill theme="snow" value={formData.result_en || ''} onChange={val => setFormData({...formData, result_en: val})} placeholder="Describe the measurable outcome..." />
+              <ReactQuill theme="snow" value={formData.result_en || ''} onChange={val => setFormData(prev => ({...prev, result_en: val}))} placeholder="Describe the measurable outcome..." />
             </div>
           </div>
 
@@ -289,14 +300,26 @@ export default function ProjectEditor() {
                 </div>
 
                 {block.type === 'text' && (
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--spacing-md)' }}>
-                    <div className="form-group" style={{ marginBottom: '40px' }}>
-                      <label className="form-label" style={{ fontSize: '0.8rem' }}>ES Content</label>
-                      <ReactQuill theme="snow" value={block.content || ''} onChange={(val) => updateBlock(block.id, 'content', val)} placeholder="Rich text content..." />
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--spacing-md)' }}>
+                      <div className="form-group">
+                        <label className="form-label" style={{ fontSize: '0.8rem' }}>ES Title (Optional)</label>
+                        <input type="text" className="form-input" placeholder="Block Title..." value={block.title || ''} onChange={(e) => updateBlock(block.id, 'title', e.target.value)} />
+                      </div>
+                      <div className="form-group">
+                        <label className="form-label" style={{ fontSize: '0.8rem' }}>EN Title (Optional)</label>
+                        <input type="text" className="form-input" placeholder="English Block Title..." value={block.title_en || ''} onChange={(e) => updateBlock(block.id, 'title_en', e.target.value)} />
+                      </div>
                     </div>
-                    <div className="form-group" style={{ marginBottom: '40px' }}>
-                      <label className="form-label" style={{ fontSize: '0.8rem' }}>EN Content</label>
-                      <ReactQuill theme="snow" value={block.content_en || ''} onChange={(val) => updateBlock(block.id, 'content_en', val)} placeholder="English rich text content..." />
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--spacing-md)' }}>
+                      <div className="form-group" style={{ marginBottom: '40px' }}>
+                        <label className="form-label" style={{ fontSize: '0.8rem' }}>ES Content</label>
+                        <ReactQuill theme="snow" value={block.content || ''} onChange={(val) => updateBlock(block.id, 'content', val)} placeholder="Rich text content..." />
+                      </div>
+                      <div className="form-group" style={{ marginBottom: '40px' }}>
+                        <label className="form-label" style={{ fontSize: '0.8rem' }}>EN Content</label>
+                        <ReactQuill theme="snow" value={block.content_en || ''} onChange={(val) => updateBlock(block.id, 'content_en', val)} placeholder="English rich text content..." />
+                      </div>
                     </div>
                   </div>
                 )}
