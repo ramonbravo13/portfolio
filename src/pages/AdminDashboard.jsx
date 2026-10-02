@@ -5,6 +5,7 @@ import ProfileEditor from '../components/Admin/ProfileEditor';
 import ExperienceEditor from '../components/Admin/ExperienceEditor';
 import CertificationsEditor from '../components/Admin/CertificationsEditor';
 import ProjectEditor from '../components/Admin/ProjectEditor';
+import CVGenerator from '../components/Admin/CVGenerator';
 
 export default function AdminDashboard() {
   const { isAdminAuth, logoutAdmin } = usePortfolio();
@@ -31,6 +32,7 @@ export default function AdminDashboard() {
       </header>
 
       <main>
+        <CVGenerator />
         <ProfileEditor />
         <ExperienceEditor />
         <CertificationsEditor />
