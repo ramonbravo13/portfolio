@@ -314,16 +314,36 @@ a {
   min-height: 120px;
 }
 
+.quill-render {
+  font-family: var(--font-sans);
+  color: var(--text-secondary);
+  font-size: 1.125rem;
+  font-weight: 300;
+  text-align: left;
+}
+
+.quill-render * {
+  font-family: inherit !important;
+  font-size: inherit !important;
+  color: inherit !important;
+  background-color: transparent !important;
+  line-height: inherit !important;
+  text-align: inherit !important;
+}
+
 .quill-render p {
-  margin-bottom: 0.8rem;
+  margin-bottom: 0.8rem !important;
 }
 .quill-render p:last-child {
-  margin-bottom: 0;
+  margin-bottom: 0 !important;
 }
 .quill-render ul, .quill-render ol {
-  margin-bottom: 0.8rem;
-  padding-left: 1.5rem;
+  margin-bottom: 0.8rem !important;
+  padding-left: 1.5rem !important;
+}
+.quill-render li {
+  margin-bottom: 0.25rem !important;
 }
 .quill-render strong {
-  font-weight: 600;
+  font-weight: 600 !important;
 }
