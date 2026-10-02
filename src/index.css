@@ -237,6 +237,11 @@ a {
   transition: all 0.3s ease;
   border-radius: 999px;
   display: inline-block;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  white-space: normal;
 }
 
 .tech-badge:hover {
