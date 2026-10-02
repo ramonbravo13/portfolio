@@ -9,6 +9,19 @@ export default function ProjectEditor() {
   const { projects, addProject, updateProject, deleteProject, uploadFile } = usePortfolio();
   const [editingId, setEditingId] = useState(null);
 
+  const modules = {
+    toolbar: [
+      [{ 'header': [1, 2, 3, false] }],
+      ['bold', 'italic', 'underline', 'strike'],
+      [{ 'list': 'ordered'}, { 'list': 'bullet' }, { 'indent': '-1'}, { 'indent': '+1' }],
+      [{ 'align': [] }],
+      ['link', 'clean']
+    ],
+    clipboard: {
+      matchVisual: false
+    }
+  };
+
   const [formData, setFormData] = useState({
     title: '', title_en: '',
     tags: '', tags_en: '',
@@ -254,33 +267,33 @@ export default function ProjectEditor() {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--spacing-md)' }}>
             <div className="form-group" style={{ marginBottom: '40px' }}>
               <label className="form-label">The Problem / El Problema (ES)</label>
-              <ReactQuill theme="snow" value={formData.problem || ''} onChange={val => setFormData(prev => ({...prev, problem: val}))} placeholder="Describe the challenges..." />
+              <ReactQuill theme="snow" modules={modules} value={formData.problem || ''} onChange={val => setFormData(prev => ({...prev, problem: val}))} placeholder="Describe the challenges..." />
             </div>
             <div className="form-group" style={{ marginBottom: '40px' }}>
               <label className="form-label">The Problem (EN)</label>
-              <ReactQuill theme="snow" value={formData.problem_en || ''} onChange={val => setFormData(prev => ({...prev, problem_en: val}))} placeholder="Describe the challenges..." />
+              <ReactQuill theme="snow" modules={modules} value={formData.problem_en || ''} onChange={val => setFormData(prev => ({...prev, problem_en: val}))} placeholder="Describe the challenges..." />
             </div>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--spacing-md)' }}>
             <div className="form-group" style={{ marginBottom: '40px' }}>
               <label className="form-label">The Solution / La Solución (ES)</label>
-              <ReactQuill theme="snow" value={formData.solution || ''} onChange={val => setFormData(prev => ({...prev, solution: val}))} placeholder="Describe how you solved it..." />
+              <ReactQuill theme="snow" modules={modules} value={formData.solution || ''} onChange={val => setFormData(prev => ({...prev, solution: val}))} placeholder="Describe how you solved it..." />
             </div>
             <div className="form-group" style={{ marginBottom: '40px' }}>
               <label className="form-label">The Solution (EN)</label>
-              <ReactQuill theme="snow" value={formData.solution_en || ''} onChange={val => setFormData(prev => ({...prev, solution_en: val}))} placeholder="Describe how you solved it..." />
+              <ReactQuill theme="snow" modules={modules} value={formData.solution_en || ''} onChange={val => setFormData(prev => ({...prev, solution_en: val}))} placeholder="Describe how you solved it..." />
             </div>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--spacing-md)' }}>
             <div className="form-group" style={{ marginBottom: '40px' }}>
               <label className="form-label">The Result / El Resultado (ES)</label>
-              <ReactQuill theme="snow" value={formData.result || ''} onChange={val => setFormData(prev => ({...prev, result: val}))} placeholder="Describe the measurable outcome..." />
+              <ReactQuill theme="snow" modules={modules} value={formData.result || ''} onChange={val => setFormData(prev => ({...prev, result: val}))} placeholder="Describe the measurable outcome..." />
             </div>
             <div className="form-group" style={{ marginBottom: '40px' }}>
               <label className="form-label">The Result (EN)</label>
-              <ReactQuill theme="snow" value={formData.result_en || ''} onChange={val => setFormData(prev => ({...prev, result_en: val}))} placeholder="Describe the measurable outcome..." />
+              <ReactQuill theme="snow" modules={modules} value={formData.result_en || ''} onChange={val => setFormData(prev => ({...prev, result_en: val}))} placeholder="Describe the measurable outcome..." />
             </div>
           </div>
 
@@ -314,11 +327,11 @@ export default function ProjectEditor() {
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--spacing-md)' }}>
                       <div className="form-group" style={{ marginBottom: '40px' }}>
                         <label className="form-label" style={{ fontSize: '0.8rem' }}>ES Content</label>
-                        <ReactQuill theme="snow" value={block.content || ''} onChange={(val) => updateBlock(block.id, 'content', val)} placeholder="Rich text content..." />
+                        <ReactQuill theme="snow" modules={modules} value={block.content || ''} onChange={(val) => updateBlock(block.id, 'content', val)} placeholder="Rich text content..." />
                       </div>
                       <div className="form-group" style={{ marginBottom: '40px' }}>
                         <label className="form-label" style={{ fontSize: '0.8rem' }}>EN Content</label>
-                        <ReactQuill theme="snow" value={block.content_en || ''} onChange={(val) => updateBlock(block.id, 'content_en', val)} placeholder="English rich text content..." />
+                        <ReactQuill theme="snow" modules={modules} value={block.content_en || ''} onChange={(val) => updateBlock(block.id, 'content_en', val)} placeholder="English rich text content..." />
                       </div>
                     </div>
                   </div>
