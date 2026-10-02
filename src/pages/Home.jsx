@@ -189,9 +189,8 @@ export default function Home() {
 
         {/* PROJECTS SECTION */}
         <section id="proyectos" className="section-container">
-          <div style={{ marginBottom: 'var(--spacing-xl)' }}>
-            <h2 style={{ margin: 0 }}>{isEnglish ? 'Index of Work' : 'Índice de Trabajo'}</h2>
-            <div style={{ width: '100%', height: '1px', backgroundColor: 'var(--border-subtle)', marginTop: 'var(--spacing-md)' }}></div>
+          <div style={{ marginBottom: 'var(--spacing-xl)', paddingBottom: 'var(--spacing-md)', borderBottom: '1px solid var(--border-subtle)' }}>
+            <h2 style={{ margin: 0 }}>{isEnglish ? 'Projects & Development' : 'Proyectos y Desarrollo'}</h2>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -203,9 +202,8 @@ export default function Home() {
 
         {/* EXPERIENCE SECTION */}
         <section id="experiencia" className="section-container">
-          <div style={{ marginBottom: 'var(--spacing-xl)' }}>
-            <h2 style={{ margin: 0 }}>{isEnglish ? 'Trajectory' : 'Trayectoria'}</h2>
-            <div style={{ width: '100%', height: '1px', backgroundColor: 'var(--border-subtle)', marginTop: 'var(--spacing-md)' }}></div>
+          <div style={{ marginBottom: 'var(--spacing-xl)', paddingBottom: 'var(--spacing-md)', borderBottom: '1px solid var(--border-subtle)' }}>
+            <h2 style={{ margin: 0 }}>{isEnglish ? 'Professional Experience' : 'Experiencia Profesional'}</h2>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
@@ -242,9 +240,8 @@ export default function Home() {
 
         {/* CERTIFICATIONS SECTION */}
         <section id="certificaciones" className="section-container">
-          <div style={{ marginBottom: 'var(--spacing-xl)' }}>
-            <h2 style={{ margin: 0 }}>{isEnglish ? 'Credentials' : 'Credenciales'}</h2>
-            <div style={{ width: '100%', height: '1px', backgroundColor: 'var(--border-subtle)', marginTop: 'var(--spacing-md)' }}></div>
+          <div style={{ marginBottom: 'var(--spacing-xl)', paddingBottom: 'var(--spacing-md)', borderBottom: '1px solid var(--border-subtle)' }}>
+            <h2 style={{ margin: 0 }}>{isEnglish ? 'Certifications & Training' : 'Certificaciones y Formación'}</h2>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 'var(--spacing-xl)' }}>

@@ -173,13 +173,13 @@ a {
 
 .premium-card {
   background-color: transparent;
-  border-top: 1px solid var(--border-light);
+  border-bottom: 1px solid var(--border-light);
   padding: var(--spacing-xl) 0;
   transition: all 0.3s ease;
 }
 
 .premium-card:hover {
-  border-top-color: var(--color-voltage);
+  border-bottom-color: var(--color-voltage);
 }
 
 .form-group {
