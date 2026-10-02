@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { usePortfolio } from '../../context/PortfolioContext';
 import { Plus, Trash2, Edit, Save, ArrowUp, ArrowDown, UploadCloud, Languages } from 'lucide-react';
 import { autoTranslate } from '../../utils/translate';
+import ReactQuill from 'react-quill-new';
+import 'react-quill-new/dist/quill.snow.css';
 
 export default function ProjectEditor() {
   const { projects, addProject, updateProject, deleteProject, uploadFile } = usePortfolio();
@@ -239,35 +241,35 @@ export default function ProjectEditor() {
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--spacing-md)' }}>
-            <div className="form-group">
+            <div className="form-group" style={{ marginBottom: '40px' }}>
               <label className="form-label">The Problem / El Problema (ES)</label>
-              <textarea className="form-input" rows="3" placeholder="Describe the challenges..." value={formData.problem} onChange={e => setFormData({...formData, problem: e.target.value})} />
+              <ReactQuill theme="snow" value={formData.problem || ''} onChange={val => setFormData({...formData, problem: val})} placeholder="Describe the challenges..." />
             </div>
-            <div className="form-group">
+            <div className="form-group" style={{ marginBottom: '40px' }}>
               <label className="form-label">The Problem (EN)</label>
-              <textarea className="form-input" rows="3" placeholder="Describe the challenges..." value={formData.problem_en} onChange={e => setFormData({...formData, problem_en: e.target.value})} />
+              <ReactQuill theme="snow" value={formData.problem_en || ''} onChange={val => setFormData({...formData, problem_en: val})} placeholder="Describe the challenges..." />
             </div>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--spacing-md)' }}>
-            <div className="form-group">
+            <div className="form-group" style={{ marginBottom: '40px' }}>
               <label className="form-label">The Solution / La Solución (ES)</label>
-              <textarea className="form-input" rows="3" placeholder="Describe how you solved it..." value={formData.solution} onChange={e => setFormData({...formData, solution: e.target.value})} />
+              <ReactQuill theme="snow" value={formData.solution || ''} onChange={val => setFormData({...formData, solution: val})} placeholder="Describe how you solved it..." />
             </div>
-            <div className="form-group">
+            <div className="form-group" style={{ marginBottom: '40px' }}>
               <label className="form-label">The Solution (EN)</label>
-              <textarea className="form-input" rows="3" placeholder="Describe how you solved it..." value={formData.solution_en} onChange={e => setFormData({...formData, solution_en: e.target.value})} />
+              <ReactQuill theme="snow" value={formData.solution_en || ''} onChange={val => setFormData({...formData, solution_en: val})} placeholder="Describe how you solved it..." />
             </div>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--spacing-md)' }}>
-            <div className="form-group">
+            <div className="form-group" style={{ marginBottom: '40px' }}>
               <label className="form-label">The Result / El Resultado (ES)</label>
-              <textarea className="form-input" rows="3" placeholder="Describe the measurable outcome..." value={formData.result} onChange={e => setFormData({...formData, result: e.target.value})} />
+              <ReactQuill theme="snow" value={formData.result || ''} onChange={val => setFormData({...formData, result: val})} placeholder="Describe the measurable outcome..." />
             </div>
-            <div className="form-group">
+            <div className="form-group" style={{ marginBottom: '40px' }}>
               <label className="form-label">The Result (EN)</label>
-              <textarea className="form-input" rows="3" placeholder="Describe the measurable outcome..." value={formData.result_en} onChange={e => setFormData({...formData, result_en: e.target.value})} />
+              <ReactQuill theme="snow" value={formData.result_en || ''} onChange={val => setFormData({...formData, result_en: val})} placeholder="Describe the measurable outcome..." />
             </div>
           </div>
 
@@ -288,13 +290,13 @@ export default function ProjectEditor() {
 
                 {block.type === 'text' && (
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--spacing-md)' }}>
-                    <div>
+                    <div className="form-group" style={{ marginBottom: '40px' }}>
                       <label className="form-label" style={{ fontSize: '0.8rem' }}>ES Content</label>
-                      <textarea className="form-input" rows="3" placeholder="Markdown or plain text content..." value={block.content} onChange={(e) => updateBlock(block.id, 'content', e.target.value)} required />
+                      <ReactQuill theme="snow" value={block.content || ''} onChange={(val) => updateBlock(block.id, 'content', val)} placeholder="Rich text content..." />
                     </div>
-                    <div>
+                    <div className="form-group" style={{ marginBottom: '40px' }}>
                       <label className="form-label" style={{ fontSize: '0.8rem' }}>EN Content</label>
-                      <textarea className="form-input" rows="3" placeholder="English text content..." value={block.content_en} onChange={(e) => updateBlock(block.id, 'content_en', e.target.value)} />
+                      <ReactQuill theme="snow" value={block.content_en || ''} onChange={(val) => updateBlock(block.id, 'content_en', val)} placeholder="English rich text content..." />
                     </div>
                   </div>
                 )}

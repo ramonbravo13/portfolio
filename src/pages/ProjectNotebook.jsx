@@ -24,6 +24,9 @@ export default function ProjectNotebook() {
 
   const title = isEnglish && project.title_en ? project.title_en : project.title;
   const tags = isEnglish && project.tags_en && project.tags_en.length > 0 ? project.tags_en : (project.tags || []);
+  const problem = isEnglish && project.problem_en ? project.problem_en : project.problem;
+  const solution = isEnglish && project.solution_en ? project.solution_en : project.solution;
+  const result = isEnglish && project.result_en ? project.result_en : project.result;
 
   return (
     <div className="page-container animate-fade-in" style={{ maxWidth: '900px' }}>
@@ -47,7 +50,34 @@ export default function ProjectNotebook() {
         </div>
       </header>
 
+      {project.thumbnailUrl && (
+        <div style={{ marginBottom: 'var(--spacing-2xl)' }}>
+          <img src={project.thumbnailUrl} alt={title} style={{ width: '100%', maxHeight: '400px', objectFit: 'cover', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)' }} />
+        </div>
+      )}
+
       <div className="notebook-content">
+        {problem && (
+          <div style={{ marginBottom: 'var(--spacing-xl)' }}>
+            <h3 style={{ textTransform: 'uppercase', color: 'var(--accent-primary)', fontSize: '0.9rem', letterSpacing: '0.05em', marginBottom: 'var(--spacing-sm)' }}>{isEnglish ? 'The Problem' : 'El Problema'}</h3>
+            <div className="quill-render" dangerouslySetInnerHTML={{ __html: problem }} />
+          </div>
+        )}
+        
+        {solution && (
+          <div style={{ marginBottom: 'var(--spacing-xl)' }}>
+            <h3 style={{ textTransform: 'uppercase', color: 'var(--accent-primary)', fontSize: '0.9rem', letterSpacing: '0.05em', marginBottom: 'var(--spacing-sm)' }}>{isEnglish ? 'The Solution' : 'La Solución'}</h3>
+            <div className="quill-render" dangerouslySetInnerHTML={{ __html: solution }} />
+          </div>
+        )}
+        
+        {result && (
+          <div style={{ marginBottom: 'var(--spacing-xl)' }}>
+            <h3 style={{ textTransform: 'uppercase', color: 'var(--accent-primary)', fontSize: '0.9rem', letterSpacing: '0.05em', marginBottom: 'var(--spacing-sm)' }}>{isEnglish ? 'The Result' : 'El Resultado'}</h3>
+            <div className="quill-render" dangerouslySetInnerHTML={{ __html: result }} />
+          </div>
+        )}
+
         {(project.blocks || []).map((block, idx) => {
           switch (block.type) {
             case 'text':

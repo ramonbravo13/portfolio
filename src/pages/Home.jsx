@@ -10,110 +10,6 @@ import { usePortfolio } from '../context/PortfolioContext';
 import gsap from 'gsap';
 
 // --- VISUAL REDESIGN COMPONENTS ---
-
-// ImageTrail Component
-function ImageTrail({ images }) {
-  useEffect(() => {
-    // Only initialize if we have valid images and it's not a small screen
-    if (!images || images.length === 0 || window.innerWidth < 768) return;
-    
-    // Filter out undefined/null images
-    const validImages = images.filter(Boolean);
-    if (validImages.length === 0) return;
-    
-    let currentIndex = 0;
-    let lastRenderTime = 0;
-    let zIndexCounter = 100;
-    let mouseX = window.innerWidth / 2;
-    let mouseY = window.innerHeight / 2;
-    let requestRef;
-    
-    // Pre-create DOM elements
-    const imgElements = validImages.map(src => {
-      const img = document.createElement('img');
-      img.src = src;
-      Object.assign(img.style, {
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        width: '320px',
-        height: '420px',
-        objectFit: 'cover',
-        pointerEvents: 'none',
-        opacity: '0',
-        transform: 'translate(-50%, -50%) scale(0.8)',
-        zIndex: '0',
-        display: 'none',
-        border: '1px solid var(--border-light)',
-        boxShadow: '0 20px 40px rgba(0,0,0,0.1)'
-      });
-      document.body.appendChild(img);
-      return img;
-    });
-
-    const handleMouseMove = (e) => {
-      mouseX = e.clientX;
-      mouseY = e.clientY;
-      
-      const now = Date.now();
-      if (now - lastRenderTime < 100) return; // 100ms throttle for trail density
-      lastRenderTime = now;
-      
-      const img = imgElements[currentIndex];
-      if (!img) return;
-      
-      img.style.display = 'block';
-      img.style.zIndex = zIndexCounter++;
-      
-      // GSAP Animation
-      gsap.fromTo(img, 
-        { 
-          x: mouseX, 
-          y: mouseY, 
-          scale: 0.8, 
-          opacity: 0,
-          rotation: Math.random() * 10 - 5
-        },
-        { 
-          scale: 1, 
-          opacity: 1, 
-          duration: 0.4,
-          ease: 'power2.out',
-          onComplete: () => {
-            gsap.to(img, {
-              opacity: 0,
-              scale: 0.9,
-              duration: 0.6,
-              delay: 0.5,
-              ease: 'power2.in',
-              onComplete: () => {
-                img.style.display = 'none';
-              }
-            });
-          }
-        }
-      );
-      
-      currentIndex = (currentIndex + 1) % validImages.length;
-    };
-
-    window.addEventListener('mousemove', handleMouseMove);
-    
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      if (requestRef) cancelAnimationFrame(requestRef);
-      imgElements.forEach(img => {
-        if (img && img.parentNode) {
-          gsap.killTweensOf(img);
-          img.parentNode.removeChild(img);
-        }
-      });
-    };
-  }, [images]);
-
-  return null;
-}
-
 // Editorial Project Card
 function EditorialProject({ project, index, isEnglish, getIcon }) {
   const hasCaseStudy = project.problem || project.solution || project.result;
@@ -147,26 +43,35 @@ function EditorialProject({ project, index, isEnglish, getIcon }) {
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 'var(--spacing-xl)', marginTop: 'var(--spacing-sm)' }}>
-          <div>
-            <p style={{ margin: 0, maxWidth: '600px' }}>
-              {problem ? problem : (isEnglish ? 'Documented technological case study.' : 'Caso de estudio tecnológico documentado.')}
-            </p>
-          </div>
-          
-          <div style={{ display: 'flex', gap: 'var(--spacing-sm)', alignItems: 'center', justifyContent: 'flex-start', flexWrap: 'wrap' }}>
-            <Link to={`/project/${project.id}`} className="hover-underline mono" style={{ fontSize: '0.85rem', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-              {isEnglish ? 'Read Case Study' : 'Leer Caso de Estudio'} <ArrowRight size={14} />
-            </Link>
-            {project.liveUrl && (
-              <a href={project.liveUrl} target="_blank" rel="noreferrer" className="hover-underline mono" style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)' }}>
-                Live Demo
-              </a>
+          {project.thumbnailUrl && (
+            <div style={{ width: '100%', maxWidth: '350px' }}>
+              <img src={project.thumbnailUrl} alt={title} style={{ width: '100%', borderRadius: 'var(--radius-md)', objectFit: 'cover', border: '1px solid var(--border-subtle)' }} />
+            </div>
+          )}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-lg)' }}>
+            {problem ? (
+              <div className="quill-render" style={{ margin: 0, maxWidth: '600px' }} dangerouslySetInnerHTML={{ __html: problem }} />
+            ) : (
+              <p style={{ margin: 0, maxWidth: '600px' }}>
+                {isEnglish ? 'Documented technological case study.' : 'Caso de estudio tecnológico documentado.'}
+              </p>
             )}
-            {project.githubUrl && (
-              <a href={project.githubUrl} target="_blank" rel="noreferrer" className="hover-underline mono" style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)' }}>
-                GitHub
-              </a>
-            )}
+            
+            <div style={{ display: 'flex', gap: 'var(--spacing-sm)', alignItems: 'center', justifyContent: 'flex-start', flexWrap: 'wrap' }}>
+              <Link to={`/project/${project.id}`} className="hover-underline mono" style={{ fontSize: '0.85rem', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                {isEnglish ? 'Read Case Study' : 'Leer Caso de Estudio'} <ArrowRight size={14} />
+              </Link>
+              {project.liveUrl && (
+                <a href={project.liveUrl} target="_blank" rel="noreferrer" className="hover-underline mono" style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)' }}>
+                  Live Demo
+                </a>
+              )}
+              {project.githubUrl && (
+                <a href={project.githubUrl} target="_blank" rel="noreferrer" className="hover-underline mono" style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)' }}>
+                  GitHub
+                </a>
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -201,8 +106,6 @@ export default function Home() {
     }
   };
 
-  // Collect all project images for the ImageTrail
-  const projectImages = projects.map(p => p.thumbnailUrl).filter(Boolean);
 
   const metrics = profile.metrics || {
     yearsExp: "10+",
@@ -215,9 +118,6 @@ export default function Home() {
   return (
     <div style={{ backgroundColor: 'var(--bg-primary)', minHeight: '100vh' }}>
       <Navbar />
-      
-      {/* Visual Effect: Image Trail (only uses existing project images) */}
-      {projectImages.length > 0 && <ImageTrail images={projectImages} />}
 
       <main className="page-container animate-fade-in" style={{ paddingTop: 'calc(var(--nav-height) + var(--spacing-xl))' }}>
         
