@@ -20,14 +20,10 @@ function EditorialProject({ project, index, isEnglish, getIcon }) {
   const formattedIndex = (index + 1).toString().padStart(2, '0');
 
   return (
-    <div className="premium-card animate-fade-up" style={{ 
+    <div className="premium-card animate-fade-up project-card-grid" style={{ 
       position: 'relative',
       paddingBottom: 'var(--spacing-xl)',
-      borderTop: '1px solid var(--border-subtle)',
-      display: 'grid',
-      gridTemplateColumns: 'auto 1fr',
-      gap: 'var(--spacing-lg)',
-      alignItems: 'start'
+      borderTop: '1px solid var(--border-subtle)'
     }}>
       <div className="mono" style={{ paddingTop: '8px' }}>{formattedIndex}</div>
       
@@ -42,7 +38,7 @@ function EditorialProject({ project, index, isEnglish, getIcon }) {
           </div>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 'var(--spacing-xl)', marginTop: 'var(--spacing-sm)' }}>
+        <div className="project-card-content-grid">
           {project.thumbnailUrl && (
             <div style={{ width: '100%', maxWidth: '350px' }}>
               <img src={project.thumbnailUrl} alt={title} style={{ width: '100%', borderRadius: 'var(--radius-md)', objectFit: 'cover', border: '1px solid var(--border-subtle)' }} />
@@ -223,12 +219,7 @@ export default function Home() {
                 const tag = isEnglish && item.tag_en ? item.tag_en : item.tag;
                 
                 return (
-                  <div key={idx} className="premium-card animate-fade-up" style={{ 
-                    display: 'grid', 
-                    gridTemplateColumns: '1fr 2fr', 
-                    gap: 'var(--spacing-lg)',
-                    alignItems: 'start'
-                  }}>
+                  <div key={idx} className="premium-card animate-fade-up experience-card-grid">
                     <div>
                       <h3 style={{ fontSize: '1.5rem', marginBottom: '8px' }}>{item.company}</h3>
                       <span className="mono">{period}</span>

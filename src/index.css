@@ -62,6 +62,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
   min-height: 100vh;
   overflow-x: hidden;
+  width: 100%;
 }
 
 ::selection {
@@ -286,9 +287,31 @@ a {
   animation-delay: 200ms;
 }
 
+/* Responsive Grid Utilities */
+.project-card-grid {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--spacing-lg);
+  align-items: start;
+}
+
+.project-card-content-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  gap: var(--spacing-xl);
+  margin-top: var(--spacing-sm);
+}
+
+.experience-card-grid {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: var(--spacing-lg);
+  align-items: start;
+}
+
 @media (max-width: 768px) {
   .page-container {
-    padding: var(--spacing-xl) var(--spacing-xs);
+    padding: var(--spacing-xl) var(--spacing-md);
   }
   .section-container {
     padding: var(--spacing-2xl) 0;
@@ -296,6 +319,14 @@ a {
   .btn-primary, .btn-secondary {
     width: 100%;
     justify-content: center;
+  }
+  .project-card-grid {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-sm);
+  }
+  .experience-card-grid {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-md);
   }
 }
 
@@ -320,6 +351,10 @@ a {
   font-size: 1.125rem;
   font-weight: 300;
   text-align: left;
+  line-height: 1.6;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  max-width: 100%;
 }
 
 .quill-render * {
@@ -328,22 +363,43 @@ a {
   color: inherit !important;
   background-color: transparent !important;
   line-height: inherit !important;
-  text-align: inherit !important;
+  max-width: 100% !important;
+}
+
+.quill-render pre {
+  white-space: pre-wrap !important;
+  word-wrap: break-word !important;
+}
+
+.quill-render img {
+  height: auto !important;
 }
 
 .quill-render p {
+  margin-top: 0 !important;
   margin-bottom: 0.8rem !important;
 }
 .quill-render p:last-child {
   margin-bottom: 0 !important;
 }
 .quill-render ul, .quill-render ol {
+  margin-top: 0 !important;
   margin-bottom: 0.8rem !important;
   padding-left: 1.5rem !important;
 }
 .quill-render li {
+  margin-top: 0 !important;
   margin-bottom: 0.25rem !important;
 }
 .quill-render strong {
   font-weight: 600 !important;
 }
+
+/* Quill formatting classes */
+.quill-render .ql-indent-1 { padding-left: 3rem !important; }
+.quill-render .ql-indent-2 { padding-left: 4.5rem !important; }
+.quill-render .ql-indent-3 { padding-left: 6rem !important; }
+
+.quill-render .ql-align-center { text-align: center !important; }
+.quill-render .ql-align-right { text-align: right !important; }
+.quill-render .ql-align-justify { text-align: justify !important; }

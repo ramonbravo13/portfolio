@@ -40,7 +40,7 @@ export default function ProjectNotebook() {
       </nav>
 
       <header style={{ marginBottom: 'var(--spacing-2xl)' }}>
-        <h1 style={{ fontSize: '3rem', margin: '0 0 var(--spacing-md) 0', lineHeight: 1.1 }}>{title}</h1>
+        <h1 style={{ fontSize: 'clamp(2.5rem, 6vw, 3.5rem)', margin: '0 0 var(--spacing-md) 0', lineHeight: 1.1, wordWrap: 'break-word', overflowWrap: 'break-word' }}>{title}</h1>
         <div style={{ display: 'flex', gap: 'var(--spacing-sm)' }}>
           {tags.map(tag => (
             <span key={tag} className="mono tech-badge">
