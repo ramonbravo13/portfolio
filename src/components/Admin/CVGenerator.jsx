@@ -49,6 +49,20 @@ export default function CVGenerator() {
         ? "MUST BE WRITTEN IN FLAWLESS, PROFESSIONAL ENGLISH. Use perfect grammar, appropriate technical terminology for Data Science/AI, and impeccable phrasing. Translate EVERYTHING (titles, descriptions, roles, etc.) to English."
         : "Debe estar escrito en ESPAÑOL profesional y formal, cuidando la ortografía, la gramática y usando una excelente redacción.";
 
+      const basePromptRules = `
+REGLAS ESTRICTAS DE GENERACIÓN (OBLIGATORIAS):
+1. NO INVENTAR DATOS: No inventes años de experiencia, puestos, métricas (ej. "40% improvement", "zero failures"), resultados financieros, ni tecnologías que no estén explícitamente en los datos provistos. Si no hay métrica verificable, describe el impacto cualitativamente.
+2. POSICIONAMIENTO PROFESIONAL: El objetivo es "Data Analyst / Junior Data Scientist". Convierte el background (Ingeniería, Maestría, Management) y los proyectos prácticos en una fortaleza competitiva. No satures el perfil solo con "Data Operations" o "QA".
+3. CARGOS REALES: Usa exactamente los títulos de los cargos provistos (ej. "Campus Director"). NUNCA los cambies a "Head of Data Operations" o similares. Destaca responsabilidades de análisis de datos, reporting y automatización dentro de esos roles reales, sin inventar que era un puesto 100% de Data.
+4. HEADLINE: Usa un headline como "DATA ANALYST | DATA SCIENCE & AI", "DATA ANALYST | DATA SCIENCE & AI ENGINEERING" o similar, honesto pero competitivo.
+5. PROYECTOS (CRÍTICO): Describe los proyectos técnicamente. 
+   - Para el proyecto "Herzberg": Enfatiza análisis de datos, NLP/LLM, dashboards, automatización y AI aplicada a toma de decisiones. No lo limites a "encuestas".
+   - Para el proyecto "ERP / POS": Enfatiza Python, bases de datos, procesamiento transaccional, integridad de datos (usa "data integrity" o "transaction consistency", NO uses "data leakage"), validación y automatización.
+6. HABILIDADES (SKILLS): Agrupa lógicamente (ej. Programming, Data, Machine Learning / AI, BI / Visualization, Databases, Tools). Solo incluye las mencionadas, no inventes para rellenar.
+7. EDUCACIÓN Y CERTIFICACIONES: Diferencia claramente títulos académicos de certificaciones o cursos.
+8. IDIOMA Y ESTILO: Si es en inglés, usa inglés profesional pero natural (Built, Developed, Analyzed). Asegúrate de escribir "AI" (Inteligencia Artificial) correctamente y NO "Al" (con L minúscula). Evita prefijos basura como "+. Situation/Task".
+`;
+
       const genAI = new GoogleGenerativeAI(apiKey);
       const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
 
@@ -61,6 +75,8 @@ Instrucciones o vacante objetivo:
 ${instructions}
 
 Regla de Idioma: ${langInstructions}
+
+${basePromptRules}
 
 Tu tarea:
 1. Filtra y selecciona los 3 o 4 proyectos y certificaciones más relevantes para esta vacante o enfoque.
