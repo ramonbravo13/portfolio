@@ -415,34 +415,23 @@ a {
 }
 
 @media print {
-  body * {
-    visibility: hidden;
+  #root {
+    display: none !important;
   }
-  
-  #cv-print-area, #cv-print-area * {
-    visibility: visible;
-  }
-  
   #cv-print-area {
     display: block !important;
-    position: absolute;
-    left: 0;
-    top: 0;
     width: 100%;
     margin: 0;
     padding: 0;
     background: white;
   }
-
   @page {
     margin: 15mm 15mm;
   }
-
   .avoid-break {
     page-break-inside: avoid;
     break-inside: avoid;
   }
-  
   h1, h2, h3, h4 {
     page-break-after: avoid;
     break-after: avoid;

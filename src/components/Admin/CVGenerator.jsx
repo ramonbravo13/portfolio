@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { usePortfolio } from '../../context/PortfolioContext';
 import { FileText, Sparkles, Loader2 } from 'lucide-react';
 import { GoogleGenerativeAI } from '@google/generative-ai';
@@ -179,8 +180,8 @@ Asegúrate de que TODOS los valores en el JSON generado estén completamente en 
         </div>
       </div>
 
-      {/* Hidden CV Template for Native Printing */}
-      {generatedData && (
+      {/* Hidden CV Template for Native Printing via Portal */}
+      {generatedData && createPortal(
         <div id="cv-print-area">
           <div ref={cvRef} style={{ 
             width: '100%', 
@@ -273,7 +274,8 @@ Asegúrate de que TODOS los valores en el JSON generado estén completamente en 
             )}
             
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </section>
   );
