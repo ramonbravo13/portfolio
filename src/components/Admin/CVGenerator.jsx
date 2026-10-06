@@ -11,10 +11,12 @@ export default function CVGenerator() {
   const [error, setError] = useState(null);
   const cvRef = useRef(null);
   const [generatedData, setGeneratedData] = useState(null);
+  const [currentLang, setCurrentLang] = useState('es');
 
   const apiKey = import.meta.env.VITE_GEMINI_API_KEY || ''; // Assuming the user has a GEMINI_API_KEY env var
 
   const handleGenerate = async (lang = 'es') => {
+    setCurrentLang(lang);
     if (!apiKey) {
       setError('VITE_GEMINI_API_KEY no está configurada en las variables de entorno.');
       return;
@@ -102,7 +104,8 @@ Asegúrate de que TODOS los valores en el JSON generado estén completamente en 
       filename:     `CV_Ramon_Bravo_${lang.toUpperCase()}_${new Date().toISOString().split('T')[0]}.pdf`,
       image:        { type: 'jpeg', quality: 1.0 },
       html2canvas:  { scale: 3, useCORS: true, letterRendering: true },
-      jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
+      pagebreak:    { mode: ['css', 'legacy'] }
     };
 
     html2pdf().set(opt).from(element).save().then(() => {
@@ -110,6 +113,12 @@ Asegúrate de que TODOS los valores en el JSON generado estén completamente en 
       setGeneratedData(null); // Clear after generating
     });
   };
+
+  const headers = {
+    es: { skills: 'Habilidades Técnicas', experience: 'Experiencia Profesional', projects: 'Proyectos Clave', technologies: 'Tecnologías:', certifications: 'Certificaciones' },
+    en: { skills: 'Technical Skills', experience: 'Professional Experience', projects: 'Key Projects', technologies: 'Technologies:', certifications: 'Certifications' }
+  };
+  const t = headers[currentLang];
 
   return (
     <section className="admin-section" style={{ marginBottom: 'var(--spacing-2xl)' }}>
@@ -183,7 +192,7 @@ Asegúrate de que TODOS los valores en el JSON generado estén completamente en 
           }}>
             
             {/* Header */}
-            <header style={{ borderBottom: '2px solid #222', paddingBottom: '15px', marginBottom: '20px' }}>
+            <header style={{ borderBottom: '2px solid #222', paddingBottom: '15px', marginBottom: '20px', pageBreakInside: 'avoid', breakInside: 'avoid' }}>
               <h1 style={{ fontSize: '28px', margin: '0 0 5px 0', color: '#000', textTransform: 'uppercase' }}>{generatedData.nombre}</h1>
               <h2 style={{ fontSize: '18px', margin: 0, color: '#444', fontWeight: 500 }}>{generatedData.titulo}</h2>
               <div style={{ marginTop: '10px', fontSize: '12px', color: '#666', display: 'flex', gap: '15px' }}>
@@ -194,15 +203,15 @@ Asegúrate de que TODOS los valores en el JSON generado estén completamente en 
 
             {/* Resumen */}
             {generatedData.resumen_ejecutivo && (
-              <section style={{ marginBottom: '20px' }}>
+              <section style={{ marginBottom: '20px', pageBreakInside: 'avoid', breakInside: 'avoid' }}>
                 <p style={{ margin: 0 }}>{generatedData.resumen_ejecutivo}</p>
               </section>
             )}
 
             {/* Skills */}
             {generatedData.skills && generatedData.skills.length > 0 && (
-              <section style={{ marginBottom: '20px' }}>
-                <h3 style={{ fontSize: '16px', margin: '0 0 10px 0', borderBottom: '1px solid #ccc', paddingBottom: '5px', textTransform: 'uppercase' }}>Habilidades Técnicas</h3>
+              <section style={{ marginBottom: '20px', pageBreakInside: 'avoid', breakInside: 'avoid' }}>
+                <h3 style={{ fontSize: '16px', margin: '0 0 10px 0', borderBottom: '1px solid #ccc', paddingBottom: '5px', textTransform: 'uppercase' }}>{t.skills}</h3>
                 <p style={{ margin: 0 }}>{generatedData.skills.join(', ')}</p>
               </section>
             )}
@@ -210,9 +219,9 @@ Asegúrate de que TODOS los valores en el JSON generado estén completamente en 
             {/* Experiencia */}
             {generatedData.experiencias && generatedData.experiencias.length > 0 && (
               <section style={{ marginBottom: '20px' }}>
-                <h3 style={{ fontSize: '16px', margin: '0 0 10px 0', borderBottom: '1px solid #ccc', paddingBottom: '5px', textTransform: 'uppercase' }}>Experiencia Profesional</h3>
+                <h3 style={{ fontSize: '16px', margin: '0 0 10px 0', borderBottom: '1px solid #ccc', paddingBottom: '5px', textTransform: 'uppercase' }}>{t.experience}</h3>
                 {generatedData.experiencias.map((exp, idx) => (
-                  <div key={idx} style={{ marginBottom: '15px' }}>
+                  <div key={idx} style={{ marginBottom: '15px', pageBreakInside: 'avoid', breakInside: 'avoid' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '5px' }}>
                       <strong style={{ fontSize: '15px' }}>{exp.rol}</strong>
                       <span style={{ fontSize: '13px', color: '#666' }}>{exp.periodo}</span>
@@ -231,13 +240,13 @@ Asegúrate de que TODOS los valores en el JSON generado estén completamente en 
             {/* Proyectos Clave */}
             {generatedData.proyectos_clave && generatedData.proyectos_clave.length > 0 && (
               <section style={{ marginBottom: '20px' }}>
-                <h3 style={{ fontSize: '16px', margin: '0 0 10px 0', borderBottom: '1px solid #ccc', paddingBottom: '5px', textTransform: 'uppercase' }}>Proyectos Clave</h3>
+                <h3 style={{ fontSize: '16px', margin: '0 0 10px 0', borderBottom: '1px solid #ccc', paddingBottom: '5px', textTransform: 'uppercase' }}>{t.projects}</h3>
                 {generatedData.proyectos_clave.map((proj, idx) => (
-                  <div key={idx} style={{ marginBottom: '12px' }}>
+                  <div key={idx} style={{ marginBottom: '12px', pageBreakInside: 'avoid', breakInside: 'avoid' }}>
                     <strong style={{ fontSize: '14px', display: 'block', marginBottom: '4px' }}>{proj.titulo}</strong>
                     <p style={{ margin: '0 0 4px 0' }}>{proj.descripcion}</p>
                     <div style={{ fontSize: '12px', color: '#555' }}>
-                      <strong>Tecnologías:</strong> {(proj.tecnologias || []).join(', ')}
+                      <strong>{t.technologies}</strong> {(proj.tecnologias || []).join(', ')}
                     </div>
                   </div>
                 ))}
@@ -246,11 +255,11 @@ Asegúrate de que TODOS los valores en el JSON generado estén completamente en 
 
             {/* Certificaciones */}
             {generatedData.certificaciones && generatedData.certificaciones.length > 0 && (
-              <section>
-                <h3 style={{ fontSize: '16px', margin: '0 0 10px 0', borderBottom: '1px solid #ccc', paddingBottom: '5px', textTransform: 'uppercase' }}>Certificaciones</h3>
+              <section style={{ pageBreakInside: 'avoid', breakInside: 'avoid' }}>
+                <h3 style={{ fontSize: '16px', margin: '0 0 10px 0', borderBottom: '1px solid #ccc', paddingBottom: '5px', textTransform: 'uppercase' }}>{t.certifications}</h3>
                 <ul style={{ margin: 0, paddingLeft: '20px' }}>
                   {generatedData.certificaciones.map((cert, idx) => (
-                    <li key={idx} style={{ marginBottom: '4px' }}>
+                    <li key={idx} style={{ marginBottom: '4px', pageBreakInside: 'avoid', breakInside: 'avoid', display: 'block' }}>
                       <strong>{cert.titulo}</strong> {cert.descripcion ? `- ${cert.descripcion}` : ''}
                     </li>
                   ))}
