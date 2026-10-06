@@ -14,7 +14,7 @@ export default function CVGenerator() {
 
   const apiKey = import.meta.env.VITE_GEMINI_API_KEY || ''; // Assuming the user has a GEMINI_API_KEY env var
 
-  const handleGenerate = async () => {
+  const handleGenerate = async (lang = 'es') => {
     if (!apiKey) {
       setError('VITE_GEMINI_API_KEY no está configurada en las variables de entorno.');
       return;
@@ -43,6 +43,10 @@ export default function CVGenerator() {
         certifications: profile.certs || []
       };
 
+      const langInstructions = lang === 'en'
+        ? "MUST BE WRITTEN IN FLAWLESS, PROFESSIONAL ENGLISH. Use perfect grammar, appropriate technical terminology for Data Science/AI, and impeccable phrasing. Translate EVERYTHING (titles, descriptions, roles, etc.) to English."
+        : "Debe estar escrito en ESPAÑOL profesional y formal, cuidando la ortografía, la gramática y usando una excelente redacción.";
+
       const genAI = new GoogleGenerativeAI(apiKey);
       const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
 
@@ -54,10 +58,13 @@ ${JSON.stringify(dataToSend, null, 2)}
 Instrucciones o vacante objetivo:
 ${instructions}
 
+Regla de Idioma: ${langInstructions}
+
 Tu tarea:
 1. Filtra y selecciona los 3 o 4 proyectos y certificaciones más relevantes para esta vacante o enfoque.
 2. Reescribe los puntos de la experiencia laboral usando la metodología STAR (Situación, Tarea, Acción, Resultado) de manera sintética y con métricas de impacto.
 3. Genera un JSON estructurado de salida con las claves: \`nombre\`, \`titulo\`, \`resumen_ejecutivo\`, \`experiencias\` (array con \`empresa\`, \`rol\`, \`periodo\`, \`descripcion\`(array de strings STAR)), \`proyectos_clave\` (array con \`titulo\`, \`descripcion\`, \`tecnologias\` (array)), \`certificaciones\` (array con \`titulo\`, \`descripcion\`), \`skills\` (array).
+Asegúrate de que TODOS los valores en el JSON generado estén completamente en el idioma solicitado (${lang === 'en' ? 'Inglés' : 'Español'}).
 4. Devuelve ÚNICAMENTE el código JSON válido sin ningún texto explicativo o formato Markdown extra. NO incluyas bloques de código \`\`\`json.
 `;
 
@@ -67,6 +74,8 @@ Tu tarea:
       // Clean up if the model wrapped it in markdown
       if (responseText.startsWith('```json')) {
         responseText = responseText.replace(/```json\n?/, '').replace(/```$/, '');
+      } else if (responseText.startsWith('```')) {
+        responseText = responseText.replace(/```\n?/, '').replace(/```$/, '');
       }
 
       const cvData = JSON.parse(responseText.trim());
@@ -74,7 +83,7 @@ Tu tarea:
 
       // Wait for React to render the hidden template
       setTimeout(() => {
-        generatePDF();
+        generatePDF(lang);
       }, 500);
 
     } catch (err) {
@@ -84,15 +93,15 @@ Tu tarea:
     }
   };
 
-  const generatePDF = () => {
+  const generatePDF = (lang) => {
     const element = cvRef.current;
     
     // Configuración para html2pdf
     const opt = {
-      margin:       10,
-      filename:     `CV_Ramon_Bravo_${new Date().toISOString().split('T')[0]}.pdf`,
-      image:        { type: 'jpeg', quality: 0.98 },
-      html2canvas:  { scale: 2, useCORS: true },
+      margin:       [10, 0, 10, 0],
+      filename:     `CV_Ramon_Bravo_${lang.toUpperCase()}_${new Date().toISOString().split('T')[0]}.pdf`,
+      image:        { type: 'jpeg', quality: 1.0 },
+      html2canvas:  { scale: 3, useCORS: true, letterRendering: true },
       jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
 
@@ -128,28 +137,50 @@ Tu tarea:
           </div>
         )}
 
-        <button 
-          onClick={handleGenerate} 
-          disabled={loading}
-          className="btn-primary" 
-          style={{ width: '100%', justifyContent: 'center' }}
-        >
-          {loading ? (
-            <>
-              <Loader2 size={18} className="animate-spin" /> Procesando con Gemini e Imprimiendo PDF...
-            </>
-          ) : (
-            <>
-              <Sparkles size={18} /> Generar CV en PDF
-            </>
-          )}
-        </button>
+        <div style={{ display: 'flex', gap: '1rem', width: '100%', flexWrap: 'wrap' }}>
+          <button 
+            onClick={() => handleGenerate('es')} 
+            disabled={loading}
+            className="btn-primary" 
+            style={{ flex: '1 1 auto', justifyContent: 'center', minWidth: '200px' }}
+          >
+            {loading ? (
+              <><Loader2 size={18} className="animate-spin" /> Procesando...</>
+            ) : (
+              <><Sparkles size={18} /> Generar CV en Español</>
+            )}
+          </button>
+
+          <button 
+            onClick={() => handleGenerate('en')} 
+            disabled={loading}
+            className="btn-primary" 
+            style={{ flex: '1 1 auto', justifyContent: 'center', backgroundColor: '#3b82f6', borderColor: '#3b82f6', color: '#fff', minWidth: '200px' }}
+          >
+            {loading ? (
+              <><Loader2 size={18} className="animate-spin" /> Processing...</>
+            ) : (
+              <><Sparkles size={18} /> Generar CV en Inglés</>
+            )}
+          </button>
+        </div>
       </div>
 
       {/* Hidden CV Template for html2pdf */}
       {generatedData && (
         <div style={{ position: 'absolute', left: '-9999px', top: 0 }}>
-          <div ref={cvRef} style={{ width: '800px', padding: '40px', backgroundColor: '#fff', color: '#111', fontFamily: '"Inter", sans-serif', fontSize: '14px', lineHeight: 1.5 }}>
+          <div ref={cvRef} style={{ 
+            width: '794px', 
+            padding: '40px 50px', 
+            boxSizing: 'border-box',
+            backgroundColor: '#fff', 
+            color: '#111', 
+            fontFamily: '"Inter", sans-serif', 
+            fontSize: '14px', 
+            lineHeight: 1.5,
+            wordWrap: 'break-word',
+            overflowWrap: 'break-word'
+          }}>
             
             {/* Header */}
             <header style={{ borderBottom: '2px solid #222', paddingBottom: '15px', marginBottom: '20px' }}>
@@ -187,9 +218,9 @@ Tu tarea:
                       <span style={{ fontSize: '13px', color: '#666' }}>{exp.periodo}</span>
                     </div>
                     <div style={{ fontWeight: 500, marginBottom: '5px' }}>{exp.empresa}</div>
-                    <ul style={{ margin: 0, paddingLeft: '20px' }}>
+                    <ul style={{ margin: 0, paddingLeft: '20px', textAlign: 'justify' }}>
                       {(exp.descripcion || []).map((punto, pIdx) => (
-                        <li key={pIdx} style={{ marginBottom: '4px' }}>{punto}</li>
+                        <li key={pIdx} style={{ marginBottom: '6px', paddingLeft: '5px' }}>{punto}</li>
                       ))}
                     </ul>
                   </div>
