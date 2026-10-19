@@ -21,4 +21,10 @@ dist-ssr
 *.ntvs*
 *.njsproj
 *.sln
-*.sw?
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+
+# Test scripts
+test-gemini.js

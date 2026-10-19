@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, MessageCircle, Edit, LogOut, LogIn, Github, Linkedin } from 'lucide-react';
+import { Menu, X, MessageCircle, Edit, LogOut, Github, Linkedin } from 'lucide-react';
 import { usePortfolio } from '../context/PortfolioContext';
 
 export default function Navbar() {
@@ -63,8 +63,8 @@ export default function Navbar() {
         justifyContent: 'space-between'
       }}>
         {/* Logo */}
-        <Link to="/" style={{ fontSize: '1.25rem', fontFamily: 'var(--font-serif)', fontWeight: 400, letterSpacing: '-0.02em', display: 'flex', alignItems: 'center', gap: '8px', textTransform: 'uppercase' }}>
-          <span>Ramón</span> Bravo
+        <Link to="/" style={{ fontSize: '1.15rem', fontFamily: 'var(--font-heading)', fontWeight: 700, letterSpacing: '-0.02em', display: 'flex', alignItems: 'center', gap: '8px', textTransform: 'uppercase', color: 'var(--text-primary)' }}>
+          <span style={{ color: 'var(--color-sage)', fontWeight: 500 }}>Juan Ramón</span> Bravo López
         </Link>
 
         {/* Desktop Menu */}
@@ -92,6 +92,13 @@ export default function Navbar() {
               </button>
             </li>
             <li>
+              <button onClick={() => handleNavClick('certificaciones')} style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', fontSize: '0.9rem', fontWeight: 500 }}
+                onMouseOver={e => e.currentTarget.style.color = 'var(--text-primary)'}
+                onMouseOut={e => e.currentTarget.style.color = 'var(--text-secondary)'}>
+                {isEnglish ? 'Certifications' : 'Certificaciones'}
+              </button>
+            </li>
+            <li>
               <button onClick={() => handleNavClick('contacto')} style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', fontSize: '0.9rem', fontWeight: 500 }}
                 onMouseOver={e => e.currentTarget.style.color = 'var(--text-primary)'}
                 onMouseOut={e => e.currentTarget.style.color = 'var(--text-secondary)'}>
@@ -104,21 +111,18 @@ export default function Navbar() {
             <button onClick={toggleLanguage} className="btn-secondary" style={{ padding: '0.4rem 0.6rem', fontSize: '0.8rem', minWidth: '40px' }}>
               {language === 'es' ? 'EN' : 'ES'}
             </button>
-            {isAdminAuth ? (
+            {isAdminAuth && (
               <>
-                <Link to="/admin" className="btn-secondary" style={{ padding: '0.5rem 1rem', fontSize: '0.85rem' }}>
+                <Link to="/admin" className="btn-secondary" style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem' }} title={isEnglish ? "Admin Dashboard" : "Panel de Administración"}>
                   <Edit size={14} /> Admin
                 </Link>
-                <button onClick={logoutAdmin} className="btn-secondary" style={{ padding: '0.5rem 1rem', fontSize: '0.85rem', borderColor: 'rgba(239, 68, 68, 0.3)', color: '#ef4444' }}
+                <button onClick={logoutAdmin} className="btn-secondary" style={{ padding: '0.4rem 0.6rem', fontSize: '0.8rem', borderColor: 'rgba(239, 68, 68, 0.3)', color: '#ef4444' }}
+                  title={isEnglish ? "Log out" : "Cerrar sesión"}
                   onMouseOver={e => e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.05)'}
                   onMouseOut={e => e.currentTarget.style.backgroundColor = 'transparent'}>
                   <LogOut size={14} />
                 </button>
               </>
-            ) : (
-              <Link to="/login" className="btn-secondary" style={{ padding: '0.4rem 0.6rem', fontSize: '0.8rem' }} title={isEnglish ? "Admin Login" : "Acceso Admin"}>
-                <LogIn size={14} />
-              </Link>
             )}
             
             <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="btn-secondary" style={{ padding: '0.5rem', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }} title="GitHub">
@@ -177,6 +181,11 @@ export default function Navbar() {
               </button>
             </li>
             <li>
+              <button onClick={() => handleNavClick('certificaciones')} style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', fontSize: '1.1rem', fontWeight: 500, width: '100%', textAlign: 'left' }}>
+                {isEnglish ? 'Certifications' : 'Certificaciones'}
+              </button>
+            </li>
+            <li>
               <button onClick={() => handleNavClick('contacto')} style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', fontSize: '1.1rem', fontWeight: 500, width: '100%', textAlign: 'left' }}>
                 {isEnglish ? 'Contact' : 'Contacto'}
               </button>
@@ -188,7 +197,7 @@ export default function Navbar() {
               {isEnglish ? 'Cambiar a Español' : 'Switch to English'}
             </button>
 
-            {isAdminAuth ? (
+            {isAdminAuth && (
               <>
                 <Link to="/admin" onClick={() => setIsOpen(false)} className="btn-secondary" style={{ justifyContent: 'center' }}>
                   <Edit size={16} /> Admin Panel
@@ -197,10 +206,6 @@ export default function Navbar() {
                   <LogOut size={16} /> {isEnglish ? 'Logout' : 'Cerrar sesión'}
                 </button>
               </>
-            ) : (
-              <Link to="/login" onClick={() => setIsOpen(false)} className="btn-secondary" style={{ justifyContent: 'center' }}>
-                <LogIn size={16} /> {isEnglish ? 'Admin Login' : 'Acceso Admin'}
-              </Link>
             )}
 
             <div style={{ display: 'flex', gap: 'var(--spacing-md)', justifyContent: 'center', marginTop: 'var(--spacing-xs)' }}>

@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,600;9..144,700&family=Inter:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap');
 
 :root {
   /* Editorial Color Palette */
@@ -14,7 +14,7 @@
   /* Theme Mapping */
   --bg-primary: var(--color-linen);
   --bg-secondary: var(--color-mist);
-  --bg-navbar: rgba(250, 255, 250, 0.9);
+  --bg-navbar: rgba(250, 255, 250, 0.92);
   --border-subtle: var(--color-ink);
   --border-light: rgba(18, 22, 19, 0.15);
   
@@ -25,10 +25,11 @@
   --accent-primary: var(--color-voltage);
   --accent-secondary: var(--color-ink);
 
-  /* Typography */
-  --font-sans: 'Inter', -apple-system, sans-serif;
-  --font-serif: 'Fraunces', serif;
-  --font-mono: 'Inter', monospace;
+  /* Typography - Modern Clean Tech Stack */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-heading: 'Plus Jakarta Sans', var(--font-sans);
+  --font-serif: var(--font-heading); /* Backwards-compatibility fallback */
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
 
   /* Spacing */
   --spacing-xs: 0.5rem;
@@ -57,7 +58,7 @@ body {
   font-family: var(--font-sans);
   background-color: var(--bg-primary);
   color: var(--text-primary);
-  line-height: 1.6;
+  line-height: 1.65;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   min-height: 100vh;
@@ -72,34 +73,50 @@ body {
 
 h1, h2, h3, h4, h5, h6 {
   color: var(--text-primary);
-  font-family: var(--font-serif);
-  font-weight: 400;
-  line-height: 1.1;
-  letter-spacing: -0.02em;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  line-height: 1.18;
+  letter-spacing: -0.025em;
+  text-align: left;
 }
 
 h1 {
-  font-size: clamp(3.5rem, 8vw, 7rem);
+  font-size: clamp(2.75rem, 6vw, 5rem);
+  font-weight: 800;
+  letter-spacing: -0.035em;
   text-transform: uppercase;
 }
 
 h2 {
-  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-size: clamp(2rem, 4vw, 3.25rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
   margin-bottom: var(--spacing-lg);
   text-transform: uppercase;
 }
 
 h3 {
-  font-size: clamp(1.5rem, 3vw, 2.5rem);
+  font-size: clamp(1.25rem, 2.5vw, 1.85rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
   margin-bottom: var(--spacing-xs);
+}
+
+h4 {
+  font-size: clamp(1.1rem, 2vw, 1.35rem);
+  font-weight: 600;
+  letter-spacing: -0.015em;
 }
 
 p {
   color: var(--text-secondary);
-  font-size: 1.125rem;
+  font-size: 1.05rem;
+  line-height: 1.7;
   margin-bottom: var(--spacing-md);
   font-family: var(--font-sans);
-  font-weight: 300;
+  font-weight: 400;
+  text-align: left;
+  max-width: 68ch;
 }
 
 a {
@@ -109,7 +126,7 @@ a {
 }
 
 .mono {
-  font-family: var(--font-sans);
+  font-family: var(--font-mono);
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -131,17 +148,18 @@ a {
   background-color: var(--color-voltage);
   color: var(--color-ink);
   border: 1px solid var(--color-ink);
-  padding: 1rem 2rem;
-  font-family: var(--font-sans);
-  font-weight: 500;
+  padding: 0.85rem 1.75rem;
+  font-family: var(--font-heading);
+  font-weight: 600;
   font-size: 0.85rem;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.04em;
   cursor: pointer;
   transition: all 0.3s ease;
   display: inline-flex;
   align-items: center;
   gap: var(--spacing-sm);
+  border-radius: 4px;
 }
 
 .btn-primary:hover {
@@ -153,17 +171,18 @@ a {
   background-color: transparent;
   color: var(--color-ink);
   border: 1px solid var(--border-light);
-  padding: 1rem 2rem;
-  font-family: var(--font-sans);
-  font-weight: 500;
+  padding: 0.85rem 1.75rem;
+  font-family: var(--font-heading);
+  font-weight: 600;
   font-size: 0.85rem;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.04em;
   cursor: pointer;
   transition: all 0.3s ease;
   display: inline-flex;
   align-items: center;
   gap: var(--spacing-sm);
+  border-radius: 4px;
 }
 
 .btn-secondary:hover {
@@ -233,6 +252,7 @@ a {
   border: 1px solid var(--border-light);
   padding: 4px 12px;
   color: var(--color-ink);
+  font-family: var(--font-mono);
   font-size: 0.75rem;
   transition: all 0.3s ease;
   border-radius: 999px;
@@ -314,6 +334,280 @@ a {
   align-items: start;
 }
 
+/* --- Unified Certifications Component Styles --- */
+.certs-grid-unified {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: var(--spacing-xl);
+  align-items: stretch;
+}
+
+.cert-card-unified {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-light);
+  border-radius: 10px;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 2px 10px rgba(18, 22, 19, 0.03);
+  cursor: pointer;
+}
+
+.cert-card-unified:hover {
+  border-color: var(--color-voltage);
+  transform: translateY(-4px);
+  box-shadow: 0 16px 32px rgba(18, 22, 19, 0.08);
+}
+
+.cert-card-media {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  position: relative;
+  background-color: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cert-card-body {
+  padding: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+}
+
+.cert-card-meta {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--color-sage);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--spacing-xs);
+}
+
+.cert-card-title {
+  font-family: var(--font-heading);
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-xs);
+  min-height: 2.6em;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.cert-card-recipient {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--color-sage);
+  margin-bottom: var(--spacing-sm);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.cert-card-desc {
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  text-align: left;
+  margin-bottom: var(--spacing-lg);
+  flex-grow: 1;
+  max-width: 100%;
+}
+
+.cert-card-footer {
+  margin-top: auto;
+  padding-top: var(--spacing-sm);
+  border-top: 1px solid var(--border-light);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* --- Compact Refactored Certifications Grid & Tabs --- */
+.cert-tabs-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: var(--spacing-lg);
+  align-items: center;
+}
+
+.cert-tab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--border-light);
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  font-family: var(--font-heading);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cert-tab-btn:hover {
+  border-color: var(--color-ink);
+  color: var(--color-ink);
+  background: var(--color-mist);
+}
+
+.cert-tab-btn.active {
+  background: var(--color-ink);
+  color: var(--color-voltage);
+  border-color: var(--color-ink);
+}
+
+.cert-tab-count {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.08);
+  color: inherit;
+}
+
+.cert-tab-btn.active .cert-tab-count {
+  background: rgba(43, 238, 75, 0.2);
+  color: var(--color-voltage);
+}
+
+.certs-grid-compact {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: var(--spacing-md);
+  align-items: stretch;
+}
+
+.cert-card-compact {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  padding: var(--spacing-md);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 2px 8px rgba(18, 22, 19, 0.02);
+  position: relative;
+}
+
+.cert-card-compact:hover {
+  border-color: var(--color-voltage);
+  transform: translateY(-3px);
+  box-shadow: 0 10px 24px rgba(18, 22, 19, 0.06);
+}
+
+.cert-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-xs);
+}
+
+.cert-issuer-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-sage);
+}
+
+.cert-verified-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: rgba(43, 238, 75, 0.12);
+  color: #15803d;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
+
+.cert-compact-title {
+  font-family: var(--font-heading);
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--text-primary);
+  margin: 6px 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 2.7em;
+}
+
+.cert-compact-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin: var(--spacing-xs) 0 var(--spacing-sm) 0;
+}
+
+.cert-tech-pill {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  padding: 2px 7px;
+  border-radius: 4px;
+  background: rgba(18, 22, 19, 0.04);
+  border: 1px solid var(--border-light);
+  color: var(--color-bark);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.cert-compact-footer {
+  margin-top: auto;
+  padding-top: var(--spacing-xs);
+  border-top: 1px solid var(--border-light);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cert-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px 0;
+  transition: color 0.2s;
+}
+
+.cert-action-btn:hover {
+  color: #15803d;
+}
+
 @media (max-width: 768px) {
   .page-container {
     padding: var(--spacing-xl) var(--spacing-md);
@@ -332,6 +626,12 @@ a {
   .experience-card-grid {
     grid-template-columns: 1fr;
     gap: var(--spacing-md);
+  }
+  .certs-grid-unified {
+    grid-template-columns: 1fr;
+  }
+  .certs-grid-compact {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -353,13 +653,13 @@ a {
 .quill-render {
   font-family: var(--font-sans);
   color: var(--text-secondary);
-  font-size: 1.125rem;
-  font-weight: 300;
+  font-size: 1.05rem;
+  font-weight: 400;
   text-align: left;
-  line-height: 1.6;
+  line-height: 1.7;
   overflow-wrap: break-word;
   word-wrap: break-word;
-  max-width: 100%;
+  max-width: 68ch;
 }
 
 .quill-render * {
@@ -374,6 +674,7 @@ a {
 .quill-render pre {
   white-space: pre-wrap !important;
   word-wrap: break-word !important;
+  font-family: var(--font-mono) !important;
 }
 
 .quill-render img {
@@ -383,6 +684,8 @@ a {
 .quill-render p {
   margin-top: 0 !important;
   margin-bottom: 0.8rem !important;
+  text-align: left !important;
+  line-height: 1.7 !important;
 }
 .quill-render p:last-child {
   margin-bottom: 0 !important;
@@ -391,10 +694,13 @@ a {
   margin-top: 0 !important;
   margin-bottom: 0.8rem !important;
   padding-left: 1.5rem !important;
+  text-align: left !important;
 }
 .quill-render li {
   margin-top: 0 !important;
-  margin-bottom: 0.25rem !important;
+  margin-bottom: 0.35rem !important;
+  text-align: left !important;
+  line-height: 1.6 !important;
 }
 .quill-render strong {
   font-weight: 600 !important;

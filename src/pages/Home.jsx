@@ -2,9 +2,11 @@ import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   ArrowRight, MessageCircle, Code, Terminal, Database, Award, Rocket, 
-  Cpu, TrendingUp, Layers, Mail, Phone, MapPin, Briefcase 
+  Cpu, TrendingUp, Layers, Mail, Phone, MapPin, Briefcase,
+  ShieldCheck, ExternalLink, Github, Linkedin, CheckCircle2 
 } from 'lucide-react';
 import CertificationViewer from '../components/CertificationViewer';
+import CertificationsSection from '../components/CertificationsSection';
 import Navbar from '../components/Navbar';
 import { usePortfolio } from '../context/PortfolioContext';
 import gsap from 'gsap';
@@ -29,7 +31,7 @@ function EditorialProject({ project, index, isEnglish, getIcon }) {
       
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
         <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'baseline', gap: 'var(--spacing-md)' }}>
-          <h3 style={{ margin: 0, fontSize: 'clamp(2rem, 4vw, 3.5rem)', textTransform: 'uppercase', lineHeight: 1 }}>{title}</h3>
+          <h3 style={{ margin: 0, fontSize: 'clamp(1.75rem, 3.5vw, 3rem)', fontFamily: 'var(--font-heading)', fontWeight: 700, textTransform: 'uppercase', lineHeight: 1.15 }}>{title}</h3>
           
           <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
             {tags.slice(0, 3).map(tag => (
@@ -46,9 +48,9 @@ function EditorialProject({ project, index, isEnglish, getIcon }) {
           )}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-lg)' }}>
             {problem ? (
-              <div className="quill-render" style={{ margin: 0, maxWidth: '600px' }} dangerouslySetInnerHTML={{ __html: problem }} />
+              <div className="quill-render" style={{ margin: 0, maxWidth: '68ch' }} dangerouslySetInnerHTML={{ __html: problem }} />
             ) : (
-              <p style={{ margin: 0, maxWidth: '600px' }}>
+              <p style={{ margin: 0, maxWidth: '68ch' }}>
                 {isEnglish ? 'Documented technological case study.' : 'Caso de estudio tecnológico documentado.'}
               </p>
             )}
@@ -80,7 +82,7 @@ function EditorialMetric({ title, value }) {
   return (
     <div style={{ padding: 'var(--spacing-md) 0', borderBottom: '1px solid var(--border-light)' }}>
       <p className="mono" style={{ margin: 0, marginBottom: '8px', color: 'var(--text-secondary)' }}>{title}</p>
-      <div style={{ fontSize: '3rem', fontFamily: 'var(--font-serif)', lineHeight: 1 }}>{value}</div>
+      <div style={{ fontSize: '3rem', fontFamily: 'var(--font-heading)', fontWeight: 700, letterSpacing: '-0.03em', lineHeight: 1 }}>{value}</div>
     </div>
   );
 }
@@ -127,21 +129,25 @@ export default function Home() {
           paddingBottom: 'var(--spacing-3xl)'
         }}>
           <div className="animate-fade-up" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
-            <span className="mono" style={{ display: 'block', marginBottom: 'var(--spacing-xs)' }}>
-              {isEnglish ? 'Portfolio & Archive' : 'Portafolio y Archivo'} — 2026
+            <span className="mono" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginBottom: 'var(--spacing-xs)', color: 'var(--color-sage)' }}>
+              <span style={{ display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', backgroundColor: 'var(--color-voltage)' }}></span>
+              Juan Ramón Bravo López &bull; {isEnglish ? 'Portfolio & Archive' : 'Portafolio y Archivo'} — 2026
             </span>
             
             <h1 style={{ margin: 0, fontSize: profile.titleFontSize ? profile.titleFontSize : undefined }}>
               {(isEnglish && profile.title_en ? profile.title_en : profile.title).replace('Cientifico', 'Científico')}
             </h1>
             
-            <p style={{ maxWidth: '600px', margin: 0, fontSize: 'clamp(1.1rem, 2vw, 1.5rem)', marginBottom: 'var(--spacing-sm)' }}>
+            <p style={{ maxWidth: '65ch', margin: 0, fontSize: 'clamp(1.05rem, 1.8vw, 1.25rem)', lineHeight: 1.7, marginBottom: 'var(--spacing-sm)', textAlign: 'left' }}>
               {isEnglish && profile.bio_en ? profile.bio_en : profile.bio}
             </p>
             
-            <div style={{ display: 'flex', gap: 'var(--spacing-sm)' }}>
+            <div style={{ display: 'flex', gap: 'var(--spacing-sm)', flexWrap: 'wrap' }}>
               <a href="#proyectos" className="btn-primary">
                 {isEnglish ? 'Selected Works' : 'Trabajos Seleccionados'} <ArrowRight size={16} />
+              </a>
+              <a href="#certificaciones" className="btn-secondary">
+                <Award size={16} /> {isEnglish ? 'Certifications' : 'Certificaciones'}
               </a>
             </div>
             
@@ -159,20 +165,32 @@ export default function Home() {
               <div style={{
                 width: '100%',
                 maxWidth: '420px',
-                aspectRatio: '4/5',
                 border: '1px solid var(--border-subtle)',
                 padding: '12px',
-                backgroundColor: 'transparent'
+                backgroundColor: 'var(--bg-primary)',
+                borderRadius: '8px',
+                boxShadow: '0 8px 24px rgba(0,0,0,0.04)'
               }}>
-                <img 
-                  src={profile.profileImage} 
-                  alt={profile.name || "Profile"} 
-                  style={{ 
-                    width: '100%', 
-                    height: '100%', 
-                    objectFit: 'cover'
-                  }} 
-                />
+                <div style={{
+                  width: '100%',
+                  aspectRatio: '4/5',
+                  overflow: 'hidden',
+                  borderRadius: '4px'
+                }}>
+                  <img 
+                    src={profile.profileImage} 
+                    alt="Juan Ramón Bravo López - Científico de Datos & Inteligencia Artificial" 
+                    style={{ 
+                      width: '100%', 
+                      height: '100%', 
+                      objectFit: 'cover'
+                    }} 
+                  />
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '10px' }} className="mono">
+                  <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>Juan Ramón Bravo López</span>
+                  <span style={{ color: 'var(--color-sage)', fontSize: '0.7rem' }}>DATA & AI</span>
+                </div>
               </div>
             )}
           </div>
@@ -238,78 +256,26 @@ export default function Home() {
           </div>
         </section>
 
-        {/* CERTIFICATIONS SECTION */}
-        <section id="certificaciones" className="section-container">
-          <div style={{ marginBottom: 'var(--spacing-xl)', paddingBottom: 'var(--spacing-md)', borderBottom: '1px solid var(--border-subtle)' }}>
-            <h2 style={{ margin: 0 }}>{isEnglish ? 'Certifications & Training' : 'Certificaciones y Formación'}</h2>
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 'var(--spacing-xl)' }}>
-            {(profile.certs || []).length === 0 ? (
-              <p>{isEnglish ? 'No certifications added yet.' : 'Aún no se han agregado certificaciones.'}</p>
-            ) : (
-              (profile.certs || []).map((cert, idx) => {
-                const title = (isEnglish && cert.title_en ? cert.title_en : cert.title).replace('Datoss', 'Datos');
-                const desc = isEnglish && cert.desc_en ? cert.desc_en : cert.desc;
-
-                return (
-                  <div key={cert.id || idx} onClick={() => setSelectedCert(cert)} className="premium-card animate-fade-up" style={{
-                    cursor: 'pointer',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'space-between',
-                    minHeight: '200px'
-                  }}>
-                    {cert.url && (
-                      <div style={{
-                        width: '100%',
-                        aspectRatio: '1.414 / 1',
-                        marginBottom: 'var(--spacing-md)',
-                        overflow: 'hidden',
-                        position: 'relative',
-                        border: '1px solid var(--border-light)',
-                        backgroundColor: 'var(--bg-secondary)'
-                      }}>
-                        <iframe 
-                          src={`${cert.url}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`} 
-                          style={{
-                            width: '200%',
-                            height: '200%',
-                            transform: 'scale(0.5)',
-                            transformOrigin: 'top left',
-                            border: 'none',
-                            pointerEvents: 'none'
-                          }}
-                          title={title}
-                          tabIndex={-1}
-                        />
-                        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 10 }}></div>
-                      </div>
-                    )}
-                    <div>
-                      <h3 style={{ fontSize: '1.5rem', marginBottom: '16px' }}>{title}</h3>
-                      {desc && <p style={{ fontSize: '1rem' }}>{desc}</p>}
-                    </div>
-                    <div style={{ marginTop: 'var(--spacing-md)' }}>
-                      <span className="hover-underline mono" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontWeight: 600 }}>
-                        {isEnglish ? 'View Document' : 'Ver Documento'} <ArrowRight size={14} />
-                      </span>
-                    </div>
-                  </div>
-                );
-              })
-            )}
-          </div>
-        </section>
+        {/* CERTIFICATIONS & FORMATION SECTION (COMPACT REFACTORED UI) */}
+        <CertificationsSection 
+          certs={profile.certs || []} 
+          isEnglish={isEnglish} 
+          onSelectCert={setSelectedCert} 
+        />
 
         {/* CONTACT SECTION */}
-        <section id="contacto" className="section-container" style={{ textAlign: 'center', paddingBottom: 'var(--spacing-2xl)' }}>
-          <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-            <h2 style={{ fontSize: 'clamp(3rem, 6vw, 5rem)', marginBottom: 'var(--spacing-lg)' }}>
+        <section id="contacto" className="section-container" style={{ textAlign: 'center', paddingBottom: 'var(--spacing-3xl)' }}>
+          <div style={{ maxWidth: '800px', margin: '0 auto', textAlign: 'center' }}>
+            <span className="mono" style={{ display: 'inline-block', color: 'var(--color-sage)', marginBottom: 'var(--spacing-xs)', letterSpacing: '0.08em' }}>
+              {isEnglish ? 'CONNECT & COLLABORATE' : 'CONTACTO Y COLABORACIÓN'}
+            </span>
+            <h2 style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)', marginBottom: 'var(--spacing-md)', textAlign: 'center' }}>
               {isEnglish ? "Let's Talk" : 'Hablemos'}
             </h2>
-            <p style={{ fontSize: '1.25rem', marginBottom: 'var(--spacing-xl)' }}>
-              {isEnglish ? 'Do you have a software, data science or artificial intelligence problem that requires a sophisticated engineering solution? Write me directly.' : '¿Tienes un problema de software, ciencia de datos o inteligencia artificial que requiera una solución de ingeniería sofisticada? Escríbeme.'}
+            <p style={{ fontSize: '1.15rem', marginBottom: 'var(--spacing-xl)', maxWidth: '65ch', margin: '0 auto var(--spacing-xl) auto', lineHeight: 1.7, textAlign: 'center', color: 'var(--text-secondary)' }}>
+              {isEnglish 
+                ? 'Do you have a software, data science or artificial intelligence problem that requires a sophisticated engineering solution? Write to Juan Ramón Bravo López directly.' 
+                : '¿Tienes un problema de software, ciencia de datos o inteligencia artificial que requiera una solución de ingeniería sofisticada? Escríbeme directamente.'}
             </p>
             
             <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 'var(--spacing-md)' }}>
@@ -326,6 +292,106 @@ export default function Home() {
             </div>
           </div>
         </section>
+
+        {/* FOOTER */}
+        <footer style={{
+          borderTop: '1px solid var(--border-light)',
+          paddingTop: 'var(--spacing-2xl)',
+          paddingBottom: 'var(--spacing-xl)',
+          marginTop: 'var(--spacing-xl)'
+        }}>
+          <div style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            justifyContent: 'space-between',
+            alignItems: 'flex-start',
+            gap: 'var(--spacing-xl)',
+            marginBottom: 'var(--spacing-2xl)'
+          }}>
+            <div style={{ maxWidth: '440px' }}>
+              <div style={{
+                fontSize: '1.2rem',
+                fontFamily: 'var(--font-heading)',
+                fontWeight: 700,
+                letterSpacing: '-0.02em',
+                textTransform: 'uppercase',
+                marginBottom: 'var(--spacing-xs)',
+                color: 'var(--text-primary)'
+              }}>
+                <span style={{ color: 'var(--color-sage)', fontWeight: 500 }}>Juan Ramón</span> Bravo López
+              </div>
+              <p style={{ fontSize: '0.95rem', color: 'var(--text-secondary)', marginBottom: 'var(--spacing-md)', lineHeight: 1.6, textAlign: 'left' }}>
+                {isEnglish
+                  ? 'Data Scientist, Artificial Intelligence Specialist & Senior Software Engineer. Building reliable data architectures, machine learning models and scalable software.'
+                  : 'Científico de Datos, Especialista en Inteligencia Artificial e Ingeniero de Software Senior. Creando arquitecturas de datos confiables, modelos predictivos y software escalable.'}
+              </p>
+              <div className="mono" style={{ color: 'var(--color-sage)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <MapPin size={14} /> Guadalajara, Jalisco, México
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', gap: 'var(--spacing-2xl)', flexWrap: 'wrap' }}>
+              <div>
+                <div className="mono" style={{ color: 'var(--text-primary)', marginBottom: 'var(--spacing-sm)', fontWeight: 600 }}>
+                  {isEnglish ? 'Navigation' : 'Navegación'}
+                </div>
+                <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <li><a href="#inicio" className="hover-underline" style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>{isEnglish ? 'Home' : 'Inicio'}</a></li>
+                  <li><a href="#proyectos" className="hover-underline" style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>{isEnglish ? 'Projects & Dev' : 'Proyectos y Desarrollo'}</a></li>
+                  <li><a href="#experiencia" className="hover-underline" style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>{isEnglish ? 'Experience' : 'Experiencia'}</a></li>
+                  <li><a href="#certificaciones" className="hover-underline" style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>{isEnglish ? 'Certifications' : 'Certificaciones'}</a></li>
+                  <li><a href="#contacto" className="hover-underline" style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>{isEnglish ? 'Contact' : 'Contacto'}</a></li>
+                </ul>
+              </div>
+
+              <div>
+                <div className="mono" style={{ color: 'var(--text-primary)', marginBottom: 'var(--spacing-sm)', fontWeight: 600 }}>
+                  {isEnglish ? 'Connect' : 'Contacto Directo'}
+                </div>
+                <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <li>
+                    <a href="mailto:ramonbravo13@gmail.com" className="hover-underline" style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                      <Mail size={14} /> ramonbravo13@gmail.com
+                    </a>
+                  </li>
+                  <li>
+                    <a href="https://wa.me/523315004877" target="_blank" rel="noopener noreferrer" className="hover-underline" style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                      <MessageCircle size={14} /> WhatsApp Direct
+                    </a>
+                  </li>
+                  <li>
+                    <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="hover-underline" style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                      <Linkedin size={14} /> LinkedIn
+                    </a>
+                  </li>
+                  <li>
+                    <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="hover-underline" style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                      <Github size={14} /> GitHub
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div style={{
+            borderTop: '1px solid var(--border-light)',
+            paddingTop: 'var(--spacing-md)',
+            display: 'flex',
+            flexWrap: 'wrap',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            gap: 'var(--spacing-md)'
+          }}>
+            <div className="mono" style={{ color: 'var(--color-sage)', fontSize: '0.75rem' }}>
+              © {new Date().getFullYear()} Juan Ramón Bravo López. {isEnglish ? 'All rights reserved.' : 'Todos los derechos reservados.'}
+            </div>
+            <div className="mono" style={{ color: 'var(--color-sage)', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <span style={{ display: 'inline-block', width: '6px', height: '6px', borderRadius: '50%', backgroundColor: 'var(--color-voltage)' }}></span>
+              Data Science & AI Portfolio
+            </div>
+          </div>
+        </footer>
 
       </main>
 

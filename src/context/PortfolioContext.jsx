@@ -31,7 +31,7 @@ export function PortfolioProvider({ children }) {
 
   // Default data for initialization
   const defaultProfile = {
-    name: "Juan Bravo Lopez",
+    name: "Juan Ramón Bravo López",
     title: "Software Engineer & Data Scientist",
     title_en: "Software Engineer & Data Scientist",
     profileImage: "https://images.unsplash.com/photo-1568602471122-7832951cc4c5?q=80&w=2070&auto=format&fit=crop",
