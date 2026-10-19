@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import CertificationViewer from '../components/CertificationViewer';
 import CertificationsSection from '../components/CertificationsSection';
+import ProjectImpactBox, { ProjectCommercialBadge } from '../components/ProjectImpactBox';
 import Navbar from '../components/Navbar';
 import { usePortfolio } from '../context/PortfolioContext';
 import gsap from 'gsap';
@@ -30,10 +31,11 @@ function EditorialProject({ project, index, isEnglish, getIcon }) {
       <div className="mono" style={{ paddingTop: '8px' }}>{formattedIndex}</div>
       
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
-        <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'baseline', gap: 'var(--spacing-md)' }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: 'var(--spacing-md)' }}>
           <h3 style={{ margin: 0, fontSize: 'clamp(1.75rem, 3.5vw, 3rem)', fontFamily: 'var(--font-heading)', fontWeight: 700, textTransform: 'uppercase', lineHeight: 1.15 }}>{title}</h3>
           
-          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
+            <ProjectCommercialBadge project={project} isEnglish={isEnglish} />
             {tags.slice(0, 3).map(tag => (
               <span key={tag} className="mono tech-badge">{tag}</span>
             ))}
@@ -46,7 +48,7 @@ function EditorialProject({ project, index, isEnglish, getIcon }) {
               <img src={project.thumbnailUrl} alt={title} style={{ width: '100%', borderRadius: 'var(--radius-md)', objectFit: 'cover', border: '1px solid var(--border-subtle)' }} />
             </div>
           )}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-lg)' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
             {problem ? (
               <div className="quill-render" style={{ margin: 0, maxWidth: '68ch' }} dangerouslySetInnerHTML={{ __html: problem }} />
             ) : (
@@ -54,8 +56,11 @@ function EditorialProject({ project, index, isEnglish, getIcon }) {
                 {isEnglish ? 'Documented technological case study.' : 'Caso de estudio tecnológico documentado.'}
               </p>
             )}
+
+            {/* Commercial Origin & Business Impact Box */}
+            <ProjectImpactBox project={project} isEnglish={isEnglish} />
             
-            <div style={{ display: 'flex', gap: 'var(--spacing-sm)', alignItems: 'center', justifyContent: 'flex-start', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', gap: 'var(--spacing-sm)', alignItems: 'center', justifyContent: 'flex-start', flexWrap: 'wrap', marginTop: 'var(--spacing-xs)' }}>
               <Link to={`/project/${project.id}`} className="hover-underline mono" style={{ fontSize: '0.85rem', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
                 {isEnglish ? 'Read Case Study' : 'Leer Caso de Estudio'} <ArrowRight size={14} />
               </Link>

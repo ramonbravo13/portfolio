@@ -4,6 +4,7 @@ import TextBlock from '../components/Notebook/TextBlock';
 import CodeBlock from '../components/Notebook/CodeBlock';
 import MediaBlock from '../components/Notebook/MediaBlock';
 import LinkBlock from '../components/Notebook/LinkBlock';
+import ProjectImpactBox, { ProjectCommercialBadge } from '../components/ProjectImpactBox';
 import { usePortfolio } from '../context/PortfolioContext';
 
 export default function ProjectNotebook() {
@@ -39,9 +40,10 @@ export default function ProjectNotebook() {
         </button>
       </nav>
 
-      <header style={{ marginBottom: 'var(--spacing-2xl)' }}>
-        <h1 style={{ fontSize: 'clamp(2.5rem, 6vw, 3.5rem)', margin: '0 0 var(--spacing-md) 0', lineHeight: 1.1, wordWrap: 'break-word', overflowWrap: 'break-word' }}>{title}</h1>
-        <div style={{ display: 'flex', gap: 'var(--spacing-sm)' }}>
+      <header style={{ marginBottom: 'var(--spacing-xl)' }}>
+        <h1 style={{ fontSize: 'clamp(2.2rem, 5vw, 3.2rem)', margin: '0 0 var(--spacing-md) 0', lineHeight: 1.15, wordWrap: 'break-word', overflowWrap: 'break-word' }}>{title}</h1>
+        <div style={{ display: 'flex', gap: 'var(--spacing-sm)', flexWrap: 'wrap', alignItems: 'center' }}>
+          <ProjectCommercialBadge project={project} isEnglish={isEnglish} />
           {tags.map(tag => (
             <span key={tag} className="mono tech-badge">
               {tag}
@@ -49,6 +51,11 @@ export default function ProjectNotebook() {
           ))}
         </div>
       </header>
+
+      {/* Commercial Origin & Business Impact Box */}
+      <div style={{ marginBottom: 'var(--spacing-2xl)' }}>
+        <ProjectImpactBox project={project} isEnglish={isEnglish} />
+      </div>
 
       {project.thumbnailUrl && (
         <div style={{ marginBottom: 'var(--spacing-2xl)' }}>

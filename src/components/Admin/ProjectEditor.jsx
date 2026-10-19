@@ -26,6 +26,10 @@ export default function ProjectEditor() {
     title: '', title_en: '',
     tags: '', tags_en: '',
     iconType: 'Code',
+    commercialType: 'research',
+    origin: '', origin_en: '',
+    status: '', status_en: '',
+    businessValue: '', businessValue_en: '',
     problem: '', problem_en: '',
     solution: '', solution_en: '',
     result: '', result_en: '',
@@ -44,6 +48,13 @@ export default function ProjectEditor() {
       tags: Array.isArray(project.tags) ? project.tags.join(', ') : (project.tags || ''),
       tags_en: Array.isArray(project.tags_en) ? project.tags_en.join(', ') : (project.tags_en || ''),
       iconType: project.iconType || 'Code',
+      commercialType: project.commercialType || 'research',
+      origin: project.origin || '',
+      origin_en: project.origin_en || '',
+      status: project.status || '',
+      status_en: project.status_en || '',
+      businessValue: project.businessValue || '',
+      businessValue_en: project.businessValue_en || '',
       problem: project.problem || '', 
       problem_en: project.problem_en || '',
       solution: project.solution || '', 
@@ -83,6 +94,10 @@ export default function ProjectEditor() {
         tags: (formData.tags || '').split(',').map(s => s.trim()).filter(s => s),
         tags_en: (formData.tags_en || '').split(',').map(s => s.trim()).filter(s => s),
         iconType: formData.iconType || 'Code',
+        commercialType: formData.commercialType || 'research',
+        origin: formData.origin || '', origin_en: formData.origin_en || '',
+        status: formData.status || '', status_en: formData.status_en || '',
+        businessValue: formData.businessValue || '', businessValue_en: formData.businessValue_en || '',
         problem: formData.problem || '', problem_en: formData.problem_en || '',
         solution: formData.solution || '', solution_en: formData.solution_en || '',
         result: formData.result || '', result_en: formData.result_en || '',
@@ -96,7 +111,19 @@ export default function ProjectEditor() {
       } else {
         await addProject(data);
       }
-      setFormData({ title: '', title_en: '', tags: '', tags_en: '', iconType: 'Code', problem: '', problem_en: '', solution: '', solution_en: '', result: '', result_en: '', thumbnailUrl: '' });
+      setFormData({ 
+        title: '', title_en: '', 
+        tags: '', tags_en: '', 
+        iconType: 'Code', 
+        commercialType: 'research',
+        origin: '', origin_en: '',
+        status: '', status_en: '',
+        businessValue: '', businessValue_en: '',
+        problem: '', problem_en: '', 
+        solution: '', solution_en: '', 
+        result: '', result_en: '', 
+        thumbnailUrl: '' 
+      });
       setBlocks([]);
       setThumbnailFile(null);
     } catch (err) {
@@ -109,7 +136,19 @@ export default function ProjectEditor() {
 
   const cancelEdit = () => {
     setEditingId(null);
-    setFormData({ title: '', title_en: '', tags: '', tags_en: '', iconType: 'Code', problem: '', problem_en: '', solution: '', solution_en: '', result: '', result_en: '', thumbnailUrl: '' });
+    setFormData({ 
+      title: '', title_en: '', 
+      tags: '', tags_en: '', 
+      iconType: 'Code', 
+      commercialType: 'research',
+      origin: '', origin_en: '',
+      status: '', status_en: '',
+      businessValue: '', businessValue_en: '',
+      problem: '', problem_en: '', 
+      solution: '', solution_en: '', 
+      result: '', result_en: '', 
+      thumbnailUrl: '' 
+    });
     setBlocks([]);
     setThumbnailFile(null);
   };
@@ -119,6 +158,9 @@ export default function ProjectEditor() {
     try {
       const translatedTitle = await autoTranslate(formData.title);
       const translatedTags = await autoTranslate(formData.tags);
+      const translatedOrigin = formData.origin ? await autoTranslate(formData.origin) : '';
+      const translatedStatus = formData.status ? await autoTranslate(formData.status) : '';
+      const translatedBusinessValue = formData.businessValue ? await autoTranslate(formData.businessValue) : '';
       const translatedProblem = await autoTranslate(formData.problem);
       const translatedSolution = await autoTranslate(formData.solution);
       const translatedResult = await autoTranslate(formData.result);
@@ -127,6 +169,9 @@ export default function ProjectEditor() {
         ...prev,
         title_en: translatedTitle || prev.title_en,
         tags_en: translatedTags || prev.tags_en,
+        origin_en: translatedOrigin || prev.origin_en,
+        status_en: translatedStatus || prev.status_en,
+        businessValue_en: translatedBusinessValue || prev.businessValue_en,
         problem_en: translatedProblem || prev.problem_en,
         solution_en: translatedSolution || prev.solution_en,
         result_en: translatedResult || prev.result_en
@@ -246,6 +291,105 @@ export default function ProjectEditor() {
               <option value="Award">Certification / Award</option>
               <option value="Rocket">Launched / Sold App</option>
             </select>
+          </div>
+
+          {/* Módulo de Origen e Impacto Comercial */}
+          <div style={{ 
+            marginTop: 'var(--spacing-lg)', 
+            marginBottom: 'var(--spacing-lg)', 
+            padding: 'var(--spacing-md)', 
+            borderRadius: 'var(--radius-md)', 
+            background: 'rgba(2, 132, 199, 0.05)', 
+            border: '1px solid rgba(2, 132, 199, 0.25)' 
+          }}>
+            <h4 style={{ margin: '0 0 var(--spacing-xs) 0', fontSize: '0.95rem', fontWeight: 600, color: 'var(--accent-primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span>💼</span> Origen e Impacto Comercial (Badges & Ficha Ejecutiva)
+            </h4>
+            <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: 'var(--spacing-md)' }}>
+              Destaca si el proyecto fue vendido a clientes reales, es un SaaS de desarrollo propio o un caso de estudio técnico de I+D.
+            </p>
+
+            <div className="form-group" style={{ marginBottom: 'var(--spacing-md)' }}>
+              <label className="form-label">Tipo / Badge de Estado Comercial</label>
+              <select 
+                className="form-input" 
+                value={formData.commercialType} 
+                onChange={e => setFormData(prev => ({...prev, commercialType: e.target.value}))}
+              >
+                <option value="client">🔵 Proyecto Comercial / Cliente Real (Vendido / Consultoría)</option>
+                <option value="saas">🟣 SaaS Propio / Idea Original & Prototipo Comercial</option>
+                <option value="research">🟢 I+D / Proyecto de Investigación / Caso de Estudio Técnico</option>
+              </select>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--spacing-md)', marginBottom: 'var(--spacing-md)' }}>
+              <div className="form-group">
+                <label className="form-label">Origen (ES)</label>
+                <input 
+                  type="text" 
+                  className="form-input" 
+                  value={formData.origin} 
+                  placeholder="ej. Consultoría y desarrollo a medida para empresa del sector retail."
+                  onChange={e => setFormData(prev => ({...prev, origin: e.target.value}))} 
+                />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Origen (EN)</label>
+                <input 
+                  type="text" 
+                  className="form-input" 
+                  value={formData.origin_en} 
+                  placeholder="e.g. Bespoke software consulting for retail company."
+                  onChange={e => setFormData(prev => ({...prev, origin_en: e.target.value}))} 
+                />
+              </div>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--spacing-md)', marginBottom: 'var(--spacing-md)' }}>
+              <div className="form-group">
+                <label className="form-label">Estado (ES)</label>
+                <input 
+                  type="text" 
+                  className="form-input" 
+                  value={formData.status} 
+                  placeholder="ej. Desplegado en producción • En operación activa continua"
+                  onChange={e => setFormData(prev => ({...prev, status: e.target.value}))} 
+                />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Estado (EN)</label>
+                <input 
+                  type="text" 
+                  className="form-input" 
+                  value={formData.status_en} 
+                  placeholder="e.g. Production deployed • Active operation"
+                  onChange={e => setFormData(prev => ({...prev, status_en: e.target.value}))} 
+                />
+              </div>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--spacing-md)' }}>
+              <div className="form-group">
+                <label className="form-label">Valor de Negocio (ES)</label>
+                <textarea 
+                  className="form-input" 
+                  rows="2"
+                  value={formData.businessValue} 
+                  placeholder="ej. Centralización de inventarios multitienda, facturación y reducción de mermas."
+                  onChange={e => setFormData(prev => ({...prev, businessValue: e.target.value}))} 
+                />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Valor de Negocio (EN)</label>
+                <textarea 
+                  className="form-input" 
+                  rows="2"
+                  value={formData.businessValue_en} 
+                  placeholder="e.g. Multi-store inventory centralization, billing and shrinkage reduction."
+                  onChange={e => setFormData(prev => ({...prev, businessValue_en: e.target.value}))} 
+                />
+              </div>
+            </div>
           </div>
 
           {/* Case Study Details */}
