@@ -389,7 +389,9 @@ export default function Home() {
             gap: 'var(--spacing-md)'
           }}>
             <div className="mono" style={{ color: 'var(--color-sage)', fontSize: '0.75rem' }}>
-              © {new Date().getFullYear()} Juan Ramón Bravo López. {isEnglish ? 'All rights reserved.' : 'Todos los derechos reservados.'}
+              <Link to="/login" style={{ color: 'inherit', textDecoration: 'none', cursor: 'default' }}>
+                © {new Date().getFullYear()} Juan Ramón Bravo López. {isEnglish ? 'All rights reserved.' : 'Todos los derechos reservados.'}
+              </Link>
             </div>
             <div className="mono" style={{ color: 'var(--color-sage)', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
               <span style={{ display: 'inline-block', width: '6px', height: '6px', borderRadius: '50%', backgroundColor: 'var(--color-voltage)' }}></span>

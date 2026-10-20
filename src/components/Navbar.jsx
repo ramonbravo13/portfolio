@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, MessageCircle, Edit, LogOut, Github, Linkedin } from 'lucide-react';
+import { Menu, X, MessageCircle, Github, Linkedin } from 'lucide-react';
 import { usePortfolio } from '../context/PortfolioContext';
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const { isAdminAuth, logoutAdmin, language, toggleLanguage } = usePortfolio();
+  const { language, toggleLanguage } = usePortfolio();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -111,19 +111,6 @@ export default function Navbar() {
             <button onClick={toggleLanguage} className="btn-secondary" style={{ padding: '0.4rem 0.6rem', fontSize: '0.8rem', minWidth: '40px' }}>
               {language === 'es' ? 'EN' : 'ES'}
             </button>
-            {isAdminAuth && (
-              <>
-                <Link to="/admin" className="btn-secondary" style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem' }} title={isEnglish ? "Admin Dashboard" : "Panel de Administración"}>
-                  <Edit size={14} /> Admin
-                </Link>
-                <button onClick={logoutAdmin} className="btn-secondary" style={{ padding: '0.4rem 0.6rem', fontSize: '0.8rem', borderColor: 'rgba(239, 68, 68, 0.3)', color: '#ef4444' }}
-                  title={isEnglish ? "Log out" : "Cerrar sesión"}
-                  onMouseOver={e => e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.05)'}
-                  onMouseOut={e => e.currentTarget.style.backgroundColor = 'transparent'}>
-                  <LogOut size={14} />
-                </button>
-              </>
-            )}
             
             <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="btn-secondary" style={{ padding: '0.5rem', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }} title="GitHub">
               <Github size={18} />
@@ -196,17 +183,6 @@ export default function Navbar() {
             <button onClick={() => { toggleLanguage(); setIsOpen(false); }} className="btn-secondary" style={{ justifyContent: 'center' }}>
               {isEnglish ? 'Cambiar a Español' : 'Switch to English'}
             </button>
-
-            {isAdminAuth && (
-              <>
-                <Link to="/admin" onClick={() => setIsOpen(false)} className="btn-secondary" style={{ justifyContent: 'center' }}>
-                  <Edit size={16} /> Admin Panel
-                </Link>
-                <button onClick={() => { logoutAdmin(); setIsOpen(false); }} className="btn-secondary" style={{ justifyContent: 'center', borderColor: '#ef4444', color: '#ef4444' }}>
-                  <LogOut size={16} /> {isEnglish ? 'Logout' : 'Cerrar sesión'}
-                </button>
-              </>
-            )}
 
             <div style={{ display: 'flex', gap: 'var(--spacing-md)', justifyContent: 'center', marginTop: 'var(--spacing-xs)' }}>
               <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="btn-secondary" style={{ padding: '0.6rem', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
