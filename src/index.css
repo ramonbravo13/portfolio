@@ -808,3 +808,260 @@ a {
     break-after: avoid;
   }
 }
+
+/* --- Refactored SaaS Experience Section Styles --- */
+.exp-saas-card {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-light);
+  border-radius: 14px;
+  padding: 2.25rem;
+  box-shadow: 0 4px 20px rgba(18, 22, 19, 0.04), 0 1px 3px rgba(18, 22, 19, 0.02);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-sizing: border-box;
+}
+
+.exp-saas-card:hover {
+  box-shadow: 0 10px 30px rgba(18, 22, 19, 0.07);
+  border-color: rgba(18, 22, 19, 0.2);
+}
+
+.exp-card-layout {
+  display: grid;
+  grid-template-columns: 310px 1fr;
+  gap: 2.5rem;
+  align-items: start;
+}
+
+.exp-left-col {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  border-right: 1px solid var(--border-light);
+  padding-right: 2rem;
+}
+
+.exp-institution-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.exp-emblem-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  background: rgba(18, 22, 19, 0.04);
+  border: 1px solid var(--border-light);
+  flex-shrink: 0;
+  box-shadow: 0 1px 3px rgba(18, 22, 19, 0.03);
+}
+
+.exp-emblem-icon-wrap {
+  color: var(--color-ink);
+  line-height: 1;
+}
+
+.exp-emblem-code {
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: var(--color-ink);
+  margin-top: 1px;
+}
+
+.exp-institution-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.exp-org-type-tag {
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--color-sage);
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+
+.exp-plantel-title {
+  font-family: var(--font-heading);
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  margin: 0;
+  color: var(--color-ink);
+  line-height: 1.3;
+}
+
+.exp-info-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.exp-info-label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--color-sage);
+  text-transform: uppercase;
+}
+
+.exp-role-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: rgba(2, 132, 199, 0.08);
+  border: 1px solid rgba(2, 132, 199, 0.28);
+  color: #0284c7;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  width: fit-content;
+}
+
+.exp-period-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 12px;
+  border-radius: 6px;
+  background: rgba(18, 22, 19, 0.04);
+  border: 1px solid var(--border-light);
+  color: var(--color-ink);
+  font-size: 0.8rem;
+  font-weight: 600;
+  width: fit-content;
+}
+
+.exp-scope-info {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.45;
+}
+
+.exp-right-col {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.exp-categories-block {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.exp-category-row {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.exp-category-badge {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  padding: 3px 9px;
+  border-radius: 4px;
+  background: rgba(18, 22, 19, 0.05);
+  border: 1px solid var(--border-light);
+  color: var(--color-ink);
+  text-transform: uppercase;
+  white-space: nowrap;
+  flex-shrink: 0;
+  box-shadow: 0 1px 2px rgba(18, 22, 19, 0.02);
+}
+
+.exp-category-text {
+  font-family: var(--font-sans);
+  font-size: 0.92rem;
+  color: var(--text-primary);
+  margin: 0;
+  line-height: 1.6;
+  text-align: left;
+}
+
+.exp-card-divider {
+  height: 1px;
+  background: var(--border-light);
+  margin: 2px 0;
+  opacity: 0.75;
+}
+
+.exp-bullet-list {
+  list-style: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+}
+
+.exp-bullet-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  list-style: none !important;
+}
+
+.exp-bullet-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-voltage);
+  margin-top: 8px;
+  flex-shrink: 0;
+}
+
+.exp-bullet-content {
+  font-family: var(--font-sans);
+  font-size: 0.92rem;
+  color: var(--text-primary);
+  line-height: 1.6;
+  text-align: left;
+}
+
+.exp-bullet-content strong {
+  color: var(--color-ink);
+  font-weight: 700;
+}
+
+@media (max-width: 960px) {
+  .exp-card-layout {
+    grid-template-columns: 1fr;
+    gap: 1.75rem;
+  }
+  .exp-left-col {
+    border-right: none;
+    border-bottom: 1px solid var(--border-light);
+    padding-right: 0;
+    padding-bottom: 1.5rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .exp-saas-card {
+    padding: 1.5rem;
+  }
+  .exp-category-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+}

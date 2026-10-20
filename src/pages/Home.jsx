@@ -8,6 +8,7 @@ import {
 import CertificationViewer from '../components/CertificationViewer';
 import CertificationsSection from '../components/CertificationsSection';
 import ProjectImpactBox, { ProjectCommercialBadge } from '../components/ProjectImpactBox';
+import ExperienceCard from '../components/ExperienceCard';
 import Navbar from '../components/Navbar';
 import { usePortfolio } from '../context/PortfolioContext';
 import gsap from 'gsap';
@@ -229,34 +230,13 @@ export default function Home() {
             <h2 style={{ margin: 0 }}>{isEnglish ? 'Professional Experience' : 'Experiencia Profesional'}</h2>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-xl)' }}>
             {(profile.experiences || []).length === 0 ? (
               <p>{isEnglish ? 'No professional experience registered yet.' : 'No se ha registrado experiencia profesional aún.'}</p>
             ) : (
-              (profile.experiences || []).map((item, idx) => {
-                const role = isEnglish && item.role_en ? item.role_en : item.role;
-                const period = isEnglish && item.period_en ? item.period_en : item.period;
-                const desc = isEnglish && item.desc_en ? item.desc_en : item.desc;
-                const tag = isEnglish && item.tag_en ? item.tag_en : item.tag;
-                
-                return (
-                  <div key={idx} className="premium-card animate-fade-up experience-card-grid">
-                    <div>
-                      <h3 style={{ fontSize: '1.5rem', marginBottom: '8px' }}>{item.company}</h3>
-                      <span className="mono">{period}</span>
-                    </div>
-                    <div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 'var(--spacing-sm)', marginBottom: 'var(--spacing-sm)' }}>
-                        <h4 style={{ margin: 0, fontSize: '1.25rem', fontFamily: 'var(--font-sans)', fontWeight: 500 }}>{role}</h4>
-                        {tag && (
-                          <div className="mono tech-badge quill-render" dangerouslySetInnerHTML={{ __html: tag || '' }} style={{ padding: '8px 12px' }} />
-                        )}
-                      </div>
-                      <div className="quill-render" style={{ margin: 0 }} dangerouslySetInnerHTML={{ __html: desc || '' }} />
-                    </div>
-                  </div>
-                );
-              })
+              (profile.experiences || []).map((item, idx) => (
+                <ExperienceCard key={idx} item={item} isEnglish={isEnglish} />
+              ))
             )}
           </div>
         </section>
