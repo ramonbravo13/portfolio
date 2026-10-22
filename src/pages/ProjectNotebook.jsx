@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, Share2 } from 'lucide-react';
 import TextBlock from '../components/Notebook/TextBlock';
@@ -13,6 +14,10 @@ export default function ProjectNotebook() {
 
   const isEnglish = language === 'en';
   const project = projects.find(p => p.id === id);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [id]);
 
   if (!project) {
     return (
@@ -87,10 +92,11 @@ export default function ProjectNotebook() {
 
         {(project.blocks || []).map((block, idx) => {
           switch (block.type) {
-            case 'text':
+            case 'text': {
               const textContent = isEnglish && block.content_en ? block.content_en : block.content;
               const blockTitle = isEnglish && block.title_en ? block.title_en : block.title;
               return <TextBlock key={idx} content={textContent} title={blockTitle} />;
+            }
             case 'code':
               return <CodeBlock key={idx} code={block.code} language={block.language} isExecutable={block.isExecutable} />;
             case 'media':
@@ -102,6 +108,40 @@ export default function ProjectNotebook() {
           }
         })}
       </div>
+
+      {/* Bottom Navigation: Back to Portfolio */}
+      <footer style={{
+        marginTop: 'var(--spacing-3xl)',
+        paddingTop: 'var(--spacing-2xl)',
+        paddingBottom: 'var(--spacing-3xl)',
+        borderTop: '1px solid var(--border-light)',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 'var(--spacing-md)',
+        textAlign: 'center'
+      }}>
+        <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '0.95rem' }}>
+          {isEnglish 
+            ? 'Finished exploring this case study?' 
+            : '¿Terminaste de explorar este caso de estudio?'}
+        </p>
+        <Link 
+          to="/" 
+          className="btn-primary" 
+          style={{ 
+            display: 'inline-flex', 
+            alignItems: 'center', 
+            gap: '10px', 
+            padding: '0.85rem 2rem',
+            fontSize: '0.9rem',
+            textDecoration: 'none'
+          }}
+        >
+          <ArrowLeft size={18} /> {isEnglish ? 'Back to Portfolio' : 'Regresar al Portafolio'}
+        </Link>
+      </footer>
     </div>
   )
 }
