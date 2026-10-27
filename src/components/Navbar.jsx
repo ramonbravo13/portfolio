@@ -88,7 +88,14 @@ export default function Navbar() {
               <button onClick={() => handleNavClick('experiencia')} style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', fontSize: '0.9rem', fontWeight: 500 }}
                 onMouseOver={e => e.currentTarget.style.color = 'var(--text-primary)'}
                 onMouseOut={e => e.currentTarget.style.color = 'var(--text-secondary)'}>
-                {isEnglish ? 'Experience' : 'Experiencia Profesional'}
+                {isEnglish ? 'Experience' : 'Experiencia'}
+              </button>
+            </li>
+            <li>
+              <button onClick={() => handleNavClick('educacion')} style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', fontSize: '0.9rem', fontWeight: 500 }}
+                onMouseOver={e => e.currentTarget.style.color = 'var(--text-primary)'}
+                onMouseOut={e => e.currentTarget.style.color = 'var(--text-secondary)'}>
+                {isEnglish ? 'Education & Research' : 'Educación & I+D'}
               </button>
             </li>
             <li>
@@ -165,6 +172,11 @@ export default function Navbar() {
             <li>
               <button onClick={() => handleNavClick('experiencia')} style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', fontSize: '1.1rem', fontWeight: 500, width: '100%', textAlign: 'left' }}>
                 {isEnglish ? 'Experience' : 'Experiencia Profesional'}
+              </button>
+            </li>
+            <li>
+              <button onClick={() => handleNavClick('educacion')} style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', fontSize: '1.1rem', fontWeight: 500, width: '100%', textAlign: 'left' }}>
+                {isEnglish ? 'Education & Research' : 'Educación & Investigación'}
               </button>
             </li>
             <li>

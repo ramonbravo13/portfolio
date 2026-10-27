@@ -116,6 +116,15 @@ export default function CVGenerator() {
       solution: p.solution,
       result: p.result
     })),
+    education: (profile.education || []).map(e => ({
+      type: e.type,
+      title: e.title,
+      institution: e.institution,
+      period: e.period,
+      status: e.status,
+      desc: e.desc,
+      tags: e.tags
+    })),
     certifications: (profile.certs || []).map(c => ({
       title: c.title,
       desc: c.desc,

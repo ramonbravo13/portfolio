@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import CertificationViewer from '../components/CertificationViewer';
 import CertificationsSection from '../components/CertificationsSection';
+import EducationSection from '../components/EducationSection';
 import ProjectImpactBox, { ProjectCommercialBadge } from '../components/ProjectImpactBox';
 import ExperienceCard from '../components/ExperienceCard';
 import Navbar from '../components/Navbar';
@@ -241,7 +242,14 @@ export default function Home() {
           </div>
         </section>
 
-        {/* CERTIFICATIONS & FORMATION SECTION (COMPACT REFACTORED UI) */}
+        {/* EDUCATION & RESEARCH SECTION (ACADEMIC RIGOR & PAPERS) */}
+        <EducationSection 
+          education={profile.education || []} 
+          isEnglish={isEnglish} 
+          onSelectDoc={setSelectedCert} 
+        />
+
+        {/* TECHNICAL CERTIFICATIONS SECTION (COMPACT CREDENTIALS) */}
         <CertificationsSection 
           certs={profile.certs || []} 
           isEnglish={isEnglish} 

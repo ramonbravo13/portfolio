@@ -19,6 +19,7 @@ export function PortfolioProvider({ children }) {
     bio: "",
     metrics: {},
     skills: [],
+    education: [],
     certs: [],
     experiences: []
   });
@@ -130,12 +131,42 @@ export function PortfolioProvider({ children }) {
     const unsubProfile = onSnapshot(profileRef, (docSnap) => {
       if (docSnap.exists()) {
         const data = docSnap.data();
+        let educationList = data.education || [];
+        if (educationList.length === 0 && data.certs) {
+          const degreeCerts = data.certs.filter(c => 
+            c.credentialType === 'degree' || c.credentialType === 'master' || 
+            `${c.title}`.toLowerCase().includes('ingenier') ||
+            `${c.title}`.toLowerCase().includes('licenciatura') ||
+            `${c.title}`.toLowerCase().includes('título')
+          );
+          if (degreeCerts.length > 0) {
+            educationList = degreeCerts.map(c => ({
+              id: c.id || Date.now(),
+              type: c.credentialType === 'master' ? 'master' : 'degree',
+              title: c.title,
+              title_en: c.title_en || '',
+              institution: c.institution || 'Universidad / Institución',
+              institution_en: c.institution || 'University / Institution',
+              period: c.period || '',
+              period_en: c.period || '',
+              status: c.status || 'completed',
+              customStatusLabel: c.customStatusLabel || '',
+              desc: c.desc || '',
+              desc_en: c.desc_en || '',
+              tags: c.tags || '',
+              tags_en: c.tags_en || '',
+              url: c.url || ''
+            }));
+          }
+        }
+
         setProfile({
           ...data,
           bio_en: data.bio_en || '',
           metrics: data.metrics || { yearsExp: "10+", projectsCount: "50+", appsCount: "2", specialist: "IA y Ciencia de Datos", specialist_en: "AI & Data Science" },
           skills: data.skills || [],
           skills_en: data.skills_en || [],
+          education: educationList,
           certs: data.certs || [],
           experiences: data.experiences || [],
         });

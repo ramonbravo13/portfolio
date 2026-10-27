@@ -3,6 +3,7 @@ import { usePortfolio } from '../context/PortfolioContext';
 import { LogOut, Home as HomeIcon } from 'lucide-react';
 import ProfileEditor from '../components/Admin/ProfileEditor';
 import ExperienceEditor from '../components/Admin/ExperienceEditor';
+import EducationEditor from '../components/Admin/EducationEditor';
 import CertificationsEditor from '../components/Admin/CertificationsEditor';
 import ProjectEditor from '../components/Admin/ProjectEditor';
 import CVGenerator from '../components/Admin/CVGenerator';
@@ -35,6 +36,7 @@ export default function AdminDashboard() {
         <CVGenerator />
         <ProfileEditor />
         <ExperienceEditor />
+        <EducationEditor />
         <CertificationsEditor />
         <ProjectEditor />
       </main>
