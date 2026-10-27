@@ -102,13 +102,24 @@ export default function CVGenerator() {
       bio: profile.bio || '',
       skills: profile.skills || []
     },
-    experiences: (profile.experiences || []).map(exp => ({
-      role: exp.role,
-      company: exp.company,
-      period: exp.period,
-      tag: exp.tag,
-      desc: exp.desc
-    })),
+    experiences: (profile.experiences || []).flatMap(exp => {
+      if (exp.roles && exp.roles.length > 0) {
+        return exp.roles.map(r => ({
+          company: exp.company,
+          role: r.role,
+          period: r.period,
+          tag: r.tag,
+          desc: r.desc
+        }));
+      }
+      return [{
+        role: exp.role,
+        company: exp.company,
+        period: exp.period,
+        tag: exp.tag,
+        desc: exp.desc
+      }];
+    }),
     projects: (projects || []).map(p => ({
       title: p.title,
       tags: p.tags,

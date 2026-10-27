@@ -1,5 +1,5 @@
 import React from 'react';
-import { Building2, Briefcase, Calendar, MapPin } from 'lucide-react';
+import { Building2, Briefcase, Calendar, MapPin, TrendingUp, ChevronRight } from 'lucide-react';
 
 /**
  * Extracts individual list items from an HTML string (Quill editor output)
@@ -59,31 +59,183 @@ function formatResponsibilityText(text) {
   if (!text) return '';
   return text
     .replace(/60\+\s*colaboradores/gi, (m) => `<strong>${m}</strong>`)
-    .replace(/60\+\s*collaborators/gi, (m) => `<strong>${m}</strong>`);
+    .replace(/60\+\s*collaborators/gi, (m) => `<strong>${m}</strong>`)
+    .replace(/\b(\d+[\d,]*\+?)\s*(estudiantes|colaboradores|alumnos|proyectos|usuarios|horas|planteles|escuelas)/gi, 
+      (m) => `<strong>${m}</strong>`);
 }
 
 export default function ExperienceCard({ item, isEnglish }) {
   if (!item) return null;
 
+  const hasMultipleRoles = Array.isArray(item.roles) && item.roles.length > 0;
+  const isCeti = (item.company || '').toLowerCase().includes('ceti');
+
+  // Single role fallbacks
   const role = isEnglish && item.role_en ? item.role_en : item.role;
   const period = isEnglish && item.period_en ? item.period_en : item.period;
   const rawTag = isEnglish && item.tag_en ? item.tag_en : item.tag;
   const rawDesc = isEnglish && item.desc_en ? item.desc_en : item.desc;
 
-  // Extract and parse items from tag and desc
-  const tagItems = extractListItems(rawTag);
-  const descItems = extractListItems(rawDesc);
-
-  // Group into categories (with prefix) and operational responsibilities
-  const allParsed = [...tagItems, ...descItems].map(parseExperienceItem);
-  const categoryItems = allParsed.filter(p => p.isCategory);
-  const regularItems = allParsed.filter(p => !p.isCategory);
-
-  // Format plant name and role
-  const isCeti = (item.company || '').toLowerCase().includes('ceti');
   const plantName = isCeti 
     ? (isEnglish ? 'CETI • RIO SANTIAGO PLANTEL' : 'CETI • RIO SANTIAGO PLANTEL')
     : (item.company || 'INSTITUCIÓN');
+
+  // Render for nested progression trajectory (Multiple Roles in same organization)
+  if (hasMultipleRoles) {
+    const totalPeriod = isEnglish && item.period_en ? item.period_en : item.period;
+
+    return (
+      <div className="exp-saas-card animate-fade-up">
+        <div className="exp-card-layout">
+          
+          {/* Left Column: Organization Header & Career Progression Stats */}
+          <div className="exp-left-col">
+            <div className="exp-institution-box">
+              <div className="exp-emblem-container" title={item.company}>
+                <div className="exp-emblem-icon-wrap">
+                  <Building2 size={22} className="exp-emblem-icon" />
+                </div>
+                <span className="mono exp-emblem-code">{isCeti ? 'CETI' : 'ORG'}</span>
+              </div>
+              
+              <div className="exp-institution-details">
+                <span className="mono exp-org-type-tag">
+                  {isCeti 
+                    ? (isEnglish ? 'FEDERAL PUBLIC INSTITUTION' : 'ORGANISMO PÚBLICO DESCENTRALIZADO')
+                    : (isEnglish ? 'ORGANIZATION / ENTERPRISE' : 'EMPRESA / INSTITUCIÓN')}
+                </span>
+                <h3 className="exp-plantel-title">
+                  {plantName}
+                </h3>
+              </div>
+            </div>
+
+            {/* Progression Badge */}
+            <div className="exp-info-group">
+              <span className="mono exp-info-label">
+                {isEnglish ? 'CAREER PROGRESSION' : 'TRAYECTORIA INSTITUCIONAL'}
+              </span>
+              <div className="exp-progression-badge">
+                <TrendingUp size={13} />
+                <span>{item.roles.length} {isEnglish ? 'ROLES & PROMOTIONS' : 'PUESTOS Y ASCENSOS'}</span>
+              </div>
+            </div>
+
+            {/* Total Accumulated Period */}
+            <div className="exp-info-group">
+              <span className="mono exp-info-label">
+                {isEnglish ? 'TOTAL TENURE' : 'TIEMPO ACUMULADO'}
+              </span>
+              <div className="exp-period-pill mono" style={{ fontWeight: 700 }}>
+                <Calendar size={13} />
+                <span>{totalPeriod || '10 AÑOS (2014 - PRESENTE)'}</span>
+              </div>
+            </div>
+
+            {/* Institutional Location / Scope */}
+            <div className="exp-info-group">
+              <span className="mono exp-info-label">
+                {isEnglish ? 'LOCATION & SCOPE' : 'UBICACIÓN Y ALCANCE'}
+              </span>
+              <div className="exp-scope-info">
+                <MapPin size={13} style={{ flexShrink: 0, marginTop: '2px', color: 'var(--color-sage)' }} />
+                <span>{item.location || 'Jalisco, México • Educación Superior & Media Superior'}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Right Column: Internal Timeline with Connected Nodes */}
+          <div className="exp-right-col">
+            <div className="exp-timeline-wrapper">
+              <div className="exp-timeline-line" />
+
+              {item.roles.map((subRole, idx) => {
+                const subRoleTitle = isEnglish && subRole.role_en ? subRole.role_en : subRole.role;
+                const subPeriod = isEnglish && subRole.period_en ? subRole.period_en : subRole.period;
+                const subRawTag = isEnglish && subRole.tag_en ? subRole.tag_en : subRole.tag;
+                const subRawDesc = isEnglish && subRole.desc_en ? subRole.desc_en : subRole.desc;
+
+                const tagItems = extractListItems(subRawTag);
+                const descItems = extractListItems(subRawDesc);
+                const allParsed = [...tagItems, ...descItems].map(parseExperienceItem);
+                const categoryItems = allParsed.filter(p => p.isCategory);
+                const regularItems = allParsed.filter(p => !p.isCategory);
+
+                const isCurrent = idx === 0;
+
+                return (
+                  <div key={idx} className="exp-timeline-step">
+                    {/* Node Dot */}
+                    <div className={`exp-timeline-marker ${isCurrent ? 'active' : ''}`} title={subRoleTitle} />
+
+                    {/* Role Header */}
+                    <div className="exp-step-header">
+                      <h4 className="exp-step-title">
+                        <Briefcase size={15} color={isCurrent ? 'var(--color-ink)' : 'var(--color-sage)'} />
+                        <span>{subRoleTitle}</span>
+                        {isCurrent && (
+                          <span style={{ fontSize: '0.68rem', background: 'var(--color-voltage)', color: 'var(--color-ink)', padding: '2px 7px', borderRadius: '4px', fontWeight: 800, fontFamily: 'var(--font-mono)' }}>
+                            {isEnglish ? 'CURRENT' : 'ACTUAL'}
+                          </span>
+                        )}
+                      </h4>
+
+                      <div className="exp-step-period mono">
+                        <Calendar size={12} style={{ display: 'inline', marginRight: '4px' }} />
+                        <span>{subPeriod}</span>
+                      </div>
+                    </div>
+
+                    {/* Strategic Pillars / Category Tags */}
+                    {categoryItems.length > 0 && (
+                      <div className="exp-categories-block" style={{ marginTop: '8px', marginBottom: '10px' }}>
+                        {categoryItems.map((cat, cIdx) => (
+                          <div key={cIdx} className="exp-category-row">
+                            <span className="exp-category-badge mono">
+                              {cat.category}
+                            </span>
+                            <p className="exp-category-text">
+                              {cat.content}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Operational Responsibilities */}
+                    {regularItems.length > 0 && (
+                      <ul className="exp-bullet-list" style={{ marginTop: '8px' }}>
+                        {regularItems.map((resp, rIdx) => {
+                          const formattedHtml = formatResponsibilityText(resp.content);
+                          return (
+                            <li key={rIdx} className="exp-bullet-row">
+                              <span className="exp-bullet-dot" />
+                              <span 
+                                className="exp-bullet-content"
+                                dangerouslySetInnerHTML={{ __html: formattedHtml }}
+                              />
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+        </div>
+      </div>
+    );
+  }
+
+  // Fallback for single role experience item
+  const tagItems = extractListItems(rawTag);
+  const descItems = extractListItems(rawDesc);
+  const allParsed = [...tagItems, ...descItems].map(parseExperienceItem);
+  const categoryItems = allParsed.filter(p => p.isCategory);
+  const regularItems = allParsed.filter(p => !p.isCategory);
 
   const displayRole = isCeti
     ? (isEnglish ? 'CAMPUS DIRECTOR' : 'DIRECTOR DE PLANTEL')
@@ -93,19 +245,19 @@ export default function ExperienceCard({ item, isEnglish }) {
     <div className="exp-saas-card animate-fade-up">
       <div className="exp-card-layout">
         
-        {/* Left Column: Institutional Header, Plantel, Role Badge & Period */}
+        {/* Left Column */}
         <div className="exp-left-col">
           <div className="exp-institution-box">
-            <div className="exp-emblem-container" title="CETI - Centro de Enseñanza Técnica Industrial">
+            <div className="exp-emblem-container" title={item.company}>
               <div className="exp-emblem-icon-wrap">
                 <Building2 size={22} className="exp-emblem-icon" />
               </div>
-              <span className="mono exp-emblem-code">CETI</span>
+              <span className="mono exp-emblem-code">{isCeti ? 'CETI' : 'EXP'}</span>
             </div>
             
             <div className="exp-institution-details">
               <span className="mono exp-org-type-tag">
-                {isEnglish ? 'FEDERAL PUBLIC INSTITUTION' : 'ORGANISMO PÚBLICO DESCENTRALIZADO'}
+                {isEnglish ? 'PROFESSIONAL EXPERIENCE' : 'ORGANIZACIÓN / EMPRESA'}
               </span>
               <h3 className="exp-plantel-title">
                 {plantName}
@@ -142,15 +294,13 @@ export default function ExperienceCard({ item, isEnglish }) {
             </span>
             <div className="exp-scope-info">
               <MapPin size={13} style={{ flexShrink: 0, marginTop: '2px', color: 'var(--color-sage)' }} />
-              <span>Jalisco, México • Educación Superior & Media Superior</span>
+              <span>{item.location || 'México • Operaciones y Gestión'}</span>
             </div>
           </div>
         </div>
 
         {/* Right Column: Structured Responsibilities & Metrics */}
         <div className="exp-right-col">
-          
-          {/* 1. Category Strategic Pillars (DATA & OPERATIONS, PROJECT MANAGEMENT, LEADERSHIP) */}
           {categoryItems.length > 0 && (
             <div className="exp-categories-block">
               {categoryItems.map((cat, idx) => (
@@ -166,12 +316,10 @@ export default function ExperienceCard({ item, isEnglish }) {
             </div>
           )}
 
-          {/* Subtle separator between categories and operational responsibilities */}
           {categoryItems.length > 0 && regularItems.length > 0 && (
             <div className="exp-card-divider" />
           )}
 
-          {/* 2. Structured Operational Responsibilities with Bolded Metrics */}
           {regularItems.length > 0 && (
             <ul className="exp-bullet-list">
               {regularItems.map((resp, idx) => {
@@ -188,7 +336,6 @@ export default function ExperienceCard({ item, isEnglish }) {
               })}
             </ul>
           )}
-
         </div>
 
       </div>
