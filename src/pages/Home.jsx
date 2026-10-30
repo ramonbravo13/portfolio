@@ -353,7 +353,7 @@ export default function Home() {
                     </a>
                   </li>
                   <li>
-                    <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="hover-underline" style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                    <a href="https://www.linkedin.com/in/ramón-bravo" target="_blank" rel="noopener noreferrer" className="hover-underline" style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
                       <Linkedin size={14} /> LinkedIn
                     </a>
                   </li>

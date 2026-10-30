@@ -39,7 +39,7 @@ export default function CVGenerator() {
     email: profile.contactEmail || 'ramonbravo13@gmail.com',
     phone: profile.contactPhone || '+52 33 1500 4877',
     location: 'Guadalajara, México',
-    linkedin: 'linkedin.com/in/ramonbravo'
+    linkedin: 'www.linkedin.com/in/ramón-bravo'
   });
 
   // State Management
