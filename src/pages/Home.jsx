@@ -358,7 +358,7 @@ export default function Home() {
                     </a>
                   </li>
                   <li>
-                    <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="hover-underline" style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                    <a href="https://github.com/ramonbravo13" target="_blank" rel="noopener noreferrer" className="hover-underline" style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
                       <Github size={14} /> GitHub
                     </a>
                   </li>

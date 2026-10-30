@@ -39,7 +39,8 @@ export default function CVGenerator() {
     email: profile.contactEmail || 'ramonbravo13@gmail.com',
     phone: profile.contactPhone || '+52 33 1500 4877',
     location: 'Guadalajara, México',
-    linkedin: 'www.linkedin.com/in/ramón-bravo'
+    linkedin: 'www.linkedin.com/in/ramón-bravo',
+    github: 'github.com/ramonbravo13'
   });
 
   // State Management
@@ -198,7 +199,8 @@ Devuelve ÚNICAMENTE un objeto JSON válido con este formato exacto:
     "email": "${contactInfo.email}",
     "telefono": "${contactInfo.phone}",
     "ubicacion": "${contactInfo.location}",
-    "linkedin": "${contactInfo.linkedin}"
+    "linkedin": "${contactInfo.linkedin}",
+    "github": "${contactInfo.github}"
   },
   "resumen_ejecutivo": "Texto del resumen profesional...",
   "skills": ["Python", "SQL", "Pandas", "Machine Learning", "Tableau / Power BI", "Bases de Datos"],
@@ -556,7 +558,7 @@ Return ONLY the valid JSON object in English. No explanations.
             </div>
 
             {/* Editable Contact Info for CV */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 'var(--spacing-sm)' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 'var(--spacing-sm)' }}>
               <div>
                 <label className="form-label" style={{ fontSize: '0.75rem' }}>Email de Contacto</label>
                 <input 
@@ -585,6 +587,26 @@ Return ONLY the valid JSON object in English. No explanations.
                   style={{ fontSize: '0.85rem' }}
                   value={contactInfo.location} 
                   onChange={(e) => setContactInfo({ ...contactInfo, location: e.target.value })} 
+                />
+              </div>
+              <div>
+                <label className="form-label" style={{ fontSize: '0.75rem' }}>LinkedIn</label>
+                <input 
+                  type="text" 
+                  className="form-input" 
+                  style={{ fontSize: '0.85rem' }}
+                  value={contactInfo.linkedin} 
+                  onChange={(e) => setContactInfo({ ...contactInfo, linkedin: e.target.value })} 
+                />
+              </div>
+              <div>
+                <label className="form-label" style={{ fontSize: '0.75rem' }}>GitHub</label>
+                <input 
+                  type="text" 
+                  className="form-input" 
+                  style={{ fontSize: '0.85rem' }}
+                  value={contactInfo.github} 
+                  onChange={(e) => setContactInfo({ ...contactInfo, github: e.target.value })} 
                 />
               </div>
             </div>
@@ -914,11 +936,22 @@ Return ONLY the valid JSON object in English. No explanations.
                 <h2 style={{ fontSize: '12pt', margin: 0, color: '#333', fontWeight: 600, letterSpacing: '0.02em' }}>
                   {currentViewData.titulo}
                 </h2>
-                <div style={{ marginTop: '8pt', fontSize: '8.5pt', color: '#555', display: 'flex', gap: '14pt', flexWrap: 'wrap' }}>
-                  {currentViewData.contacto?.email && <span>✉ {currentViewData.contacto.email}</span>}
-                  {currentViewData.contacto?.telefono && <span>📞 {currentViewData.contacto.telefono}</span>}
-                  {currentViewData.contacto?.ubicacion && <span>📍 {currentViewData.contacto.ubicacion}</span>}
-                  {currentViewData.contacto?.linkedin && <span>🔗 {currentViewData.contacto.linkedin}</span>}
+                <div style={{ marginTop: '8pt', fontSize: '8.5pt', color: '#555', display: 'flex', gap: '12pt', flexWrap: 'wrap' }}>
+                  {(contactInfo.email || currentViewData.contacto?.email) && (
+                    <span>✉ {contactInfo.email || currentViewData.contacto?.email}</span>
+                  )}
+                  {(contactInfo.phone || currentViewData.contacto?.telefono) && (
+                    <span>📞 {contactInfo.phone || currentViewData.contacto?.telefono}</span>
+                  )}
+                  {(contactInfo.location || currentViewData.contacto?.ubicacion) && (
+                    <span>📍 {contactInfo.location || currentViewData.contacto?.ubicacion}</span>
+                  )}
+                  {(contactInfo.linkedin || currentViewData.contacto?.linkedin) && (
+                    <span>🔗 <a href={`https://${(contactInfo.linkedin || currentViewData.contacto?.linkedin).replace(/^https?:\/\//, '')}`} target="_blank" rel="noopener noreferrer" style={{ color: '#555', textDecoration: 'none' }}>{contactInfo.linkedin || currentViewData.contacto?.linkedin}</a></span>
+                  )}
+                  {(contactInfo.github || currentViewData.contacto?.github) && (
+                    <span>💻 <a href={`https://${(contactInfo.github || currentViewData.contacto?.github).replace(/^https?:\/\//, '')}`} target="_blank" rel="noopener noreferrer" style={{ color: '#555', textDecoration: 'none' }}>{contactInfo.github || currentViewData.contacto?.github}</a></span>
+                  )}
                 </div>
               </header>
 
@@ -1039,11 +1072,22 @@ Return ONLY the valid JSON object in English. No explanations.
               <h2 style={{ fontSize: '12pt', margin: 0, color: '#333', fontWeight: 600 }}>
                 {printData.titulo}
               </h2>
-              <div style={{ marginTop: '6pt', fontSize: '8.5pt', color: '#555', display: 'flex', gap: '14pt' }}>
-                {printData.contacto?.email && <span>✉ {printData.contacto.email}</span>}
-                {printData.contacto?.telefono && <span>📞 {printData.contacto.telefono}</span>}
-                {printData.contacto?.ubicacion && <span>📍 {printData.contacto.ubicacion}</span>}
-                {printData.contacto?.linkedin && <span>🔗 {printData.contacto.linkedin}</span>}
+              <div style={{ marginTop: '6pt', fontSize: '8.5pt', color: '#555', display: 'flex', gap: '12pt', flexWrap: 'wrap' }}>
+                {(contactInfo.email || printData.contacto?.email) && (
+                  <span>✉ {contactInfo.email || printData.contacto?.email}</span>
+                )}
+                {(contactInfo.phone || printData.contacto?.telefono) && (
+                  <span>📞 {contactInfo.phone || printData.contacto?.telefono}</span>
+                )}
+                {(contactInfo.location || printData.contacto?.ubicacion) && (
+                  <span>📍 {contactInfo.location || printData.contacto?.ubicacion}</span>
+                )}
+                {(contactInfo.linkedin || printData.contacto?.linkedin) && (
+                  <span>🔗 <a href={`https://${(contactInfo.linkedin || printData.contacto?.linkedin).replace(/^https?:\/\//, '')}`} style={{ color: '#555', textDecoration: 'none' }}>{contactInfo.linkedin || printData.contacto?.linkedin}</a></span>
+                )}
+                {(contactInfo.github || printData.contacto?.github) && (
+                  <span>💻 <a href={`https://${(contactInfo.github || printData.contacto?.github).replace(/^https?:\/\//, '')}`} style={{ color: '#555', textDecoration: 'none' }}>{contactInfo.github || printData.contacto?.github}</a></span>
+                )}
               </div>
             </header>
 
