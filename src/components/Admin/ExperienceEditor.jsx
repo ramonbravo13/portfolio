@@ -105,30 +105,82 @@ export default function ExperienceEditor() {
     setFormData(prev => ({ ...prev, roles: updated }));
   };
 
-  // Auto-translate whole experience
+  const [translatingSubRole, setTranslatingSubRole] = useState(false);
+
+  // Helper to check if ReactQuill or text field actually has content
+  const hasContent = (val) => {
+    if (!val) return false;
+    const stripped = val.replace(/<[^>]+>/g, '').trim();
+    return stripped.length > 0;
+  };
+
+  // Auto-translate the active sub-role form
+  const handleTranslateSubRole = async () => {
+    setTranslatingSubRole(true);
+    try {
+      const [tRole, tPeriod, tTag, tDesc] = await Promise.all([
+        hasContent(subRoleForm.role) ? autoTranslate(subRoleForm.role) : Promise.resolve(''),
+        hasContent(subRoleForm.period) ? autoTranslate(subRoleForm.period) : Promise.resolve(''),
+        hasContent(subRoleForm.tag) ? autoTranslate(subRoleForm.tag) : Promise.resolve(''),
+        hasContent(subRoleForm.desc) ? autoTranslate(subRoleForm.desc) : Promise.resolve('')
+      ]);
+
+      setSubRoleForm(prev => ({
+        ...prev,
+        role_en: tRole || prev.role_en,
+        period_en: tPeriod || prev.period_en,
+        tag_en: tTag || prev.tag_en,
+        desc_en: tDesc || prev.desc_en
+      }));
+    } catch (err) {
+      console.error(err);
+      alert('Error al traducir el puesto.');
+    } finally {
+      setTranslatingSubRole(false);
+    }
+  };
+
+  // Auto-translate whole experience (including sub-roles list AND active subRoleForm)
   const handleTranslate = async () => {
     setTranslating(true);
     try {
-      const translatedPeriod = await autoTranslate(formData.period);
+      const translatedPeriod = hasContent(formData.period) ? await autoTranslate(formData.period) : '';
       let translatedRole = '';
       let translatedTag = '';
       let translatedDesc = '';
 
       if (!formData.hasMultipleRoles) {
-        translatedRole = await autoTranslate(formData.role);
-        translatedTag = await autoTranslate(formData.tag);
-        translatedDesc = await autoTranslate(formData.desc);
+        translatedRole = hasContent(formData.role) ? await autoTranslate(formData.role) : '';
+        translatedTag = hasContent(formData.tag) ? await autoTranslate(formData.tag) : '';
+        translatedDesc = hasContent(formData.desc) ? await autoTranslate(formData.desc) : '';
       }
 
-      // Translate sub-roles if any
+      // Also translate active subRoleForm if user is currently filling/editing a sub-role
+      if (formData.hasMultipleRoles && (hasContent(subRoleForm.role) || hasContent(subRoleForm.period) || hasContent(subRoleForm.tag) || hasContent(subRoleForm.desc))) {
+        const [tSubRole, tSubPeriod, tSubTag, tSubDesc] = await Promise.all([
+          hasContent(subRoleForm.role) ? autoTranslate(subRoleForm.role) : Promise.resolve(''),
+          hasContent(subRoleForm.period) ? autoTranslate(subRoleForm.period) : Promise.resolve(''),
+          hasContent(subRoleForm.tag) ? autoTranslate(subRoleForm.tag) : Promise.resolve(''),
+          hasContent(subRoleForm.desc) ? autoTranslate(subRoleForm.desc) : Promise.resolve('')
+        ]);
+        setSubRoleForm(prev => ({
+          ...prev,
+          role_en: tSubRole || prev.role_en,
+          period_en: tSubPeriod || prev.period_en,
+          tag_en: tSubTag || prev.tag_en,
+          desc_en: tSubDesc || prev.desc_en
+        }));
+      }
+
+      // Translate all saved sub-roles in formData.roles from Spanish to English
       let translatedRoles = [...(formData.roles || [])];
       if (formData.hasMultipleRoles && translatedRoles.length > 0) {
         translatedRoles = await Promise.all(translatedRoles.map(async (r) => ({
           ...r,
-          role_en: r.role_en || await autoTranslate(r.role),
-          period_en: r.period_en || await autoTranslate(r.period),
-          tag_en: r.tag_en || await autoTranslate(r.tag),
-          desc_en: r.desc_en || await autoTranslate(r.desc)
+          role_en: hasContent(r.role) ? await autoTranslate(r.role) : r.role_en,
+          period_en: hasContent(r.period) ? await autoTranslate(r.period) : r.period_en,
+          tag_en: hasContent(r.tag) ? await autoTranslate(r.tag) : r.tag_en,
+          desc_en: hasContent(r.desc) ? await autoTranslate(r.desc) : r.desc_en
         })));
       }
 
@@ -161,7 +213,15 @@ export default function ExperienceEditor() {
     };
 
     if (formData.hasMultipleRoles) {
-      itemToSave.roles = formData.roles || [];
+      const rolesToSave = [...(formData.roles || [])];
+      if (editingSubRoleIdx !== null && subRoleForm.role.trim()) {
+        rolesToSave[editingSubRoleIdx] = { ...subRoleForm };
+      } else if (editingSubRoleIdx === null && subRoleForm.role.trim()) {
+        rolesToSave.push({ id: Date.now(), ...subRoleForm });
+      }
+      itemToSave.roles = rolesToSave;
+      setEditingSubRoleIdx(null);
+      setSubRoleForm({ role: '', role_en: '', period: '', period_en: '', tag: '', tag_en: '', desc: '', desc_en: '' });
       // Set top role as fallback
       if (itemToSave.roles.length > 0) {
         itemToSave.role = itemToSave.roles[0].role;
@@ -439,8 +499,14 @@ export default function ExperienceEditor() {
                     }}>
                       <div>
                         <strong style={{ color: 'var(--text-primary)', fontSize: '0.95rem' }}>{sub.role}</strong>
+                        {sub.role_en && <span style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', marginLeft: '6px' }}>/ {sub.role_en}</span>}
                         <span style={{ color: 'var(--color-sage)', fontSize: '0.82rem', marginLeft: '10px' }}>• {sub.period}</span>
                         {sub.tag && <span style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', marginLeft: '8px' }}>({sub.tag.replace(/<[^>]+>/g, '').slice(0, 30)}...)</span>}
+                        {(hasContent(sub.role_en) && hasContent(sub.desc_en)) && (
+                          <span style={{ marginLeft: '8px', fontSize: '0.7rem', background: 'rgba(16, 185, 129, 0.15)', color: '#10b981', padding: '1px 6px', borderRadius: '4px', fontWeight: 600 }}>
+                            EN ✓
+                          </span>
+                        )}
                       </div>
 
                       <div style={{ display: 'flex', gap: '6px' }}>
@@ -461,9 +527,20 @@ export default function ExperienceEditor() {
                 padding: 'var(--spacing-md)',
                 borderRadius: '6px'
               }}>
-                <h5 style={{ margin: '0 0 10px 0', fontSize: '0.9rem', color: 'var(--text-primary)' }}>
-                  {editingSubRoleIdx !== null ? `Editar Puesto #${editingSubRoleIdx + 1}` : '+ Agregar Puesto a la Trayectoria'}
-                </h5>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', flexWrap: 'wrap', gap: '8px' }}>
+                  <h5 style={{ margin: 0, fontSize: '0.9rem', color: 'var(--text-primary)' }}>
+                    {editingSubRoleIdx !== null ? `Editar Puesto #${editingSubRoleIdx + 1}` : '+ Agregar Puesto a la Trayectoria'}
+                  </h5>
+                  <button
+                    type="button"
+                    className="btn-secondary"
+                    onClick={handleTranslateSubRole}
+                    disabled={translatingSubRole || translating}
+                    style={{ padding: '0.3rem 0.7rem', fontSize: '0.78rem', display: 'inline-flex', alignItems: 'center', gap: '5px' }}
+                  >
+                    <Languages size={13} /> {translatingSubRole ? 'Traduciendo puesto...' : 'Auto-Traducir Puesto a EN'}
+                  </button>
+                </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--spacing-md)' }}>
                   <div className="form-group">
