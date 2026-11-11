@@ -27,14 +27,63 @@ function extractAndParseJSON(rawText) {
   }
 }
 
+// Helper to detect if an item is an academic degree rather than a technical certification
+function isAcademicDegreeItem(title = '', desc = '', type = '') {
+  const combined = `${type} ${title} ${desc}`.toLowerCase();
+  return (
+    type === 'degree' ||
+    type === 'master' ||
+    type === 'phd' ||
+    type === 'publication' ||
+    /\b(ingenier[íi]a|licenciatura|maestr[íi]a|doctorado|posgrado|bachelor|master|m\.s\.|b\.s\.|ph\.d|universidad|university|grado acad[ée]mico)\b/i.test(combined)
+  );
+}
+
 // Normalize CV JSON object so even if the LLM translates JSON keys into English, all fields map to the expected schema
 function normalizeCVData(data, fallbackData = null) {
   if (!data || typeof data !== 'object') return fallbackData || {};
 
   const rawExps = data.experiencias || data.experiences || data.experience || data.work_experience || [];
   const rawProjects = data.proyectos_clave || data.key_projects || data.projects || [];
-  const rawCerts = data.certificaciones || data.certifications || [];
+  const rawEdu = data.educacion || data.education || data.academic_background || data.formacion_academica || fallbackData?.educacion || [];
+  const rawCerts = data.certificaciones || data.certifications || data.technical_certifications || [];
   const rawContact = data.contacto || data.contact || fallbackData?.contacto || {};
+
+  const normalizedEdu = Array.isArray(rawEdu)
+    ? rawEdu.map((edu) => ({
+        titulo: edu.titulo || edu.title || edu.degree || edu.name || '',
+        institucion: edu.institucion || edu.institution || edu.university || edu.school || '',
+        periodo: edu.periodo || edu.period || edu.dates || edu.year || edu.status || '',
+        detalle: edu.detalle || edu.detail || edu.descripcion || edu.description || ''
+      }))
+    : [];
+
+  const normalizedCerts = [];
+  if (Array.isArray(rawCerts)) {
+    for (const cert of rawCerts) {
+      const cTitle = cert.titulo || cert.title || cert.name || '';
+      const cDesc = cert.descripcion || cert.description || cert.issuer || cert.detail || '';
+      // If the LLM accidentally placed an academic degree inside certifications, move it to educacion
+      if (isAcademicDegreeItem(cTitle, cDesc, cert.type)) {
+        const alreadyInEdu = normalizedEdu.some(
+          (e) => e.titulo.toLowerCase() === cTitle.toLowerCase()
+        );
+        if (!alreadyInEdu) {
+          normalizedEdu.push({
+            titulo: cTitle,
+            institucion: cert.institucion || cert.institution || cDesc || '',
+            periodo: cert.periodo || cert.period || '',
+            detalle: cert.institucion ? cDesc : ''
+          });
+        }
+      } else {
+        normalizedCerts.push({
+          titulo: cTitle,
+          descripcion: cDesc
+        });
+      }
+    }
+  }
 
   return {
     nombre: data.nombre || data.name || fallbackData?.nombre || '',
@@ -77,12 +126,8 @@ function normalizeCVData(data, fallbackData = null) {
           };
         })
       : [],
-    certificaciones: Array.isArray(rawCerts)
-      ? rawCerts.map((cert) => ({
-          titulo: cert.titulo || cert.title || cert.name || '',
-          descripcion: cert.descripcion || cert.description || cert.issuer || cert.detail || ''
-        }))
-      : []
+    educacion: normalizedEdu,
+    certificaciones: normalizedCerts
   };
 }
 
@@ -187,20 +232,35 @@ export default function CVGenerator() {
       solution: p.solution,
       result: p.result
     })),
-    education: (profile.education || []).map(e => ({
-      type: e.type,
-      title: e.title,
-      institution: e.institution,
-      period: e.period,
-      status: e.status,
-      desc: e.desc,
-      tags: e.tags
-    })),
-    certifications: (profile.certs || []).map(c => ({
-      title: c.title,
-      desc: c.desc,
-      tags: c.tags
-    }))
+    education: [
+      ...(profile.education || []).map(e => ({
+        type: e.type,
+        title: e.title,
+        institution: e.institution,
+        period: e.period,
+        status: e.status,
+        desc: e.desc,
+        tags: e.tags
+      })),
+      ...(profile.certs || [])
+        .filter(c => isAcademicDegreeItem(c.title, c.desc, c.credentialType))
+        .map(c => ({
+          type: c.credentialType || 'degree',
+          title: c.title,
+          institution: c.institution || '',
+          period: c.period || '',
+          status: c.status || 'completed',
+          desc: c.desc,
+          tags: c.tags
+        }))
+    ],
+    certifications: (profile.certs || [])
+      .filter(c => !isAcademicDegreeItem(c.title, c.desc, c.credentialType))
+      .map(c => ({
+        title: c.title,
+        desc: c.desc,
+        tags: c.tags
+      }))
   });
 
   const basePromptRules = `
@@ -213,7 +273,9 @@ REGLAS ESTRICTAS DE GENERACIÓN (OBLIGATORIAS):
    - Para el proyecto "Herzberg": Enfatiza análisis de datos, NLP/LLM, dashboards, automatización y AI aplicada a toma de decisiones. No lo limites a simples encuestas.
    - Para el proyecto "ERP / POS": Enfatiza Python, bases de datos relacionales, procesamiento transaccional, integridad de datos (usa "data integrity" o "transaction consistency", NO uses "data leakage"), validación y automatización.
 6. HABILIDADES (SKILLS): Agrupa o lista lógicamente las tecnologías reales del candidato (Programming, Data Analysis, Machine Learning / AI, BI / Dashboards, Databases, Tools). Prioriza las que hagan match con la vacante.
-7. EDUCACIÓN Y CERTIFICACIONES: Diferencia claramente títulos académicos de certificaciones o cursos.
+7. SEPARACIÓN ESTRICTA ENTRE EDUCACIÓN ACADÉMICA Y CERTIFICACIONES TÉCNICAS:
+   - En "educacion" incluye ÚNICAMENTE grados universitarios, posgrados/maestrías e investigación académica (de la lista "education").
+   - En "certificaciones" incluye ÚNICAMENTE certificaciones técnicas, cursos especializados y credenciales profesionales (de la lista "certifications"). NUNCA mezcles títulos universitarios dentro de "certificaciones".
 8. METODOLOGÍA STAR: En cada experiencia laboral, redacta entre 2 y 4 viñetas (bullets) en formato STAR concisas (Situación, Tarea, Acción, Resultado), evitando prefijos basura como "+. Situation/Task".
 `;
 
@@ -248,7 +310,8 @@ Genera una propuesta inicial de CV en ESPAÑOL formal y profesional que destaque
 3. Organiza las habilidades técnicas clave que domina el candidato y que solicita la vacante.
 4. Redacta las experiencias laborales más relevantes con metodología STAR enfocadas en datos, impacto y automatización.
 5. Selecciona los 3 o 4 proyectos clave más relevantes con sus tecnologías.
-6. Incluye las certificaciones destacadas.
+6. Incluye en "educacion" la formación académica (grados universitarios, maestría, publicaciones).
+7. Incluye en "certificaciones" únicamente las certificaciones técnicas relevantes.
 
 Devuelve ÚNICAMENTE un objeto JSON válido con este formato exacto:
 {
@@ -281,9 +344,17 @@ Devuelve ÚNICAMENTE un objeto JSON válido con este formato exacto:
       "tecnologias": ["Python", "Pandas", "NLP"]
     }
   ],
+  "educacion": [
+    {
+      "titulo": "Grado Académico / Maestría / Ingeniería",
+      "institucion": "Universidad o Institución",
+      "periodo": "Periodo o Estado",
+      "detalle": "Enfoque académico o logro relevante"
+    }
+  ],
   "certificaciones": [
     {
-      "titulo": "Nombre Certificación",
+      "titulo": "Nombre Certificación Técnica",
       "descripcion": "Detalle / Emisor"
     }
   ]
@@ -348,7 +419,7 @@ Aplica rigurosamente los cambios pedidos por el usuario a la propuesta actual de
 - Si el usuario pide cambiar el tono, hazlo más conciso, técnico o de liderazgo según lo indique.
 - Si pide ajustar un resumen, experiencias o proyectos específicos, actualízalos respetando los datos reales provistos.
 - Asegúrate de que el documento completo siga siendo coherente, fluido y profesional.
-- Devuelve ÚNICAMENTE el objeto JSON actualizado con la misma estructura (nombre, titulo, contacto, resumen_ejecutivo, skills, experiencias, proyectos_clave, certificaciones).
+- Devuelve ÚNICAMENTE el objeto JSON actualizado con la misma estructura (nombre, titulo, contacto, resumen_ejecutivo, skills, experiencias, proyectos_clave, educacion, certificaciones).
 NO agregues texto fuera del JSON.
 `;
 
@@ -406,7 +477,7 @@ STRICT TRANSLATION AND LOCALIZATION RULES:
 3. TERMINOLOGY: Use standard tech/data industry vocabulary (Data Integrity, Transactional Processing, Predictive Modeling, Machine Learning Pipelines).
 4. ACCURACY: Write "AI" (capital A, capital I) and NEVER "Al" (lowercase L).
 5. TRANSLATE ALL STRING VALUES INTO ENGLISH, BUT DO NOT TRANSLATE THE JSON PROPERTY KEYS:
-   You MUST keep the exact JSON keys: "nombre", "titulo", "contacto" ("email", "telefono", "ubicacion", "linkedin", "github"), "resumen_ejecutivo", "skills", "experiencias" ("empresa", "rol", "periodo", "descripcion"), "proyectos_clave" ("titulo", "descripcion", "tecnologias"), and "certificaciones" ("titulo", "descripcion").
+   You MUST keep the exact JSON keys: "nombre", "titulo", "contacto" ("email", "telefono", "ubicacion", "linkedin", "github"), "resumen_ejecutivo", "skills", "experiencias" ("empresa", "rol", "periodo", "descripcion"), "proyectos_clave" ("titulo", "descripcion", "tecnologias"), "educacion" ("titulo", "institucion", "periodo", "detalle"), and "certificaciones" ("titulo", "descripcion").
 
 Return ONLY the valid JSON object with those exact JSON keys and all values translated into English. Do not add markdown or introductory text.
 `;
@@ -440,7 +511,7 @@ You are a senior bilingual Tech Recruiter and Executive Resume Writer.
 Translate and professionally localize the following approved Spanish CV into flawless, high-impact American English resume format:
 ${JSON.stringify(proposalData, null, 2)}
 
-CRITICAL: Translate all string values into English, but KEEP the exact Spanish JSON property keys ("nombre", "titulo", "contacto", "resumen_ejecutivo", "skills", "experiencias" with "empresa", "rol", "periodo", "descripcion", "proyectos_clave" with "titulo", "descripcion", "tecnologias", and "certificaciones" with "titulo", "descripcion").
+CRITICAL: Translate all string values into English, but KEEP the exact Spanish JSON property keys ("nombre", "titulo", "contacto", "resumen_ejecutivo", "skills", "experiencias" with "empresa", "rol", "periodo", "descripcion", "proyectos_clave" with "titulo", "descripcion", "tecnologias", "educacion" with "titulo", "institucion", "periodo", "detalle", and "certificaciones" with "titulo", "descripcion").
 Return ONLY the valid JSON object. No explanations.
 `;
         const result = await model.generateContent(prompt);
@@ -511,8 +582,8 @@ Return ONLY the valid JSON object. No explanations.
   const currentViewData = activeTab === 'en' ? (englishData || proposalData) : proposalData;
 
   const sectionHeaders = {
-    es: { skills: 'Habilidades Técnicas', experience: 'Experiencia Profesional', projects: 'Proyectos Clave', technologies: 'Tecnologías:', certifications: 'Certificaciones' },
-    en: { skills: 'Technical Skills', experience: 'Professional Experience', projects: 'Key Projects', technologies: 'Technologies:', certifications: 'Certifications' }
+    es: { skills: 'Habilidades Técnicas', experience: 'Experiencia Profesional', projects: 'Proyectos Clave', technologies: 'Tecnologías:', education: 'Educación Académica', certifications: 'Certificaciones Técnicas' },
+    en: { skills: 'Technical Skills', experience: 'Professional Experience', projects: 'Key Projects', technologies: 'Technologies:', education: 'Education', certifications: 'Technical Certifications' }
   };
   const t = sectionHeaders[activeTab] || sectionHeaders.es;
   const printT = sectionHeaders[printLang] || sectionHeaders.es;
@@ -1086,7 +1157,30 @@ Return ONLY the valid JSON object. No explanations.
                 </section>
               )}
 
-              {/* Certifications */}
+              {/* Academic Education */}
+              {currentViewData.educacion && currentViewData.educacion.length > 0 && (
+                <section style={{ marginBottom: '14pt' }}>
+                  <h3 style={{ fontSize: '11pt', margin: '0 0 6pt 0', borderBottom: '1px solid #ddd', paddingBottom: '3pt', textTransform: 'uppercase', fontWeight: 700, color: '#111' }}>
+                    {t.education}
+                  </h3>
+                  {currentViewData.educacion.map((edu, idx) => (
+                    <div key={idx} style={{ marginBottom: '6pt' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                        <strong style={{ fontSize: '10pt', color: '#000' }}>{edu.titulo}</strong>
+                        {edu.periodo && <span style={{ fontSize: '8.5pt', color: '#666', whiteSpace: 'nowrap' }}>{edu.periodo}</span>}
+                      </div>
+                      {edu.institucion && (
+                        <div style={{ fontSize: '9.2pt', fontWeight: 600, color: '#444' }}>{edu.institucion}</div>
+                      )}
+                      {edu.detalle && (
+                        <div style={{ fontSize: '9pt', color: '#333', marginTop: '1pt' }}>{edu.detalle}</div>
+                      )}
+                    </div>
+                  ))}
+                </section>
+              )}
+
+              {/* Technical Certifications */}
               {currentViewData.certificaciones && currentViewData.certificaciones.length > 0 && (
                 <section>
                   <h3 style={{ fontSize: '11pt', margin: '0 0 6pt 0', borderBottom: '1px solid #ddd', paddingBottom: '3pt', textTransform: 'uppercase', fontWeight: 700, color: '#111' }}>
@@ -1212,7 +1306,30 @@ Return ONLY the valid JSON object. No explanations.
               </section>
             )}
 
-            {/* Certificaciones */}
+            {/* Educación Académica */}
+            {printData.educacion && printData.educacion.length > 0 && (
+              <section style={{ marginBottom: '14pt', pageBreakInside: 'avoid', breakInside: 'avoid' }}>
+                <h3 style={{ fontSize: '11pt', margin: '0 0 6pt 0', borderBottom: '1px solid #ccc', paddingBottom: '3pt', textTransform: 'uppercase', fontWeight: 700, pageBreakAfter: 'avoid', breakAfter: 'avoid' }}>
+                  {printT.education}
+                </h3>
+                {printData.educacion.map((edu, idx) => (
+                  <div key={idx} style={{ marginBottom: '6pt', pageBreakInside: 'avoid', breakInside: 'avoid' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                      <strong style={{ fontSize: '10pt', color: '#000' }}>{edu.titulo}</strong>
+                      {edu.periodo && <span style={{ fontSize: '8.5pt', color: '#666', whiteSpace: 'nowrap' }}>{edu.periodo}</span>}
+                    </div>
+                    {edu.institucion && (
+                      <div style={{ fontSize: '9.2pt', fontWeight: 600, color: '#333' }}>{edu.institucion}</div>
+                    )}
+                    {edu.detalle && (
+                      <div style={{ fontSize: '9pt', color: '#222', marginTop: '1pt' }}>{edu.detalle}</div>
+                    )}
+                  </div>
+                ))}
+              </section>
+            )}
+
+            {/* Certificaciones Técnicas */}
             {printData.certificaciones && printData.certificaciones.length > 0 && (
               <section style={{ pageBreakInside: 'avoid', breakInside: 'avoid' }}>
                 <h3 style={{ fontSize: '11pt', margin: '0 0 6pt 0', borderBottom: '1px solid #ccc', paddingBottom: '3pt', textTransform: 'uppercase', fontWeight: 700, pageBreakAfter: 'avoid', breakAfter: 'avoid' }}>
