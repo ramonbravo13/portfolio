@@ -12,6 +12,7 @@ import ProjectImpactBox, { ProjectCommercialBadge } from '../components/ProjectI
 import ExperienceCard from '../components/ExperienceCard';
 import Navbar from '../components/Navbar';
 import { usePortfolio } from '../context/PortfolioContext';
+import { sanitizeHtml, sanitizeUrl } from '../utils/sanitize';
 import gsap from 'gsap';
 
 // --- VISUAL REDESIGN COMPONENTS ---
@@ -52,7 +53,7 @@ function EditorialProject({ project, index, isEnglish, getIcon }) {
           )}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
             {problem ? (
-              <div className="quill-render" style={{ margin: 0, maxWidth: '68ch' }} dangerouslySetInnerHTML={{ __html: problem }} />
+              <div className="quill-render" style={{ margin: 0, maxWidth: '68ch' }} dangerouslySetInnerHTML={{ __html: sanitizeHtml(problem) }} />
             ) : (
               <p style={{ margin: 0, maxWidth: '68ch' }}>
                 {isEnglish ? 'Documented technological case study.' : 'Caso de estudio tecnológico documentado.'}
@@ -67,12 +68,12 @@ function EditorialProject({ project, index, isEnglish, getIcon }) {
                 {isEnglish ? 'Read Case Study' : 'Leer Caso de Estudio'} <ArrowRight size={14} />
               </Link>
               {project.liveUrl && (
-                <a href={project.liveUrl} target="_blank" rel="noreferrer" className="hover-underline mono" style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)' }}>
+                <a href={sanitizeUrl(project.liveUrl)} target="_blank" rel="noopener noreferrer" className="hover-underline mono" style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)' }}>
                   Live Demo
                 </a>
               )}
               {project.githubUrl && (
-                <a href={project.githubUrl} target="_blank" rel="noreferrer" className="hover-underline mono" style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)' }}>
+                <a href={sanitizeUrl(project.githubUrl)} target="_blank" rel="noopener noreferrer" className="hover-underline mono" style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)' }}>
                   GitHub
                 </a>
               )}

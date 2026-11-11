@@ -1,5 +1,6 @@
 import React from 'react';
 import { Building2, Briefcase, Calendar, MapPin, TrendingUp, ChevronRight } from 'lucide-react';
+import { sanitizeHtml } from '../utils/sanitize';
 
 /**
  * Extracts individual list items from an HTML string (Quill editor output)
@@ -57,11 +58,12 @@ function parseExperienceItem(rawItem) {
  */
 function formatResponsibilityText(text) {
   if (!text) return '';
-  return text
+  const formatted = text
     .replace(/60\+\s*colaboradores/gi, (m) => `<strong>${m}</strong>`)
     .replace(/60\+\s*collaborators/gi, (m) => `<strong>${m}</strong>`)
     .replace(/\b(\d+[\d,]*\+?)\s*(estudiantes|colaboradores|alumnos|proyectos|usuarios|horas|planteles|escuelas)/gi, 
       (m) => `<strong>${m}</strong>`);
+  return sanitizeHtml(formatted);
 }
 
 export default function ExperienceCard({ item, isEnglish }) {

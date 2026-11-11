@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { db, storage } from '../config/firebase';
-import { doc, getDoc, setDoc, onSnapshot, collection, deleteDoc } from 'firebase/firestore';
+import { doc, setDoc, onSnapshot, collection, deleteDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { auth } from '../config/firebase';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
@@ -27,6 +27,7 @@ export function PortfolioProvider({ children }) {
   const [projects, setProjects] = useState([]);
 
   const [isAdminAuth, setIsAdminAuth] = useState(false);
+  const [authLoading, setAuthLoading] = useState(true);
 
   const [loading, setLoading] = useState(true);
 
@@ -109,23 +110,11 @@ export function PortfolioProvider({ children }) {
   useEffect(() => {
     // Safety timeout: force loading to false after 5 seconds
     const timeoutId = setTimeout(() => {
-      if (loading) {
-        console.warn("Portfolio initialization timed out. Using available data.");
-        setLoading(false);
-      }
+      setLoading(false);
     }, 5000);
 
     // Reference to profile doc
     const profileRef = doc(db, 'portfolio', 'profile');
-    
-    // Check if profile exists, if not initialize
-    getDoc(profileRef).then(docSnap => {
-      if (!docSnap.exists()) {
-        return setDoc(profileRef, defaultProfile);
-      }
-    }).catch(err => {
-      console.error("Error checking/initializing profile:", err);
-    });
 
     // Realtime listener for Profile
     const unsubProfile = onSnapshot(profileRef, (docSnap) => {
@@ -197,11 +186,12 @@ export function PortfolioProvider({ children }) {
       unsubProfile();
       unsubProjects();
     }
-  }, [loading]);
+  }, []);
 
   useEffect(() => {
     const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
       setIsAdminAuth(!!user);
+      setAuthLoading(false);
     });
     return () => unsubscribeAuth();
   }, []);
@@ -236,12 +226,28 @@ export function PortfolioProvider({ children }) {
 
   const uploadFile = async (file, folderPath) => {
     if (!file) return null;
-    const fileRef = ref(storage, `${folderPath}/${Date.now()}_${file.name}`);
+
+    // Validate maximum file size (15 MB)
+    const MAX_FILE_SIZE = 15 * 1024 * 1024;
+    if (file.size > MAX_FILE_SIZE) {
+      throw new Error('El archivo excede el tamaño máximo permitido de 15 MB.');
+    }
+
+    // Sanitize filename andfolderPath to prevent path traversal
+    const safeFolder = String(folderPath || 'uploads').replace(/[^a-zA-Z0-9/_-]/g, '');
+    const safeFileName = String(file.name || 'file').replace(/[^a-zA-Z0-9._-]/g, '_');
+    const ext = safeFileName.split('.').pop().toLowerCase();
+
+    const allowedExtensions = ['pdf', 'png', 'jpg', 'jpeg', 'gif', 'webp', 'svg', 'mp4', 'webm', 'ogg'];
+    if (!allowedExtensions.includes(ext)) {
+      throw new Error('Tipo de archivo no permitido.');
+    }
+
+    const fileRef = ref(storage, `${safeFolder}/${Date.now()}_${safeFileName}`);
     
     // Detect content type robustly, especially for PDFs
     let contentType = file.type;
     if (!contentType) {
-      const ext = file.name.split('.').pop().toLowerCase();
       if (ext === 'pdf') {
         contentType = 'application/pdf';
       } else if (['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg'].includes(ext)) {
@@ -268,7 +274,7 @@ export function PortfolioProvider({ children }) {
 
   return (
     <PortfolioContext.Provider value={{
-      profile, projects, isAdminAuth, loading, language, setLanguage, toggleLanguage,
+      profile, projects, isAdminAuth, authLoading, loading, language, setLanguage, toggleLanguage,
       updateProfile, addProject, updateProject, deleteProject, uploadFile,
       logoutAdmin
     }}>

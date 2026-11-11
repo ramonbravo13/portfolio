@@ -1,4 +1,4 @@
-import { Link, Navigate } from 'react-router-dom';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { usePortfolio } from '../context/PortfolioContext';
 import { LogOut, Home as HomeIcon } from 'lucide-react';
 import ProfileEditor from '../components/Admin/ProfileEditor';
@@ -9,11 +9,25 @@ import ProjectEditor from '../components/Admin/ProjectEditor';
 import CVGenerator from '../components/Admin/CVGenerator';
 
 export default function AdminDashboard() {
-  const { isAdminAuth, logoutAdmin } = usePortfolio();
+  const { isAdminAuth, authLoading, logoutAdmin } = usePortfolio();
+  const navigate = useNavigate();
+
+  if (authLoading) {
+    return (
+      <div className="page-container" style={{ justifyContent: 'center', alignItems: 'center' }}>
+        <p className="mono" style={{ color: 'var(--text-secondary)' }}>Verificando credenciales de administrador...</p>
+      </div>
+    );
+  }
 
   if (!isAdminAuth) {
     return <Navigate to="/login" replace />;
   }
+
+  const handleLogout = async () => {
+    await logoutAdmin();
+    navigate('/login', { replace: true });
+  };
 
   return (
     <div className="page-container animate-fade-in" style={{ maxWidth: '1000px' }}>
@@ -26,7 +40,7 @@ export default function AdminDashboard() {
           <Link to="/" className="btn-primary" style={{ background: 'var(--bg-glass)', border: '1px solid var(--border-glass)', color: 'var(--text-primary)' }}>
             <HomeIcon size={18} /> Visit Site
           </Link>
-          <button onClick={() => { logoutAdmin(); window.location.href = '/login'; }} className="btn-primary" style={{ background: 'transparent', border: '1px solid #ef4444', color: '#ef4444' }}>
+          <button onClick={handleLogout} className="btn-primary" style={{ background: 'transparent', border: '1px solid #ef4444', color: '#ef4444' }}>
             <LogOut size={18} /> Logout
           </button>
         </div>

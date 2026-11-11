@@ -2,11 +2,19 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /{document=**} {
-      // Public read access for the portfolio visitors.
+    match /portfolio/profile {
       allow read: if true;
-      // Only authenticated admin can modify the database.
       allow write: if request.auth != null;
+    }
+
+    match /projects/{projectId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    // Deny access to any other collections by default
+    match /{document=**} {
+      allow read, write: if false;
     }
   }
 }

@@ -7,6 +7,7 @@ import MediaBlock from '../components/Notebook/MediaBlock';
 import LinkBlock from '../components/Notebook/LinkBlock';
 import ProjectImpactBox, { ProjectCommercialBadge } from '../components/ProjectImpactBox';
 import { usePortfolio } from '../context/PortfolioContext';
+import { sanitizeHtml } from '../utils/sanitize';
 
 export default function ProjectNotebook() {
   const { id } = useParams();
@@ -72,21 +73,21 @@ export default function ProjectNotebook() {
         {problem && (
           <div style={{ marginBottom: 'var(--spacing-xl)' }}>
             <h3 style={{ textTransform: 'uppercase', color: 'var(--accent-primary)', fontSize: '0.9rem', letterSpacing: '0.05em', marginBottom: 'var(--spacing-sm)' }}>{isEnglish ? 'The Problem' : 'El Problema'}</h3>
-            <div className="quill-render" dangerouslySetInnerHTML={{ __html: problem }} />
+            <div className="quill-render" dangerouslySetInnerHTML={{ __html: sanitizeHtml(problem) }} />
           </div>
         )}
         
         {solution && (
           <div style={{ marginBottom: 'var(--spacing-xl)' }}>
             <h3 style={{ textTransform: 'uppercase', color: 'var(--accent-primary)', fontSize: '0.9rem', letterSpacing: '0.05em', marginBottom: 'var(--spacing-sm)' }}>{isEnglish ? 'The Solution' : 'La Solución'}</h3>
-            <div className="quill-render" dangerouslySetInnerHTML={{ __html: solution }} />
+            <div className="quill-render" dangerouslySetInnerHTML={{ __html: sanitizeHtml(solution) }} />
           </div>
         )}
         
         {result && (
           <div style={{ marginBottom: 'var(--spacing-xl)' }}>
             <h3 style={{ textTransform: 'uppercase', color: 'var(--accent-primary)', fontSize: '0.9rem', letterSpacing: '0.05em', marginBottom: 'var(--spacing-sm)' }}>{isEnglish ? 'The Result' : 'El Resultado'}</h3>
-            <div className="quill-render" dangerouslySetInnerHTML={{ __html: result }} />
+            <div className="quill-render" dangerouslySetInnerHTML={{ __html: sanitizeHtml(result) }} />
           </div>
         )}
 

@@ -1,5 +1,8 @@
+import { sanitizeUrl } from '../utils/sanitize';
+
 export default function CertificationViewer({ pdfUrl, title, onClose }) {
-  if (!pdfUrl) return null;
+  const safePdfUrl = sanitizeUrl(pdfUrl);
+  if (!safePdfUrl || safePdfUrl === '#') return null;
 
   return (
     <div style={{
@@ -30,7 +33,7 @@ export default function CertificationViewer({ pdfUrl, title, onClose }) {
           </div>
           
           <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-xs)' }}>
-            <a href={pdfUrl} target="_blank" rel="noopener noreferrer" className="btn-secondary" style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem' }}>
+            <a href={safePdfUrl} target="_blank" rel="noopener noreferrer" className="btn-secondary" style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem' }}>
               Ver completo ↗
             </a>
             <button onClick={onClose} style={{
@@ -54,7 +57,7 @@ export default function CertificationViewer({ pdfUrl, title, onClose }) {
         </div>
         
         <div style={{ flexGrow: 1, backgroundColor: 'var(--bg-secondary)', borderRadius: '8px', overflow: 'hidden', border: '1px solid var(--border-light)' }}>
-          <iframe src={pdfUrl} width="100%" height="100%" style={{ border: 'none' }} title={title} />
+          <iframe src={safePdfUrl} width="100%" height="100%" style={{ border: 'none' }} title={title} sandbox="allow-scripts allow-same-origin" />
         </div>
       </div>
     </div>
