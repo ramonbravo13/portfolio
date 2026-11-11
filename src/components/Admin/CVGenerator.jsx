@@ -27,6 +27,65 @@ function extractAndParseJSON(rawText) {
   }
 }
 
+// Normalize CV JSON object so even if the LLM translates JSON keys into English, all fields map to the expected schema
+function normalizeCVData(data, fallbackData = null) {
+  if (!data || typeof data !== 'object') return fallbackData || {};
+
+  const rawExps = data.experiencias || data.experiences || data.experience || data.work_experience || [];
+  const rawProjects = data.proyectos_clave || data.key_projects || data.projects || [];
+  const rawCerts = data.certificaciones || data.certifications || [];
+  const rawContact = data.contacto || data.contact || fallbackData?.contacto || {};
+
+  return {
+    nombre: data.nombre || data.name || fallbackData?.nombre || '',
+    titulo: data.titulo || data.title || data.headline || fallbackData?.titulo || '',
+    contacto: {
+      email: rawContact.email || fallbackData?.contacto?.email || '',
+      telefono: rawContact.telefono || rawContact.phone || fallbackData?.contacto?.telefono || '',
+      ubicacion: rawContact.ubicacion || rawContact.location || fallbackData?.contacto?.ubicacion || '',
+      linkedin: rawContact.linkedin || fallbackData?.contacto?.linkedin || '',
+      github: rawContact.github || fallbackData?.contacto?.github || ''
+    },
+    resumen_ejecutivo:
+      data.resumen_ejecutivo ||
+      data.executive_summary ||
+      data.summary ||
+      data.professional_summary ||
+      fallbackData?.resumen_ejecutivo ||
+      '',
+    skills: Array.isArray(data.skills || data.technical_skills || data.habilidades)
+      ? (data.skills || data.technical_skills || data.habilidades)
+      : (fallbackData?.skills || []),
+    experiencias: Array.isArray(rawExps)
+      ? rawExps.map((exp) => {
+          const desc = exp.descripcion || exp.description || exp.bullets || exp.responsibilities || [];
+          return {
+            empresa: exp.empresa || exp.company || exp.organization || '',
+            rol: exp.rol || exp.role || exp.position || exp.title || '',
+            periodo: exp.periodo || exp.period || exp.dates || exp.tenure || '',
+            descripcion: Array.isArray(desc) ? desc : (typeof desc === 'string' ? [desc] : [])
+          };
+        })
+      : [],
+    proyectos_clave: Array.isArray(rawProjects)
+      ? rawProjects.map((proj) => {
+          const techs = proj.tecnologias || proj.technologies || proj.tech_stack || proj.tags || [];
+          return {
+            titulo: proj.titulo || proj.title || proj.name || '',
+            descripcion: proj.descripcion || proj.description || proj.summary || '',
+            tecnologias: Array.isArray(techs) ? techs : (typeof techs === 'string' ? techs.split(',').map(s => s.trim()) : [])
+          };
+        })
+      : [],
+    certificaciones: Array.isArray(rawCerts)
+      ? rawCerts.map((cert) => ({
+          titulo: cert.titulo || cert.title || cert.name || '',
+          descripcion: cert.descripcion || cert.description || cert.issuer || cert.detail || ''
+        }))
+      : []
+  };
+}
+
 export default function CVGenerator() {
   const { profile, projects } = usePortfolio();
   
@@ -233,7 +292,7 @@ NO agregues explicaciones fuera del JSON. Devuelve exclusivamente JSON válido.
 `;
 
       const result = await model.generateContent(prompt);
-      const parsed = extractAndParseJSON(result.response.text());
+      const parsed = normalizeCVData(extractAndParseJSON(result.response.text()));
 
       // Save and advance to Step 2 (Review)
       setProposalData(parsed);
@@ -294,7 +353,7 @@ NO agregues texto fuera del JSON.
 `;
 
       const result = await model.generateContent(prompt);
-      const updated = extractAndParseJSON(result.response.text());
+      const updated = normalizeCVData(extractAndParseJSON(result.response.text()), proposalData);
 
       // Push previous proposal to history for undo
       setHistory(prev => [proposalData, ...prev.slice(0, 4)]);
@@ -346,13 +405,14 @@ STRICT TRANSLATION AND LOCALIZATION RULES:
 2. EXECUTIVE US RESUME TONE: Use punchy action verbs (e.g., Engineered, Spearheaded, Built, Optimized, Deployed, Automated, Analyzed).
 3. TERMINOLOGY: Use standard tech/data industry vocabulary (Data Integrity, Transactional Processing, Predictive Modeling, Machine Learning Pipelines).
 4. ACCURACY: Write "AI" (capital A, capital I) and NEVER "Al" (lowercase L).
-5. TRANSLATE ALL VALUES: Translate headline, summary, skills, experience descriptions, project descriptions, and certifications.
+5. TRANSLATE ALL STRING VALUES INTO ENGLISH, BUT DO NOT TRANSLATE THE JSON PROPERTY KEYS:
+   You MUST keep the exact JSON keys: "nombre", "titulo", "contacto" ("email", "telefono", "ubicacion", "linkedin", "github"), "resumen_ejecutivo", "skills", "experiencias" ("empresa", "rol", "periodo", "descripcion"), "proyectos_clave" ("titulo", "descripcion", "tecnologias"), and "certificaciones" ("titulo", "descripcion").
 
-Return ONLY the valid JSON object with the exact same structure in English. Do not add markdown or introductory text.
+Return ONLY the valid JSON object with those exact JSON keys and all values translated into English. Do not add markdown or introductory text.
 `;
 
       const result = await model.generateContent(prompt);
-      const translated = extractAndParseJSON(result.response.text());
+      const translated = normalizeCVData(extractAndParseJSON(result.response.text()), proposalData);
       setEnglishData(translated);
       setActiveTab('en');
       showToast('¡Versión en Inglés adaptada exitosamente!');
@@ -380,10 +440,11 @@ You are a senior bilingual Tech Recruiter and Executive Resume Writer.
 Translate and professionally localize the following approved Spanish CV into flawless, high-impact American English resume format:
 ${JSON.stringify(proposalData, null, 2)}
 
-Return ONLY the valid JSON object in English. No explanations.
+CRITICAL: Translate all string values into English, but KEEP the exact Spanish JSON property keys ("nombre", "titulo", "contacto", "resumen_ejecutivo", "skills", "experiencias" with "empresa", "rol", "periodo", "descripcion", "proyectos_clave" with "titulo", "descripcion", "tecnologias", and "certificaciones" with "titulo", "descripcion").
+Return ONLY the valid JSON object. No explanations.
 `;
         const result = await model.generateContent(prompt);
-        dataToPrint = extractAndParseJSON(result.response.text());
+        dataToPrint = normalizeCVData(extractAndParseJSON(result.response.text()), proposalData);
         setEnglishData(dataToPrint);
       } catch (err) {
         setError('Error al generar la versión en inglés antes de imprimir: ' + err.message);
