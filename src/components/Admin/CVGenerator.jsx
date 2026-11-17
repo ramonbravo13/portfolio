@@ -27,20 +27,9 @@ function extractAndParseJSON(rawText) {
   }
 }
 
-// Helper to detect if an item is an academic degree rather than a technical certification
-function isAcademicDegreeItem(title = '', desc = '', type = '') {
-  const combined = `${type} ${title} ${desc}`.toLowerCase();
-  return (
-    type === 'degree' ||
-    type === 'master' ||
-    type === 'phd' ||
-    type === 'publication' ||
-    /\b(ingenier[íi]a|licenciatura|maestr[íi]a|doctorado|posgrado|bachelor|master|m\.s\.|b\.s\.|ph\.d|universidad|university|grado acad[ée]mico)\b/i.test(combined)
-  );
-}
-
 // Normalize CV JSON object so even if the LLM translates JSON keys into English, all fields map to the expected schema
-function normalizeCVData(data, fallbackData = null) {
+// Also enforces that items from profile.certs stay in certificaciones and items from profile.education stay in educacion.
+function normalizeCVData(data, fallbackData = null, profileCerts = [], profileEdu = []) {
   if (!data || typeof data !== 'object') return fallbackData || {};
 
   const rawExps = data.experiencias || data.experiences || data.experience || data.work_experience || [];
@@ -49,34 +38,70 @@ function normalizeCVData(data, fallbackData = null) {
   const rawCerts = data.certificaciones || data.certifications || data.technical_certifications || [];
   const rawContact = data.contacto || data.contact || fallbackData?.contacto || {};
 
-  const normalizedEdu = Array.isArray(rawEdu)
-    ? rawEdu.map((edu) => ({
-        titulo: edu.titulo || edu.title || edu.degree || edu.name || '',
-        institucion: edu.institucion || edu.institution || edu.university || edu.school || '',
-        periodo: edu.periodo || edu.period || edu.dates || edu.year || edu.status || '',
-        detalle: edu.detalle || edu.detail || edu.descripcion || edu.description || ''
-      }))
-    : [];
+  // Build lookup sets from actual database sections so AI cannot misclassify certs as education
+  const certTitlesLower = new Set(
+    (profileCerts || [])
+      .flatMap((c) => [c.title, c.title_en])
+      .filter(Boolean)
+      .map((t) => t.trim().toLowerCase())
+  );
 
+  const eduTitlesLower = new Set(
+    (profileEdu || [])
+      .flatMap((e) => [e.title, e.title_en])
+      .filter(Boolean)
+      .map((t) => t.trim().toLowerCase())
+  );
+
+  const isKnownTechCert = (title = '') => {
+    const t = title.trim().toLowerCase();
+    if (!t) return false;
+    if (eduTitlesLower.has(t)) return false;
+    if (certTitlesLower.has(t)) return true;
+    // Also check substring match against known cert titles (e.g. translated or shortened by AI)
+    for (const certT of certTitlesLower) {
+      if (certT.length > 8 && (t.includes(certT) || certT.includes(t))) {
+        return true;
+      }
+    }
+    return false;
+  };
+
+  const normalizedEdu = [];
   const normalizedCerts = [];
+
+  if (Array.isArray(rawEdu)) {
+    for (const edu of rawEdu) {
+      const eTitle = edu.titulo || edu.title || edu.degree || edu.name || '';
+      const eInst = edu.institucion || edu.institution || edu.university || edu.school || '';
+      const ePeriod = edu.periodo || edu.period || edu.dates || edu.year || edu.status || '';
+      const eDetail = edu.detalle || edu.detail || edu.descripcion || edu.description || '';
+
+      // If the LLM placed a technical certification (e.g. "Master en Big Data..." or "Understanding Data Engineering") inside educacion, move it back to certificaciones
+      if (isKnownTechCert(eTitle)) {
+        normalizedCerts.push({
+          titulo: eTitle,
+          descripcion: eDetail || eInst || ''
+        });
+      } else {
+        normalizedEdu.push({
+          titulo: eTitle,
+          institucion: eInst,
+          periodo: ePeriod,
+          detalle: eDetail
+        });
+      }
+    }
+  }
+
   if (Array.isArray(rawCerts)) {
     for (const cert of rawCerts) {
       const cTitle = cert.titulo || cert.title || cert.name || '';
       const cDesc = cert.descripcion || cert.description || cert.issuer || cert.detail || '';
-      // If the LLM accidentally placed an academic degree inside certifications, move it to educacion
-      if (isAcademicDegreeItem(cTitle, cDesc, cert.type)) {
-        const alreadyInEdu = normalizedEdu.some(
-          (e) => e.titulo.toLowerCase() === cTitle.toLowerCase()
-        );
-        if (!alreadyInEdu) {
-          normalizedEdu.push({
-            titulo: cTitle,
-            institucion: cert.institucion || cert.institution || cDesc || '',
-            periodo: cert.periodo || cert.period || '',
-            detalle: cert.institucion ? cDesc : ''
-          });
-        }
-      } else {
+      const alreadyInCerts = normalizedCerts.some(
+        (c) => c.titulo.trim().toLowerCase() === cTitle.trim().toLowerCase()
+      );
+      if (!alreadyInCerts) {
         normalizedCerts.push({
           titulo: cTitle,
           descripcion: cDesc
@@ -232,30 +257,17 @@ export default function CVGenerator() {
       solution: p.solution,
       result: p.result
     })),
-    education: [
-      ...(profile.education || []).map(e => ({
-        type: e.type,
-        title: e.title,
-        institution: e.institution,
-        period: e.period,
-        status: e.status,
-        desc: e.desc,
-        tags: e.tags
-      })),
-      ...(profile.certs || [])
-        .filter(c => isAcademicDegreeItem(c.title, c.desc, c.credentialType))
-        .map(c => ({
-          type: c.credentialType || 'degree',
-          title: c.title,
-          institution: c.institution || '',
-          period: c.period || '',
-          status: c.status || 'completed',
-          desc: c.desc,
-          tags: c.tags
-        }))
-    ],
+    education: (profile.education || []).map(e => ({
+      type: e.type,
+      title: e.title,
+      institution: e.institution,
+      period: e.period,
+      status: e.status,
+      desc: e.desc,
+      tags: e.tags
+    })),
     certifications: (profile.certs || [])
-      .filter(c => !isAcademicDegreeItem(c.title, c.desc, c.credentialType))
+      .filter(c => c.credentialType !== 'degree' && c.credentialType !== 'master')
       .map(c => ({
         title: c.title,
         desc: c.desc,
@@ -363,7 +375,7 @@ NO agregues explicaciones fuera del JSON. Devuelve exclusivamente JSON válido.
 `;
 
       const result = await model.generateContent(prompt);
-      const parsed = normalizeCVData(extractAndParseJSON(result.response.text()));
+      const parsed = normalizeCVData(extractAndParseJSON(result.response.text()), null, profile.certs, profile.education);
 
       // Save and advance to Step 2 (Review)
       setProposalData(parsed);
@@ -424,7 +436,7 @@ NO agregues texto fuera del JSON.
 `;
 
       const result = await model.generateContent(prompt);
-      const updated = normalizeCVData(extractAndParseJSON(result.response.text()), proposalData);
+      const updated = normalizeCVData(extractAndParseJSON(result.response.text()), proposalData, profile.certs, profile.education);
 
       // Push previous proposal to history for undo
       setHistory(prev => [proposalData, ...prev.slice(0, 4)]);
@@ -483,7 +495,7 @@ Return ONLY the valid JSON object with those exact JSON keys and all values tran
 `;
 
       const result = await model.generateContent(prompt);
-      const translated = normalizeCVData(extractAndParseJSON(result.response.text()), proposalData);
+      const translated = normalizeCVData(extractAndParseJSON(result.response.text()), proposalData, profile.certs, profile.education);
       setEnglishData(translated);
       setActiveTab('en');
       showToast('¡Versión en Inglés adaptada exitosamente!');
@@ -515,7 +527,7 @@ CRITICAL: Translate all string values into English, but KEEP the exact Spanish J
 Return ONLY the valid JSON object. No explanations.
 `;
         const result = await model.generateContent(prompt);
-        dataToPrint = normalizeCVData(extractAndParseJSON(result.response.text()), proposalData);
+        dataToPrint = normalizeCVData(extractAndParseJSON(result.response.text()), proposalData, profile.certs, profile.education);
         setEnglishData(dataToPrint);
       } catch (err) {
         setError('Error al generar la versión en inglés antes de imprimir: ' + err.message);
